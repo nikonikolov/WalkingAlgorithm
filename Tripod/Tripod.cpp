@@ -32,4 +32,3 @@ void Tripod::WriteAngles(){
 		Legs[i]->WriteAngles(distance);
 	}
 }
-
