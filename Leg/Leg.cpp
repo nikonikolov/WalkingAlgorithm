@@ -127,7 +127,7 @@ void Leg::WriteAngles(){
 
 
 // Valid calculations for negative input as well in the current form
-void Leg::IKForward(double dist){
+void Leg::IKForward(const double& dist){
 
 	double distSQ = pow(dist,2);
 
@@ -151,23 +151,28 @@ void Leg::IKForward(double dist){
 }
 
 
-void Leg::IKRotate(double angle){
+void Leg::IKRotate(const double& angle){
 
 	// Sine Rule to find rotation distance
-	double RotDist = 2 * Param[DISTCENTER] * sin (angle/2);
+	double RotDist = 2 * Param[DISTCENTER] * sin (abs(angle)/2);
 
 	double RotDistSQ = pow(RotDist, 2);
 
 	// Cosine Rule to find new HipToEndSQ
-	double HipToEndNewSQ = ParamSQ[HIPTOEND] + RotDistSQ - 
-								2 * RotDist * Param[HIPTOEND] * cos( PI/2 - ServoAngle[ARM] + angle/2 ) ;
+	double HipToEndNewSQ;
+	if (angle>=0.0) HipToEndNewSQ = ParamSQ[HIPTOEND] + RotDistSQ - 
+									2 * RotDist * Param[HIPTOEND] * cos( PI/2 + angle/2 - ServoAngle[ARM] ) ;
+	else HipToEndNewSQ = ParamSQ[HIPTOEND] + RotDistSQ - 
+									2 * RotDist * Param[HIPTOEND] * cos( PI/2 - angle/2 + ServoAngle[ARM] ) ;	
+
 
 	double HipToEndNew = sqrt(HipToEndNewSQ);
 
 	// Cosine Rule to find new Arm Servo Angle
 	ServoAgnle[ARM] = acos( RotDistSQ + HipToEndNewSQ - ParamSQ[HIPTOEND]) / ( 2 * RotDist * HipToEndNew ) );
 	// Convert to actual angle for the servo
-	ServoAngle[ARM] = ServoAngle[ARM] - PI/2 - angle/2;
+	if (angle>=0.0)	ServoAngle[ARM] = - PI/2 + ServoAngle[ARM] - angle/2;
+	else 			ServoAngle[ARM] =  	PI/2 - ServoAngle[ARM] - angle/2;
 
 	// Update new values
 	Param[HIPTOEND]   = HipToEndNew;

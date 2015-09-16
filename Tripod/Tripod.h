@@ -11,7 +11,8 @@ class Tripod{
 
 public:
 	Tripod (Leg& front_in, Leg& back_in, Leg middle_in);
-	void BodyForward(int distance);
+	void BodyForward(double distance);
+	void BodyRotate(double angle);
 	void WriteAngles();
 
 private:
@@ -21,7 +22,7 @@ private:
 
 #define FRONTLEG 	0
 #define MIDDLELEG 	1
-#define BACKLEG 	2
+#define REARLEG 	2
 #define LEG_COUNT	3
 
 #endif //TRIPOD_H

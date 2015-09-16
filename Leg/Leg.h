@@ -25,9 +25,8 @@ public:
 	void SetPosition(const int& knee_pos, const int& hip_pos, const int& arm_pos);
 	int SetJointPosition(const int& JointIdx, const int& position);
 
-	void IKForward(double dist);
-	// Mofify IKRotate so it works for CCW
-	void IKRotate(double angle);
+	void IKForward(const double& dist);
+	void IKRotate(const double& angle);
 
 	void UpdateArrayPos(double NewPos[]);
 	void UpdateArrayPos(const int& idx, const double& pos);
