@@ -66,9 +66,18 @@ int DNXServo::angleScale(const double& angle){
 	
 	// 2.61799387799 rad = 150 degrees
 	int result = 512 - ((angle/2.61799387799)*512);
+	// 0 is end CW and 1024 is end CCW
 
-	if (result>1024) return 1024;
-	else if (result<0) return 0; 
+	if (result>1024){
+		Serial.println("CCW out of range");
+		return 1024;	
+	} 
+
+	else if (result<0){
+		Serial.println("CW out of range");
+		return 0;	
+	}  
+	
 	else return result;
 }
 

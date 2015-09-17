@@ -186,10 +186,22 @@ void Leg::IKRotate(const double& angle){
 void Leg::IKUpdateHipKnee(){
 	
 	// Cosine Rule to find new Knee Servo Angle
-	ServoAgnle[KNEE] = acos( ParamSQ[FEMUR] + ParamSQ[TIBIA] - ParamSQ[HIPTOEND] ) / ( 2 * Param[FEMUR] * Param[TIBIA]) );
+	ServoAngle[KNEE] = acos( ParamSQ[FEMUR] + ParamSQ[TIBIA] - ParamSQ[HIPTOEND] ) / ( 2 * Param[FEMUR] * Param[TIBIA]) );
+	// Convert to actual angle for the servo
+	ServoAngle[KNEE] = ServoAngle[KNEE] - PI;
 
 	// Cosine Rule to find new Knee Servo Angle
 	ServoAgnle[HIP] = acos( ParamSQ[FEMUR] + ParamSQ[HIPTOEND] - ParamSQ[TIBIA] ) / ( 2 * Param[FEMUR] * Param[HIPTOEND]) );
 	// Convert to actual angle for the servo
-	ServoAngle[HIP] = PI - ServoAngle[HIP] - acos(Param[HEIGHT]/Param[HIPTOEND]);
+	ServoAngle[HIP] = ServoAngle[HIP] + acos(Param[HEIGHT]/Param[HIPTOEND]) - PI/2;
+}
+
+// input equals height required for the end effector
+void Leg::Lift(const double& height){
+	ServoAngle[KNEE] = ServoAngle[KNEE] + acos(1 -pow(height,2) / ParamSQ [TIBIA]); 
+}
+
+// input equals current height of the end effector
+void Leg::Down(const double& height){
+	ServoAngle[KNEE] = ServoAngle[KNEE] - acos(1 -pow(height,2) / ParamSQ [TIBIA]); 
 }

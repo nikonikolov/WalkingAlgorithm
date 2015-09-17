@@ -27,6 +27,9 @@ public:
 
 	void IKForward(const double& dist);
 	void IKRotate(const double& angle);
+	void Lift(const double& height);
+	void Down(const double& height);
+
 
 	void UpdateArrayPos(double NewPos[]);
 	void UpdateArrayPos(const int& idx, const double& pos);
@@ -37,7 +40,7 @@ public:
 
 private:
 	void IKUpdateHipKnee();
-	double Leg::angleScale(const int& angle);
+	double angleScale(const int& angle);
 
 	ServoJoint *Joints[JOINT_COUNT];
 	double ServoAngle[JOINT_COUNT];		// In radians: 0.0 - center, positive - CW, negative - CCW

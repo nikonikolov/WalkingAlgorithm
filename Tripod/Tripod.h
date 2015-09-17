@@ -11,9 +11,12 @@ class Tripod{
 
 public:
 	Tripod (Leg& front_in, Leg& back_in, Leg middle_in);
-	void BodyForward(double distance);
-	void BodyRotate(double angle);
+	void BodyForward(const double& distance);
+	void BodyRotate(const double& angle);
 	void WriteAngles();
+	void Lift(const double& height);
+	void Down(const double& height);
+
 
 private:
 	Leg *Legs[LEG_COUNT];

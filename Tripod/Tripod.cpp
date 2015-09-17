@@ -32,3 +32,18 @@ void Tripod::WriteAngles(){
 		Legs[i]->WriteAngles(distance);
 	}
 }
+
+void Tripod::Lift(const double& height){
+	for(int i=0; i<LEG_COUNT; i++){
+		Legs[i]->Lift(height);
+	}
+
+	WriteAngles();
+}
+void Tripod::Down(const double& height){
+	for(int i=0; i<LEG_COUNT; i++){
+		Legs[i]->Down(height);
+	}
+
+	WriteAngles();
+}
