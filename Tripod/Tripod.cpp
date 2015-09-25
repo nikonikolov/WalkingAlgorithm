@@ -33,13 +33,14 @@ void Tripod::WriteAngles(){
 	}
 }
 
-void Tripod::Lift(const double& height){
+void Tripod::Raise(const double& height){
 	for(int i=0; i<LEG_COUNT; i++){
 		Legs[i]->Lift(height);
 	}
 
 	WriteAngles();
 }
+
 void Tripod::Down(const double& height){
 	for(int i=0; i<LEG_COUNT; i++){
 		Legs[i]->Down(height);
@@ -47,3 +48,28 @@ void Tripod::Down(const double& height){
 
 	WriteAngles();
 }
+
+
+/*
+// Think about creating a function wrapper for all Body movements, that takes as input pointer to the desired function. Sth like
+void Tripod::BodyMove(double parameter, void (*IKLegMovement)(double) ){
+	for(int i=0; i<LEG_COUNT; i++){
+		Legs[i]->IKLegMovement(parameter);
+	}
+
+	WriteAngles();
+}
+
+void Tripod::BodyRotate(double angle){
+	BodyMove(angle, &Leg::IKRotate);
+}
+
+
+
+void Tripod::LegAction(Leg* LegIn, void (Leg::*LegMethod)(double), const double& parameter){
+	LegIn->LegMethod(parameter);
+}
+
+// issues with this implementation are differences between pointers to member functions and normal functions 
+//and objects to call them on or declaring the member function as static
+*/

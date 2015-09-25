@@ -1,7 +1,7 @@
 #include "Walk.h"
 
 XL320 ArmsWings(Serial1, 112500);
-XL320 Knees(Serial2, 112500);
+AX12A Knees(Serial2, 112500);
 AX12A Hips(Serial3, 112500);
 
 ServoJoint Hip_Left_Front 		(11, &Hips);

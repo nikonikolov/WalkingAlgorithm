@@ -10,12 +10,15 @@
 class Tripod{
 
 public:
-	Tripod (Leg& front_in, Leg& back_in, Leg middle_in);
+	Tripod (Leg& front_in, Leg& back_in, Leg& middle_in);
 	void BodyForward(const double& distance);
 	void BodyRotate(const double& angle);
 	void WriteAngles();
-	void Lift(const double& height);
+	void Raise(const double& height);
 	void Down(const double& height);
+
+	void FlyQuadcopter();
+	void FlyHexacopter();
 
 
 private:
