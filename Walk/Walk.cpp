@@ -4,33 +4,35 @@ XL320 ArmsWings(Serial1, 112500);
 AX12A Knees(Serial2, 112500);
 AX12A Hips(Serial3, 112500);
 
-ServoJoint Hip_Left_Front 		(11, &Hips);
-ServoJoint Hip_Left_Middle 		(12, &Hips); 
-ServoJoint Hip_Left_Back 	 	(13, &Hips); 
-ServoJoint Hip_Right_Front 		(14, &Hips); 
-ServoJoint Hip_Right_Middle 	(15, &Hips); 
-ServoJoint Hip_Right_Back 		(16, &Hips); 
 
-ServoJoint Knee_Left_Front 		(17, &Knees);
-ServoJoint Knee_Left_Middle 	(18, &Knees); 
-ServoJoint Knee_Left_Back 		(19, &Knees); 
-ServoJoint Knee_Right_Front 	(20, &Knees); 
-ServoJoint Knee_Right_Middle 	(21, &Knees); 
-ServoJoint Knee_Right_Back 		(22, &Knees); 
+ServoJoint Hip_Left_Front 		(HIP_LEFT_FRONT, 	&Hips);
+ServoJoint Hip_Left_Middle 		(HIP_LEFT_MIDDLE, 	&Hips); 
+ServoJoint Hip_Left_Back 		(HIP_LEFT_BACK, 	&Hips); 
+ServoJoint Hip_Right_Front 		(HIP_RIGHT_FRONT, 	&Hips); 
+ServoJoint Hip_Right_Middle 	(HIP_RIGHT_MIDDLE, 	&Hips); 
+ServoJoint Hip_Right_Back 		(HIP_RIGHT_BACK, 	&Hips); 
 
-ServoJoint Wing_Left_Front 		(23, &ArmsWings);
-ServoJoint Wing_Left_Middle 	(24, &ArmsWings); 
-ServoJoint Wing_Left_Back 		(25, &ArmsWings); 
-ServoJoint Wing_Right_Front 	(26, &ArmsWings); 
-ServoJoint Wing_Right_Middle 	(27, &ArmsWings); 
-ServoJoint Wing_Right_Back 		(28, &ArmsWings); 
+ServoJoint Knee_Left_Front 		(KNEE_LEFT_FRONT, 	&Knees);
+ServoJoint Knee_Left_Middle 	(KNEE_LEFT_MIDDLE, 	&Knees); 
+ServoJoint Knee_Left_Back 		(KNEE_LEFT_BACK, 	&Knees); 
+ServoJoint Knee_Right_Front 	(KNEE_RIGHT_FRONT, 	&Knees); 
+ServoJoint Knee_Right_Middle 	(KNEE_RIGHT_MIDDLE, &Knees); 
+ServoJoint Knee_Right_Back 		(KNEE_RIGHT_BACK, 	&Knees); 
 
-ServoJoint Arm_Left_Front 		(29, &ArmsWings);
-ServoJoint Arm_Left_Middle 		(30, &ArmsWings); 
-ServoJoint Arm_Left_Back 		(31, &ArmsWings); 
-ServoJoint Arm_Right_Front 		(32, &ArmsWings); 
-ServoJoint Arm_Right_Middle 	(33, &ArmsWings); 
-ServoJoint Arm_Right_Back 		(34, &ArmsWings);
+ServoJoint Wing_Left_Front 		(WING_LEFT_FRONT, 	&ArmsWings);
+ServoJoint Wing_Left_Middle 	(WING_LEFT_MIDDLE, 	&ArmsWings); 
+ServoJoint Wing_Left_Back 		(WING_LEFT_BACK, 	&ArmsWings); 
+ServoJoint Wing_Right_Front 	(WING_RIGHT_FRONT, 	&ArmsWings); 
+ServoJoint Wing_Right_Middle 	(WING_RIGHT_MIDDLE, &ArmsWings); 
+ServoJoint Wing_Right_Back 		(WING_RIGHT_BACK, 	&ArmsWings);
+
+ServoJoint Arm_Left_Front 		(ARM_LEFT_FRONT, 	&ArmsWings);
+ServoJoint Arm_Left_Middle 		(ARM_LEFT_MIDDLE, 	&ArmsWings); 
+ServoJoint Arm_Left_Back 		(ARM_LEFT_BACK, 	&ArmsWings); 
+ServoJoint Arm_Right_Front 		(ARM_RIGHT_FRONT, 	&ArmsWings); 
+ServoJoint Arm_Right_Middle 	(ARM_RIGHT_MIDDLE, 	&ArmsWings); 
+ServoJoint Arm_Right_Back 		(ARM_RIGHT_BACK, 	&ArmsWings);
+
 
 Leg Left_Front 		(Knee_Left_Front, 	Hip_Left_Front, 	Arm_Left_Front, 	Wing_Left_Front);
 Leg Left_Middle 	(Knee_Left_Middle, 	Hip_Left_Middle, 	Arm_Left_Middle, 	Wing_Left_Middle); 

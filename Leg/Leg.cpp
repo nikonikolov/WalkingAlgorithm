@@ -70,6 +70,8 @@ double Leg::ConvertAngle(const int& angle){
 
 /* *********************************** CONSTRUCTOR ********************************** */
 
+
+// HAVE TO WRITE VALUES TO SERVOS TO INITIALIZE ROBOT POSITION
 Leg::Leg 	(ServoJoint& knee_in, ServoJoint& hip_in, ServoJoint& arm_in, ServoJoint& wing_in, 
 			double& distcenter_in /*=10.9*/, double& coxa_in /*=2.65*/, double& femur_in /*=15.0*/, 
 			double& tibia_in /*=25.0*/, double& heigh_in /*=default*/, double& angle_offset_in /*=default*/){
@@ -78,6 +80,11 @@ Leg::Leg 	(ServoJoint& knee_in, ServoJoint& hip_in, ServoJoint& arm_in, ServoJoi
 			Joints[HIP]=&hip_in;
 			Joints[ARM]=&arm_in;
 			Joints[WING]=&wing_in;
+
+			// Check if right or left
+			int kneeid = Joints[KNEE]->GetID();
+			if(kneeid>KNEE_LEFT_BACK) LegRight=1;
+			else LegRight=0;
 
 			// Have to calculate these dynamically or get them as inputs
 			ServoAngle[KNEE]=;
@@ -167,7 +174,7 @@ void Leg::IKForward(const double& dist){
 
 	UpdateParam(ARMGTOEND, ArmGToEndNew, ArmGToEndNewSQ);
 	UpdateHipToEnd();
-	IKUpdateHipKnee();
+	IKUpdateHipKneeAngles();
 }
 
 
@@ -195,12 +202,12 @@ void Leg::IKRotate(const double& angle){
 
 	UpdateParam(ARMGTOEND, ArmGToEndNew, ArmGToEndNewSQ);
 	UpdateHipToEnd();
-	IKUpdateHipKnee();
+	IKUpdateHipKneeAngles();
 }
 
 
 // input equals height to be raised by; negative values also work
-void Leg::BodyHeight(const double& hraise){
+void Leg::BodyRaise(const double& hraise){
 
 	UpdateParam(HEIGHT, (Param[HEIGHT] + hraise) ;
 
@@ -217,22 +224,30 @@ void Leg::BodyHeight(const double& hraise){
 		UpdateHeight();
 	}
 
-	IKUpdateHipKnee();
+	IKUpdateHipKneeAngles();
 }
 
 
 // Updates Hip and Knee angles according to the current HIPTOEND and HEIGHT values
-void Leg::IKUpdateHipKnee(){
+void Leg::IKUpdateHipKneeAngles(){
 
 	// Cosine Rule to find new Knee Servo Angle
 	ServoAngle[KNEE] = acos( (ParamSQ[FEMUR] + ParamSQ[TIBIA] - ParamSQ[HIPTOEND] ) / ( 2 * Param[FEMUR] * Param[TIBIA]) );
 	// Convert to actual angle for the servo
-	ServoAngle[KNEE] = ServoAngle[KNEE] - PI;
+	ServoAngle[KNEE] = PI - ServoAngle[KNEE];  											// Valid for LEFT leg
 
 	// Cosine Rule to find new Knee Servo Angle
 	ServoAgnle[HIP] = acos( (ParamSQ[FEMUR] + ParamSQ[HIPTOEND] - ParamSQ[TIBIA] ) / ( 2 * Param[FEMUR] * Param[HIPTOEND]) );
 	// Convert to actual angle for the servo
-	ServoAngle[HIP] = ServoAngle[HIP] + acos(Param[HEIGHT]/Param[HIPTOEND]) - PI/2;
+	ServoAngle[HIP] = PI/2 - ServoAngle[HIP] - acos(Param[HEIGHT]/Param[HIPTOEND]);		// Valid for LEFT leg
+
+	if(LegRight) ConvertToRight();
+
+}
+
+void Leg::ConvertToRight(){
+	ServoAngle[HIP] = - ServoAngle[HIP];
+	ServoAngle[KNEE] = - ServoAngle[KNEE];
 }
 
 

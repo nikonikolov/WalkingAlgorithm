@@ -7,7 +7,7 @@ class ServoJoint{
 
 public:
 
-	ServoJoint(int ID_in, DNXServo* ChainPtrIn);
+	ServoJoint(int ID_in, DNXServo* SerialObjPtrIn);
 
 	int GetPort() const;
 	int GetID() const;
@@ -26,7 +26,7 @@ public:
 private:
 
 	int ID;
-	DNXServo* ChainPtr;		// Pointer to the object (Knees/Hips/Arms/Wings) associated with the right serial port
+	DNXServo* SerialObjPtr;		// Pointer to the object (Knees/Hips/Arms/Wings) associated with the right serial port
 };
 
 

@@ -9,6 +9,8 @@ public:
 
 	DNXServo(HardwareSerial& port, const long int& baud);
 
+	virtual ~DNXServo();
+
 	unsigned char getPort() const;
 
     int SetID(int ID, int newID);
@@ -64,5 +66,7 @@ const unsigned char ID_Broadcast = 0xFE; // 254(0xFE) ID writes to all servos on
 #define MAKEWORD(a, b) ((unsigned short)(((unsigned char)(((unsigned long)(a)) & 0xff)) | ((unsigned short)((unsigned char)(((unsigned long)(b)) & 0xff))) << 8))
 #define LOBYTE(w) ( (unsigned char)(w) )
 #define HIBYTE(w) ( (unsigned char) ( ((unsigned long)(w)) >> 8 ) )
+// ADD MASKS !!
+
 
 #endif //DNXSERVO_H

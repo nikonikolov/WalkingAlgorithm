@@ -1,11 +1,11 @@
 #include "ServoJoint.h"
 
-ServoJoint::ServoJoint(int ID_in, DNXServo* ChainPtrIn):
-	ID(ID_in), ChainPtr(ChainPtr) {}
+ServoJoint::ServoJoint(int ID_in, DNXServo* SerialObjPtrIn):
+	ID(ID_in), SerialObjPtr(SerialObjPtr) {}
 
 
 int ServoJoint::GetPort() const {
-	return ChainPtr->getPort();
+	return SerialObjPtr->getPort();
 }
 
 // return ID of the object, not of the physical servo
@@ -14,41 +14,41 @@ int ServoJoint::GetID() const {
 }
 
 int ServoJoint::SetID(int newID){
-	return ChainPtr->SetID(ID, newID);
+	return SerialObjPtr->SetID(ID, newID);
 }
 	
 int ServoJoint::GetValue(int address){
-	return ChainPtr->GetValue(ID, address);
+	return SerialObjPtr->GetValue(ID, address);
 }
     
 int ServoJoint::SetBaud(int rate){
-	return ChainPtr->SetBaud(ID, rate);
+	return SerialObjPtr->SetBaud(ID, rate);
 }
     
 int ServoJoint::SetReturnLevel(int lvl){
-	return ChainPtr->SetReturnLevel(ID, lvl);
+	return SerialObjPtr->SetReturnLevel(ID, lvl);
 }
 
 int ServoJoint::SetLED(int colour){
-	return ChainPtr->SetLED(ID, colour);
+	return SerialObjPtr->SetLED(ID, colour);
 }
 
 int ServoJoint::SetGoalPosition(int angle){
-	return ChainPtr->SetGoalPosition(ID, angle);
+	return SerialObjPtr->SetGoalPosition(ID, angle);
 }
 
 int ServoJoint::SetGoalPosition(double angle){
-	return ChainPtr->SetGoalPosition(ID, angle);
+	return SerialObjPtr->SetGoalPosition(ID, angle);
 }
 
 int ServoJoint::SetGoalVelocity(int velocity){
-	return ChainPtr->SetGoalVelocity(ID, velocity);
+	return SerialObjPtr->SetGoalVelocity(ID, velocity);
 }
 
 int ServoJoint::SetGoalTorque(int torque){
-	return ChainPtr->SetGoalTorque(ID, torque);
+	return SerialObjPtr->SetGoalTorque(ID, torque);
 }
 
 int ServoJoint::SetPunch(int punch){
-	return ChainPtr->SetPunch(ID, punch);
+	return SerialObjPtr->SetPunch(ID, punch);
 }
