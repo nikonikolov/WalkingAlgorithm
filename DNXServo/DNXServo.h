@@ -3,54 +3,67 @@
 
 #include <Arduino.h>
 
+/* Things to repair
+	Reply buffer - size for 12 servos
+	How to deal with setting the reight return level in the DNX constructor
+	Repair emptying the buffer when writing - read does not read single byte at a call
+	Check readbytesuntil as well
+*/
+
+
 class DNXServo{
 
 public:
 
-	DNXServo(HardwareSerial& port, const long int& baud);
+	DNXServo(HardwareSerial& portIn, const long int& baudIn, const int& DebugLvlIn =0);
 
 	virtual ~DNXServo();
 
 	unsigned char getPort() const;
+	void EnableDebugging();
+	void DisableDebugging();
 
-    int SetID(int ID, int newID);
-	int GetValue(int ID, int address);
+    int SetID(const int& ID, const int& newID);
+	int GetValue(const int& ID, const int& address);
 
     // virtual int Ping(int ID /*=1*/) =0;		// may be possible to put implementation here
-    virtual int SetBaud(int ID, int rate) =0;
-    virtual int SetReturnLevel(int ID, int lvl) =0;
-    virtual int SetLED(int ID, int colour) =0; 
-	virtual int SetGoalPosition(int ID, int angle) =0;
-	virtual int SetGoalPosition(int ID, double angle) =0;
-	virtual int SetGoalVelocity(int ID, int velocity) =0;
-	virtual int SetGoalTorque(int ID, int torque) =0;
-	virtual int SetPunch(int ID, int punch) =0;
+	//int Ping(const int& ID);
+    virtual int SetBaud	(const int& ID, const int& rate) =0;
+    virtual int SetReturnLevel(const int& ID, const int& lvl) =0;
+    virtual int SetLED(const int& ID, const int& colour) =0; 
+	virtual int SetGoalPosition(const int& ID, const int& angle) =0;
+	virtual int SetGoalPosition(const int& ID, const double& angle) =0;
+	virtual int SetGoalVelocity(const int& ID, const int& velocity) =0;
+	virtual int SetGoalTorque(const int& ID, const int& torque) =0;
+	virtual int SetPunch(const int& ID, const int& punch) =0;
 
 protected:
 	
-	int angleScale(const double& angle);
-	int addrLength(int address, const unsigned char * two_byte);
-	void packetPrint(int bytes, unsigned char* buf);
-	
 	void flush();
-	void write(unsigned char* buf, int n);
-	int read(int ID, unsigned char* buf, int nMax=255);
+	void write(unsigned char* buf, const int& n);
+	int read(const int& ID, unsigned char* buf, const int& nMax=255);
 
-	virtual int statusError(unsigned char* buf, int n) =0;
-	virtual int send(int ID, int bytes, unsigned char* parameters, unsigned char ins) =0;
+	int angleScale(const double& angle);
+	int AddressLenght(const int& address, const unsigned char * TWO_BYTE_ADDRESSES);
+	void packetPrint(const int& bytes, unsigned char* buf);
+	
+	virtual int statusError(unsigned char* buf, const int& n) =0;
+	virtual int send(const int& ID, const int& bytes, unsigned char* parameters, const unsigned char& ins) =0;
 
-	//int ping(int ID);
-	virtual int dataPack(unsigned char ins, unsigned char ** parameters, int address, int value =0) =0;
-	virtual int dataPush(int ID, int address, int value) =0;
-	virtual int dataPull(int ID, int address) =0;
+	virtual int dataPack(const unsigned char& ins, unsigned char ** parameters, const int& address, const int& value =0) =0;
+	virtual int dataPush(const int& ID, const int& address, const int& value) =0;
+	virtual int dataPull(const int& ID, const int& address) =0;
 
-	// REPLY BUFFER
-    unsigned char reply_buf[32];		// Find out optimal size
+	// REPLY BUFFER - SIZE 64 so that there is extra space available for extreme cases. NOTE that currently if 12 servos reply 
+	//at once, buffer will overflow. That should not happen though, since read/write is done with one servo at a time
+    unsigned char reply_buf[64];		
 
-    HardwareSerial* _port;
-    unsigned char _port_num;
-    long int _baud;
-    double _bitPeriod;
+    HardwareSerial* port;
+    unsigned char port_num;
+    long int baud;
+    double bitPeriod;
+    int DebugLvl;
+    int ReturnLvl;
 
 };
 
@@ -63,10 +76,11 @@ const unsigned char ID_Broadcast = 0xFE; // 254(0xFE) ID writes to all servos on
 
 
 // Util
-#define MAKEWORD(a, b) ((unsigned short)(((unsigned char)(((unsigned long)(a)) & 0xff)) | ((unsigned short)((unsigned char)(((unsigned long)(b)) & 0xff))) << 8))
+//#define MAKEWORD(a, b) ((unsigned short)(((unsigned char)(((unsigned long)(a)) & 0xff)) | ((unsigned short)((unsigned char)(((unsigned long)(b)) & 0xff))) << 8))
+//#define HIBYTE(w) ( (unsigned char) ( ((unsigned long)(w)) >> 8 ) )
+#define MAKEWORD(a, b) ( ((unsigned short)(a) & 0x00ff) | ( ((unsigned short)(b) & 0x00ff) << 8 ) )
 #define LOBYTE(w) ( (unsigned char)(w) )
-#define HIBYTE(w) ( (unsigned char) ( ((unsigned long)(w)) >> 8 ) )
-// ADD MASKS !!
+#define HIBYTE(w) ( (unsigned char) ( ((unsigned short)(w)) >> 8 ) )
 
 
 #endif //DNXSERVO_H

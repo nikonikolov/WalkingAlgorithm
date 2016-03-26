@@ -1,15 +1,117 @@
 #include "XL320.h"
 #include <math.h>
 
-XL320::XL320(HardwareSerial& port, long int baud) :
-	DNXServo(port, baud) {}
+/* ******************************** PUBLIC METHODS ************************************** */
 
 
-const unsigned char XL320::two_byte[11] = { 0, 6, 8, 15, 30, 32, 35, 37, 39, 41, 51 };
+XL320::XL320(HardwareSerial& portIn, const long int& baudIn, const int& DebugLvlIn /*=0*/) :
+	DNXServo(portIn, baudIn, DebugLvlIn) {
+	// make sure Return level matches
+	SetReturnLevel(ID_Broadcast, ReturnLvl);
+}
+
+XL320::~XL320(){}
+
+
+
+// 0: 9600, 1:57600, 2:115200, 3:1Mbps
+int XL320::SetBaud(const int& ID, const int& rate) {
+	if ((rate > 3) || rate < 0) {
+		Serial.println("Incorrect baud rate.");
+		return 1;
+	}
+	return dataPush(ID, XL_BAUD_RATE, rate);
+}
+
+// Set which commands return status; 0: None, 1: Read, 2: All.
+int XL320::SetReturnLevel(const int& ID, const int& lvl) {
+	return dataPush(ID, XL_RETURN_LEVEL, lvl);
+}
+
+
+
+// 1024 = -150 degrees CCW, 512 = 0 degrees (ORIGIN), 0 = +150 degrees CW
+int XL320::SetGoalPosition(const int& ID, const int& angle){
+	return dataPush(ID, XL_GOAL_POSITION_L, angle);
+}
+
+int XL320::SetGoalPosition(const int& ID, const double& angle){
+	return dataPush(ID, XL_GOAL_POSITION_L, angleScale(angle));
+}
+
+int XL320::SetGoalVelocity(const int& ID, const int& velocity){
+	return dataPush(ID, XL_GOAL_SPEED_L, velocity);
+}
+
+int XL320::SetGoalTorque(const int& ID, const int& torque){
+	return dataPush(ID, XL_GOAL_TORQUE, torque);
+}
+
+int XL320::SetPunch(const int& ID, const int& punch){
+	return dataPush(ID, XL_PUNCH, punch);
+}
+
+
+
+int XL320::SetP(const int& ID, const int& value){
+	return dataPush(ID, XL_P_GAIN, value);
+}
+
+int XL320::SetI(const int& ID, const int& value){
+	return dataPush(ID, XL_I_GAIN, value);
+}
+
+int XL320::SetD(const int& ID, const int& value){
+	return dataPush(ID, XL_D_GAIN, value);
+}
+
+
+
+// Ping
+int XL320::Ping(const int& ID /*=1*/){
+
+	int ec = send(ID, 0, NULL, XL_INS_Ping);
+	Serial.print(" - ec ");
+	Serial.print(ec);
+	Serial.print(" ");
+	if (ec != 0) {
+		Serial.print("PING { ");
+		for (int i = 0; i < 15; ++i){
+			Serial.print(" 0x");
+			Serial.print(reply_buf[i], HEX);
+		}
+		Serial.println(" }");
+	}
+
+	return ec;
+}
+
+// Sets motor led colours. r = 1, g = 2, y = 3, b = 4, p = 5, c = 6, w = 7, o = 0
+int XL320::SetLED(const int& ID, const int& colour){
+	return dataPush(ID, XL_LED, colour);
+}
+
+// Rainbow
+int XL320::Rainbow(const int& ID){
+	for (int i = 1; i < 8; ++i)
+	{
+		int status = SetLED(ID, i);
+		if (status != 0) {
+			return status;
+		}
+		delay(1000);
+	}
+	return SetLED(ID, 0);
+}
+
+/* ******************************** PUBLIC METHODS END************************************** */
+
+
+/* ******************************** PRIVATE METHODS ************************************** */
 
 
 // Dynamixel Communication 2.0 Checksum
-unsigned short XL320::update_crc(unsigned short crc_accum, unsigned char *data_blk_ptr, unsigned short data_blk_size) {
+unsigned short XL320::update_crc(unsigned short crc_accum, unsigned char *data_blk_ptr, const unsigned short& data_blk_size) {
     unsigned short i, j;
     unsigned short crc_table[256] = {
         0x0000, 0x8005, 0x800F, 0x000A, 0x801B, 0x001E, 0x0014, 0x8011,
@@ -54,41 +156,45 @@ unsigned short XL320::update_crc(unsigned short crc_accum, unsigned char *data_b
 }
 
 
-// Returns length of packet
-int XL320::length(unsigned char* buf) {
+// Returns Length of Packet
+int XL320::PacketLength(unsigned char* buf) {
 	// Header(3) + Reserved(1) + ID(1) +  Packet Length(?) + CRC(2)
-	int a = MAKEWORD(buf[5], buf[6]) + 7;
-	return a;
+	int Length = MAKEWORD(buf[5], buf[6]) + 7;
+	return Length;
 }
 
 
-// Length of address
-int XL320::addrLength(int address) {
-	return DNXServo::addrLength(address, two_byte);
+// Returns Length of Address
+int XL320::AddressLenght(const int& address) {
+	return DNXServo::AddressLenght(address, TWO_BYTE_ADDRESSES);
 }
 
 
-int XL320::statusError(unsigned char* buf, int n) {
+int XL320::statusError(unsigned char* buf, const int& n) {
 
 	// Minimum return length
 	if (n < 11) {
 		flush();
-		Serial.println("READING CORRUPTION");
+		if(DebugLvl) Serial.println("READING CORRUPTION");
 		return -1; 
 	}
 
 	if ((buf[0]!=0xFF)||(buf[1]!=0xFF)||(buf[2]!=0xFD)||(buf[3]!=0x00)) {
 		flush();
-		Serial.println("WRONG RETURN HEADER");
-		packetPrint(n, buf);
+		if(DebugLvl){
+			Serial.println("WRONG RETURN HEADER");
+			packetPrint(n, buf);	
+		}
 		return -1; 
 	}
 
-	int l = length(buf);
+	int l = PacketLength(buf);
 	if (l != n) {
 		flush();
-		Serial.println("WRONG RETURN LENGTH");
-		packetPrint(n, buf);
+		if(DebugLvl){
+			Serial.println("WRONG RETURN LENGTH");
+			packetPrint(n, buf);	
+		}
 		return -1;
 	}
 
@@ -96,20 +202,22 @@ int XL320::statusError(unsigned char* buf, int n) {
 	unsigned short checksum = MAKEWORD(buf[n-2],buf[n-1]);
 	if (CRC != checksum){ 
 		flush();
-		Serial.println("WRONG CHECKSUM");
+		if(DebugLvl) Serial.println("WRONG CHECKSUM");
 		return -1;
 	}
 
 
 	if(buf[8]!=0 ){
-		Serial.println("STATUS ERROR ");
-		if 		(buf[8] == 0x01) Serial.println("FAILED PROCESS OF INSTRUCTION");	
-		else if (buf[8] == 0x02) Serial.println("UNDEFINED INSTRUCTION OR ACTION WITHOUT REG WRITE");
-		else if (buf[8] == 0x03) Serial.println("CORRUPTED PACKAGE SENT - CRC DOES NOT MATCH");
-		else if (buf[8] == 0x04) Serial.println("VALUE TO WRITE OUT OF RANGE");
-		else if (buf[8] == 0x05) Serial.println("RECEIVED VALUE LENGTH SHORTER IN BYTES THAN REQUIRED FOR THIS ADDRESS");
-		else if (buf[8] == 0x06) Serial.println("RECEIVED VALUE LENGTH LONGER IN BYTES THAN REQUIRED FOR THIS ADDRESS");
-		else if (buf[8] == 0x07) Serial.println("READ_ONLY OR WRITE_ONLY ADDRESS");
+		if(DebugLvl){
+			Serial.println("STATUS ERROR ");
+			if 		(buf[8] == 0x01) Serial.println("FAILED PROCESS OF INSTRUCTION");	
+			else if (buf[8] == 0x02) Serial.println("UNDEFINED INSTRUCTION OR ACTION WITHOUT REG WRITE");
+			else if (buf[8] == 0x03) Serial.println("CORRUPTED PACKAGE SENT - CRC DOES NOT MATCH");
+			else if (buf[8] == 0x04) Serial.println("VALUE TO WRITE OUT OF RANGE");
+			else if (buf[8] == 0x05) Serial.println("RECEIVED VALUE LENGTH SHORTER IN BYTES THAN REQUIRED FOR THIS ADDRESS");
+			else if (buf[8] == 0x06) Serial.println("RECEIVED VALUE LENGTH LONGER IN BYTES THAN REQUIRED FOR THIS ADDRESS");
+			else if (buf[8] == 0x07) Serial.println("READ_ONLY OR WRITE_ONLY ADDRESS");
+		}
 		return -1;
 	}
 
@@ -117,54 +225,9 @@ int XL320::statusError(unsigned char* buf, int n) {
 }
 
 
-int XL320::Test(int ID) {
-	unsigned char TxPacket[14] = {0xFF, 0xFF, 0xFD, 0x00, ((unsigned char) ID), 0x07, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00};
-	unsigned short CRC = update_crc ( 0, TxPacket , 12 ) ; // 12 = 5 + Packet Length(0x00 0x07) = 5+7
-	Serial.print("CRC ");
-	Serial.println(CRC);
-	unsigned char CRC_L = LOBYTE(CRC);
-	unsigned char CRC_H = HIBYTE(CRC);
-	Serial.print("CRC_L ");
-	Serial.println(CRC_L);
-	Serial.print("CRC_H ");
-	Serial.println(CRC_H);
-
-	TxPacket[12] = CRC_L;
-	TxPacket[13] = CRC_H;
-
-	Serial.println("TRANMITTING");
-	for (int i = 0; i < (14); ++i) {
-		_port->write(TxPacket[i]);
-		_port->read();	//Echo
-	}
-
-	delayMicroseconds(_bitPeriod*112);
-	//delay(0.5);
-
-	Serial.print("DATA { ");
-	int timeout = 0;
-	int plen = 0;
-	while ((timeout < 256) && (plen<15)) {
-		if (_port->available()) {	
-			Serial.print(" 0x");
-			Serial.print(_port->read(), HEX);
-			plen++;
-			timeout = 0;
-		}
-
-		// wait for the bit period
-		delayMicroseconds(_bitPeriod);
-		timeout++;
-	}
-	Serial.println(" }");
-
-	return (0);
-}
-
-
 // Packs data and sends it to the servo
 // Dynamixel Communication 2.0 Protocol: Header, Reserved, ID, Packet Length, Instruction, Parameter, 16bit CRC
-int XL320::send(int ID, int bytes, unsigned char* parameters, unsigned char ins) {
+int XL320::send(const int& ID, const int& packetLenght, unsigned char* parameters, const unsigned char& ins) {
 	unsigned char buf[255]; // Packet
 
 	// Header
@@ -179,52 +242,57 @@ int XL320::send(int ID, int bytes, unsigned char* parameters, unsigned char ins)
 	buf[4] = ID;
 
 	// Packet Length
-	buf[5] = LOBYTE(bytes+3);
-	buf[6] = HIBYTE(bytes+3);
+	buf[5] = LOBYTE(packetLenght+3);
+	buf[6] = HIBYTE(packetLenght+3);
 
 	// Instruction
 	buf[7] = ins;
 
 	// Parameter
-	for (int i=0; i < bytes; i++) {
+	for (int i=0; i < packetLenght; i++) {
 		buf[8+i] = parameters[i];
 	}
 
 	// Checksum
-	unsigned short CRC = update_crc(0, buf, bytes+8);
-	buf[bytes+8] = LOBYTE(CRC);
-	buf[bytes+9] = HIBYTE(CRC);
+	unsigned short CRC = update_crc(0, buf, packetLenght+8);
+	buf[packetLenght+8] = LOBYTE(CRC);
+	buf[packetLenght+9] = HIBYTE(CRC);
 
 	// Transmit
-	write(buf, bytes+10);
+	write(buf, packetLenght+10);
 
-	// Broadcast doesn't reply.
-	if (ID == ID_Broadcast) {
+	// Broadcast and Reply Lvl less than 2 do not reply
+	if (ID == ID_Broadcast || ReplyLvl==0 || (ReplyLvl==1 && ins!=XL_INS_Read)) {
 		return 0;	
 	}
-	
+
 	// Read reply
-	//Serial.println("- Reading");
+	if(DebugLvl) Serial.println("Reading reply");
+	
 	int n = read(ID, reply_buf);
 	if (n == 0) {
-		Serial.println("Could not read status packet");
+		if(DebugLvl) Serial.println("Could not read status packet");
 		return 0;
 	}
 
-	/*Serial.print("- Read ");
-	Serial.print(n);
-	Serial.println(" bytes");*/
+	if(DebugLvl){
+		Serial.print("- Read ");
+		Serial.print(n);
+		Serial.println(" bytes");
+	} 
 
-	return statusError(reply_buf, n); // Error code
+	return statusError(reply_buf, n); // Return Error code
 }
 
 
+
+
 // dataPack sets the parameters in char array and returns length.
-int XL320::dataPack(unsigned char ins, unsigned char ** parameters, int address, int value /*=0*/){
+int XL320::dataPack(const unsigned char& ins, unsigned char ** parameters, const int& address, const int& value /*=0*/){
 
 	unsigned char* data; 
 	
-	int adrl = addrLength(address);
+	int adrl = AddressLenght(address);
 
 	int size;
 	if (ins == XL_INS_Write) size = adrl+2;
@@ -253,13 +321,13 @@ int XL320::dataPack(unsigned char ins, unsigned char ** parameters, int address,
 }
 
 // dataPush is a generic wrapper for single value SET instructions for public methods
-int XL320::dataPush(int ID, int address, int value){
+int XL320::dataPush(const int& ID, const int& address, const int& value){
 	flush(); // Flush reply	for safety
 	
 	unsigned char* parameters;
-    int bytes = dataPack(XL_INS_Write, &parameters, address, value);
+    int packetLenght = dataPack(XL_INS_Write, &parameters, address, value);
 
-    int ec = send(ID, bytes, parameters, XL_INS_Write);
+    int ec = send(ID, packetLenght, parameters, XL_INS_Write);
    	
    	delete[] parameters;
 
@@ -268,16 +336,16 @@ int XL320::dataPush(int ID, int address, int value){
 
 
 // dataPull is a generic wrapper for single value GET instructions for public methods
-int XL320::dataPull(int ID, int address){
+int XL320::dataPull(const int& ID, const int& address){
 	flush(); // Flush reply	for safety
 	
 	unsigned char* parameters;
-    int bytes = dataPack(XL_INS_Read, &parameters, address);
+    int packetLenght = dataPack(XL_INS_Read, &parameters, address);
 
     int size = parameters[2];
    // unsigned char buf[(11+size)] = {0};
    	
-   	int ec = send(ID, bytes, parameters, XL_INS_Read);
+   	int ec = send(ID, packetLenght, parameters, XL_INS_Read);
 
    	delete[] parameters;
    	
@@ -292,107 +360,61 @@ int XL320::dataPull(int ID, int address){
    	}
 
    	else{
-   		Serial.println("WRONG ID REPLIED");
+   		if(DebugLvl) Serial.println("WRONG ID REPLIED");
    		return -1;
    	}
 }
 
 
-// Ping
-int XL320::Ping(int ID /*=1*/){
+const unsigned char XL320::TWO_BYTE_ADDRESSES[11] = { 0, 6, 8, 15, 30, 32, 35, 37, 39, 41, 51 };
 
-	int ec = send(ID, 0, NULL, XL_INS_Ping);
-	Serial.print(" - ec ");
-	Serial.print(ec);
-	Serial.print(" ");
-	if (ec != 0) {
-		Serial.print("PING { ");
-		for (int i = 0; i < 15; ++i){
+
+/* ******************************** PRIVATE METHODS END ************************************** */
+
+
+
+
+/*
+int XL320::Test(const int& ID) {
+	unsigned char TxPacket[14] = {0xFF, 0xFF, 0xFD, 0x00, ((unsigned char) ID), 0x07, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00};
+	unsigned short CRC = update_crc ( 0, TxPacket , 12 ) ; // 12 = 5 + Packet Length(0x00 0x07) = 5+7
+	Serial.print("CRC ");
+	Serial.println(CRC);
+	unsigned char CRC_L = LOBYTE(CRC);
+	unsigned char CRC_H = HIBYTE(CRC);
+	Serial.print("CRC_L ");
+	Serial.println(CRC_L);
+	Serial.print("CRC_H ");
+	Serial.println(CRC_H);
+
+	TxPacket[12] = CRC_L;
+	TxPacket[13] = CRC_H;
+
+	Serial.println("TRANMITTING");
+	for (int i = 0; i < (14); ++i) {
+		port->write(TxPacket[i]);
+		port->read();	//Echo
+	}
+
+	delayMicroseconds(bitPeriod*112);
+	//delay(0.5);
+
+	Serial.print("DATA { ");
+	int timeout = 0;
+	int plen = 0;
+	while ((timeout < 256) && (plen<15)) {
+		if (port->available()) {	
 			Serial.print(" 0x");
-			Serial.print(reply_buf[i], HEX);
+			Serial.print(port->read(), HEX);
+			plen++;
+			timeout = 0;
 		}
-		Serial.println(" }");
+
+		// wait for the bit period
+		delayMicroseconds(bitPeriod);
+		timeout++;
 	}
+	Serial.println(" }");
 
-	return ec;
-}
-
-
-// SetBaud
-// 0: 9600, 1:57600, 2:115200, 3:1Mbps
-int XL320::SetBaud(int ID, int rate) {
-	if ((rate > 3) || rate < 0) {
-		Serial.println("Incorrect baud rate.");
-		return 1;
-	}
-	return dataPush(ID, XL_BAUD_RATE, rate);
-}
-
-
-// Set which commands return status
-// 0: None, 1: Read, 2: All.
-int XL320::SetReturnLevel(int ID, int lvl) {
-	return dataPush(ID, XL_RETURN_LEVEL, lvl);
-}
-
-
-// SetLED sets motor led colours.
-// r = 1, g = 2, y = 3, b = 4, p = 5, c = 6, w = 7, o = 0
-int XL320::SetLED(int ID, int colour){
-	return dataPush(ID, XL_LED, colour);
-}
-
-
-// Rainbow
-int XL320::Rainbow(int ID){
-	for (int i = 1; i < 8; ++i)
-	{
-		int status = SetLED(ID, i);
-		if (status != 0) {
-			return status;
-		}
-		delay(1000);
-	}
-	return SetLED(ID, 0);
-}
-
-
-int XL320::SetP(int ID, int value){
-	return dataPush(ID, XL_P_GAIN, value);
-}
-
-
-int XL320::SetI(int ID, int value){
-	return dataPush(ID, XL_I_GAIN, value);
-}
-
-
-int XL320::SetD(int ID, int value){
-	return dataPush(ID, XL_D_GAIN, value);
-}
-
-
-// SetGoalPosition
-// 1024 = -150 degrees CCW, 512 = 0 degrees (ORIGIN), 0 = +150 degrees CW
-int XL320::SetGoalPosition(int ID, int angle){
-	return dataPush(ID, XL_GOAL_POSITION_L, angle);
-}
-
-int XL320::SetGoalPosition(int ID, double angle){
-	return dataPush(ID, XL_GOAL_POSITION_L, angleScale(angle));
-}
-
-
-int XL320::SetGoalVelocity(int ID, int velocity){
-	return dataPush(ID, XL_GOAL_SPEED_L, velocity);
-}
-
-
-int XL320::SetGoalTorque(int ID, int torque){
-	return dataPush(ID, XL_GOAL_TORQUE, torque);
-}
-
-
-int XL320::SetPunch(int ID, int punch){
-	return dataPush(ID, XL_PUNCH, punch);
-}
+	return (0);
+}*/

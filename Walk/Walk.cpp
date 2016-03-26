@@ -1,10 +1,7 @@
 #include "Walk.h"
 
-XL320 ArmsWings(Serial1, 112500);
-AX12A Knees(Serial2, 112500);
-AX12A Hips(Serial3, 112500);
 
-
+/*
 ServoJoint Hip_Left_Front 		(HIP_LEFT_FRONT, 	&Hips);
 ServoJoint Hip_Left_Middle 		(HIP_LEFT_MIDDLE, 	&Hips); 
 ServoJoint Hip_Left_Back 		(HIP_LEFT_BACK, 	&Hips); 
@@ -41,7 +38,7 @@ Leg Right_Front 	(Knee_Right_Front, 	Hip_Right_Front, 	Arm_Right_Front, 	Wing_Ri
 Leg Right_Middle 	(Knee_Right_Middle, Hip_Right_Middle, 	Arm_Right_Middle, 	Wing_Right_Middle); 
 Leg Right_Back 		(Knee_Right_Back, 	Hip_Right_Back, 	Arm_Right_Back, 	Wing_Right_Back); 
 
-
+*/
 int RobotFly(){
 	Knees.SetGoalPosition(ID_Broadcast, 512); 
 	Hips.SetGoalPosition(ID_Broadcast, 512);
