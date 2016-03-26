@@ -1,9 +1,6 @@
 #ifndef WALKING_QUAD_NAMESPACE
 #define WALKING_QUAD_NAMESPACE
 
-//#define RADIANS(A)				((A)/180*PI)
-//#define DEGREES(A)				((A)/PI*180)
-
 namespace wkquad{
 
 	double radians(const double& degrees);
@@ -14,7 +11,7 @@ namespace wkquad{
 	 	NOTE: Try to keep IDs the same. Changing them will cause bugs in Tripod constructor parameters 
 	 	and you will also have to change the ID of the physical servo */
 
-	// SERIAL 2 - knees
+	// SERIAL TX-9 RX-10 - KNEES
 	const int knee_left_front =			11;
 	const int knee_left_middle =		12;
 	const int knee_left_back =			13;
@@ -22,7 +19,7 @@ namespace wkquad{
 	const int knee_right_middle =		15;
 	const int knee_right_back =			16;
 
-	// SERIAL 3 -hips
+	// SERIAL TX-9 RX-10 - HIPS
 	const int hip_left_front =			17;
 	const int hip_left_middle =			18;
 	const int hip_left_back =			19;
@@ -30,7 +27,7 @@ namespace wkquad{
 	const int hip_right_middle =		21;
 	const int hip_right_back =			22;
 
-	// SERIAL 1 - arms_wings
+	// SERIAL TX-13 RX-14 - WINGS
 	const int wing_left_front =			23;
 	const int wing_left_middle =		24;
 	const int wing_left_back =			25;
@@ -38,7 +35,7 @@ namespace wkquad{
 	const int wing_right_middle =		27;
 	const int wing_right_back =			28;
 
-	// SERIAL 1 - arms_wings
+	// SERIAL TX-13 RX-14 - ARMS
 	const int arm_left_front =			29;
 	const int arm_left_middle =			30;
 	const int arm_left_back =			31;
