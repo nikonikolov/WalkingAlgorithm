@@ -1,15 +1,14 @@
 #include "AX12A.h"
-#include "../DNXServo/DNXServo.h"
-
-#include <math.h>
 
 
 /* ******************************** PUBLIC METHODS ************************************** */
 
-AX12A::AX12A(HardwareSerial& portIn, const long int& baudIn, const int& DebugLvlIn /*=0*/):
-	DNXServo(portIn, baudIn, DebugLvlIn) {
+AX12A::AX12A(mbed::Serial* portIn, const long int& baudIn):
+	DNXServo(portIn, baudIn) {
 	// make sure Return level matches
 	SetReturnLevel(ID_Broadcast, ReturnLvl);
+
+	pc.print_debug("AX12A object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + itos(bitPeriod) + "\n");
 }
 
 AX12A::~AX12A(){}
@@ -19,7 +18,7 @@ AX12A::~AX12A(){}
 // 1: 1Mbps, 3: 500 000, 4: 400 000, 7: 250 000, 9: 200 000, 16: 115200, 34: 57600, 103: 19200, 207: 9600
 int AX12A::SetBaud(const int& ID, const int& rate) {
 	if ( rate != 1 && rate != 3 && rate != 4 && rate != 7 && rate != 9 && rate != 16  && rate != 34 && rate != 103 && rate != 207 ) {
-		if(DebugLvl) Serial.println("Incorrect baud rate");
+		pc.print_debug("Incorrect baud rate\n");
 		return 1;
 	}
 
@@ -89,16 +88,14 @@ int AX12A::statusError(unsigned char* buf, const int& n) {
 	// Minimum return length
 	if (n < 6) {
 		flush();
-		if(DebugLvl) Serial.println("READING CORRUPTION");
+		pc.print_debug("READING CORRUPTION\n");
 		return -1; 
 	}
 
 	if ((buf[0]!=0xFF)||(buf[1]!=0xFF)) {
 		flush();
-		if(DebugLvl){
-			Serial.println("WRONG RETURN HEADER");
-			packetPrint(n, buf);
-		}
+		pc.print_debug("WRONG RETURN HEADER\n");
+		packetPrint(n, buf);
 		return -1; 
 	}
 
@@ -106,44 +103,37 @@ int AX12A::statusError(unsigned char* buf, const int& n) {
 	// The last byte does not get included in the checksum
 	if(checksum != buf[n-1]){
 		flush();
-		if(DebugLvl){
-				Serial.println("WRONG RETURN CHECKSUM");
+			pc.print_debug("WRONG RETURN CHECKSUM\n");
 			packetPrint(n, buf);
-			Serial.print("CHECKSUM READ IS ");
-			Serial.println(checksum, HEX);
-		}
+			pc.print_debug("CHECKSUM READ IS " + to_hex(checksum)+"\n");
 		return -1;
 	}
 
 	if ( (buf[3]+4) != n ) {
 		flush();
-		if(DebugLvl){
-			Serial.println("WRONG RETURN LENGHT");
-			packetPrint(n, buf);
-		}
+		pc.print_debug("WRONG RETURN LENGHT\n");
+		packetPrint(n, buf);
 		return -1;
 	}
 
 	if(buf[4]!=0 ){
-		if(DebugLvl){
-			Serial.println("STATUS ERROR ");
-			// bit 0
-			 if ( !(buf[4] & 0x01) ) Serial.println("VOLTAGE OUT OF RANGE");	
-			// bit 1
-			else if ( !(buf[4] & 0x02) ) Serial.println("REQUIRED POSITION OUT OF RANGE");
-			// bit 2
-			else if ( !(buf[4] & 0x04) ) Serial.println("TEMPERATURE OUT OF RANGE");
-			// bit 3
-			else if ( !(buf[4] & 0x08) ) Serial.println("COMMAND OUT OF RANGE");
-			// bit 4
-			else if ( !(buf[4] & 0x10) ) Serial.println("CORRUPTED PACKAGE SENT - CRC DOES NOT MATCH");
-			// bit 5
-			else if ( !(buf[4] & 0x20) ) Serial.println("LOAD OUT OF RANGE");
-			// bit 6
-			else if ( !(buf[4] & 0x40) ) Serial.println("UNDEFINED OR MISSING COMMAND");
-			// bit 7
-			else if ( !(buf[4] & 0x80) ) Serial.println("GLITCH");
-		}
+		pc.print_debug("STATUS ERROR \n");
+		// bit 0
+		 if ( !(buf[4] & 0x01) ) pc.print_debug("VOLTAGE OUT OF RANGE\n");	
+		// bit 1
+		else if ( !(buf[4] & 0x02) ) pc.print_debug("REQUIRED POSITION OUT OF RANGE\n");
+		// bit 2
+		else if ( !(buf[4] & 0x04) ) pc.print_debug("TEMPERATURE OUT OF RANGE\n");
+		// bit 3
+		else if ( !(buf[4] & 0x08) ) pc.print_debug("COMMAND OUT OF RANGE\n");
+		// bit 4
+		else if ( !(buf[4] & 0x10) ) pc.print_debug("CORRUPTED PACKAGE SENT - CRC DOES NOT MATCH\n");
+		// bit 5
+		else if ( !(buf[4] & 0x20) ) pc.print_debug("LOAD OUT OF RANGE\n");
+		// bit 6
+		else if ( !(buf[4] & 0x40) ) pc.print_debug("UNDEFINED OR MISSING COMMAND\n");
+		// bit 7
+		else if ( !(buf[4] & 0x80) ) pc.print_debug("GLITCH\n");
 		return -1;
 	}
 
@@ -182,25 +172,21 @@ int AX12A::send(const int& ID, const int& packetLength, unsigned char* parameter
 	write(buf, packetLength+6);
 	
 	// Broadcast and Reply Lvl less than 2 do not reply
-	if (ID == ID_Broadcast || ReplyLvl==0 || (ReplyLvl==1 && ins!=AX_INS_Read)) {
+	if (ID == ID_Broadcast || ReturnLvl==0 || (ReturnLvl==1 && ins!=AX_INS_Read)) {
 		return 0;	
 	}
 
 	
 	// Read reply
-	if(DebugLvl) Serial.println("Reading reply");
+	pc.print_debug("Reading reply\n");
 	
-	int n = read(ID, reply_buf);
+	int n = read(reply_buf);
 	if (n == 0) {
-		if(DebugLvl) Serial.println("Could not read status packet");
+		pc.print_debug("Could not read status packet\n");
 		return 0;
 	}
 
-	if(DebugLvl){
-		Serial.print("- Read ");
-		Serial.print(n);
-		Serial.println(" bytes");
-	} 
+	pc.print_debug("- Read " + itos(n) + " bytes\n");
 
 	return statusError(reply_buf, n); // Return Error code
 }
@@ -276,7 +262,7 @@ int AX12A::dataPull(const int& ID, const int& address){
    	}
 
    	else{
-   		if(DebugLvl) Serial.println("WRONG ID REPLIED");
+   		pc.print_debug("WRONG ID REPLIED\n");
    		return -1;
    	}
 }

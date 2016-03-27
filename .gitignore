@@ -1,3 +1,7 @@
 Notes.txt
 bin/*
-
+*.bin
+*.elf
+*.hex
+*.d
+*.o

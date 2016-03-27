@@ -3,7 +3,7 @@
 #ifndef XL320_H
 #define XL320_H
 
-#include "../DNXServo/DNXServo.h"
+#include "DNXServo.h"
 
 
 class XL320 : public DNXServo {
@@ -11,7 +11,7 @@ class XL320 : public DNXServo {
 public:
  	
  	// Create Dynamixel Communication protocol 2.0
-    XL320(HardwareSerial& portIn, const long int& baudIn, const int& DebugLvlIn =0);
+    XL320(mbed::Serial* portIn, const long int& baudIn);
 
     ~XL320();
     

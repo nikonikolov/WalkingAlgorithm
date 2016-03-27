@@ -1,13 +1,14 @@
 #include "XL320.h"
-#include <math.h>
 
 /* ******************************** PUBLIC METHODS ************************************** */
 
 
-XL320::XL320(HardwareSerial& portIn, const long int& baudIn, const int& DebugLvlIn /*=0*/) :
-	DNXServo(portIn, baudIn, DebugLvlIn) {
+XL320::XL320(mbed::Serial* portIn, const long int& baudIn) :
+	DNXServo(portIn, baudIn) {
 	// make sure Return level matches
 	SetReturnLevel(ID_Broadcast, ReturnLvl);
+
+	pc.print_debug("XL320 object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + itos(bitPeriod) + "\n");
 }
 
 XL320::~XL320(){}
@@ -17,7 +18,7 @@ XL320::~XL320(){}
 // 0: 9600, 1:57600, 2:115200, 3:1Mbps
 int XL320::SetBaud(const int& ID, const int& rate) {
 	if ((rate > 3) || rate < 0) {
-		Serial.println("Incorrect baud rate.");
+		pc.print_debug("XL320: Incorrect baud rate\n");
 		return 1;
 	}
 	return dataPush(ID, XL_BAUD_RATE, rate);
@@ -71,16 +72,13 @@ int XL320::SetD(const int& ID, const int& value){
 int XL320::Ping(const int& ID /*=1*/){
 
 	int ec = send(ID, 0, NULL, XL_INS_Ping);
-	Serial.print(" - ec ");
-	Serial.print(ec);
-	Serial.print(" ");
+	pc.print_debug(" - ec " + itos(ec));
 	if (ec != 0) {
-		Serial.print("PING { ");
+		pc.print_debug("PING { ");
 		for (int i = 0; i < 15; ++i){
-			Serial.print(" 0x");
-			Serial.print(reply_buf[i], HEX);
+			pc.print_debug(to_hex(reply_buf[i]) + " ");
 		}
-		Serial.println(" }");
+		pc.print_debug("}\n");
 	}
 
 	return ec;
@@ -99,7 +97,7 @@ int XL320::Rainbow(const int& ID){
 		if (status != 0) {
 			return status;
 		}
-		delay(1000);
+		wait(1);
 	}
 	return SetLED(ID, 0);
 }
@@ -175,26 +173,22 @@ int XL320::statusError(unsigned char* buf, const int& n) {
 	// Minimum return length
 	if (n < 11) {
 		flush();
-		if(DebugLvl) Serial.println("READING CORRUPTION");
+		pc.print_debug("READING CORRUPTION\n");
 		return -1; 
 	}
 
 	if ((buf[0]!=0xFF)||(buf[1]!=0xFF)||(buf[2]!=0xFD)||(buf[3]!=0x00)) {
 		flush();
-		if(DebugLvl){
-			Serial.println("WRONG RETURN HEADER");
-			packetPrint(n, buf);	
-		}
+		pc.print_debug("WRONG RETURN HEADER\n");
+		packetPrint(n, buf);	
 		return -1; 
 	}
 
 	int l = PacketLength(buf);
 	if (l != n) {
 		flush();
-		if(DebugLvl){
-			Serial.println("WRONG RETURN LENGTH");
-			packetPrint(n, buf);	
-		}
+		pc.print_debug("WRONG RETURN LENGTH\n");
+		packetPrint(n, buf);	
 		return -1;
 	}
 
@@ -202,22 +196,20 @@ int XL320::statusError(unsigned char* buf, const int& n) {
 	unsigned short checksum = MAKEWORD(buf[n-2],buf[n-1]);
 	if (CRC != checksum){ 
 		flush();
-		if(DebugLvl) Serial.println("WRONG CHECKSUM");
+		pc.print_debug("WRONG CHECKSUM\n");
 		return -1;
 	}
 
 
 	if(buf[8]!=0 ){
-		if(DebugLvl){
-			Serial.println("STATUS ERROR ");
-			if 		(buf[8] == 0x01) Serial.println("FAILED PROCESS OF INSTRUCTION");	
-			else if (buf[8] == 0x02) Serial.println("UNDEFINED INSTRUCTION OR ACTION WITHOUT REG WRITE");
-			else if (buf[8] == 0x03) Serial.println("CORRUPTED PACKAGE SENT - CRC DOES NOT MATCH");
-			else if (buf[8] == 0x04) Serial.println("VALUE TO WRITE OUT OF RANGE");
-			else if (buf[8] == 0x05) Serial.println("RECEIVED VALUE LENGTH SHORTER IN BYTES THAN REQUIRED FOR THIS ADDRESS");
-			else if (buf[8] == 0x06) Serial.println("RECEIVED VALUE LENGTH LONGER IN BYTES THAN REQUIRED FOR THIS ADDRESS");
-			else if (buf[8] == 0x07) Serial.println("READ_ONLY OR WRITE_ONLY ADDRESS");
-		}
+		pc.print_debug("STATUS ERROR \n");
+		if 		(buf[8] == 0x01) pc.print_debug("FAILED PROCESS OF INSTRUCTION\n");	
+		else if (buf[8] == 0x02) pc.print_debug("UNDEFINED INSTRUCTION OR ACTION WITHOUT REG WRITE\n");
+		else if (buf[8] == 0x03) pc.print_debug("CORRUPTED PACKAGE SENT - CRC DOES NOT MATCH\n");
+		else if (buf[8] == 0x04) pc.print_debug("VALUE TO WRITE OUT OF RANGE\n");
+		else if (buf[8] == 0x05) pc.print_debug("RECEIVED VALUE LENGTH SHORTER IN BYTES THAN REQUIRED FOR THIS ADDRESS\n");
+		else if (buf[8] == 0x06) pc.print_debug("RECEIVED VALUE LENGTH LONGER IN BYTES THAN REQUIRED FOR THIS ADDRESS\n");
+		else if (buf[8] == 0x07) pc.print_debug("READ_ONLY OR WRITE_ONLY ADDRESS\n");
 		return -1;
 	}
 
@@ -262,24 +254,20 @@ int XL320::send(const int& ID, const int& packetLenght, unsigned char* parameter
 	write(buf, packetLenght+10);
 
 	// Broadcast and Reply Lvl less than 2 do not reply
-	if (ID == ID_Broadcast || ReplyLvl==0 || (ReplyLvl==1 && ins!=XL_INS_Read)) {
+	if (ID == ID_Broadcast || ReturnLvl==0 || (ReturnLvl==1 && ins!=XL_INS_Read)) {
 		return 0;	
 	}
 
 	// Read reply
-	if(DebugLvl) Serial.println("Reading reply");
+	pc.print_debug("Reading reply\n");
 	
-	int n = read(ID, reply_buf);
+	int n = read(reply_buf);
 	if (n == 0) {
-		if(DebugLvl) Serial.println("Could not read status packet");
+		pc.print_debug("Could not read status packet\n");
 		return 0;
 	}
 
-	if(DebugLvl){
-		Serial.print("- Read ");
-		Serial.print(n);
-		Serial.println(" bytes");
-	} 
+	pc.print_debug("- Read" + itos(n) + " bytes\n");
 
 	return statusError(reply_buf, n); // Return Error code
 }
@@ -360,7 +348,7 @@ int XL320::dataPull(const int& ID, const int& address){
    	}
 
    	else{
-   		if(DebugLvl) Serial.println("WRONG ID REPLIED");
+   		pc.print_debug("WRONG ID REPLIED\n");
    		return -1;
    	}
 }
@@ -378,19 +366,19 @@ const unsigned char XL320::TWO_BYTE_ADDRESSES[11] = { 0, 6, 8, 15, 30, 32, 35, 3
 int XL320::Test(const int& ID) {
 	unsigned char TxPacket[14] = {0xFF, 0xFF, 0xFD, 0x00, ((unsigned char) ID), 0x07, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00};
 	unsigned short CRC = update_crc ( 0, TxPacket , 12 ) ; // 12 = 5 + Packet Length(0x00 0x07) = 5+7
-	Serial.print("CRC ");
-	Serial.println(CRC);
+	Serial.pc("CRC \n");
+	pc.print_debug(CRC);
 	unsigned char CRC_L = LOBYTE(CRC);
 	unsigned char CRC_H = HIBYTE(CRC);
-	Serial.print("CRC_L ");
-	Serial.println(CRC_L);
-	Serial.print("CRC_H ");
-	Serial.println(CRC_H);
+	pc.print_debug("CRC_L \n");
+	pc.print_debug(CRC_L);
+	pc.print_debug("CRC_H \n");
+	pc.print_debug(CRC_H);
 
 	TxPacket[12] = CRC_L;
 	TxPacket[13] = CRC_H;
 
-	Serial.println("TRANMITTING");
+	pc.print_debug("TRANMITTING\n");
 	for (int i = 0; i < (14); ++i) {
 		port->write(TxPacket[i]);
 		port->read();	//Echo
@@ -399,13 +387,13 @@ int XL320::Test(const int& ID) {
 	delayMicroseconds(bitPeriod*112);
 	//delay(0.5);
 
-	Serial.print("DATA { ");
+	pc.print_debug("DATA { \n");
 	int timeout = 0;
 	int plen = 0;
 	while ((timeout < 256) && (plen<15)) {
 		if (port->available()) {	
-			Serial.print(" 0x");
-			Serial.print(port->read(), HEX);
+			pc.print_debug(" 0x\n");
+			pc.print_debug(port->read(), HEX);
 			plen++;
 			timeout = 0;
 		}
@@ -414,7 +402,7 @@ int XL320::Test(const int& ID) {
 		delayMicroseconds(bitPeriod);
 		timeout++;
 	}
-	Serial.println(" }");
+	pc.print_debug(" }\n");
 
 	return (0);
 }*/

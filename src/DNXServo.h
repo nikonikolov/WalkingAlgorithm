@@ -1,13 +1,14 @@
 #ifndef DNXSERVO_H
 #define DNXSERVO_H
 
-#include <Arduino.h>
+#include "include.h"
+#include <math.h>
 
 /* Things to repair
 	Reply buffer - size for 12 servos
-	How to deal with setting the reight return level in the DNX constructor
+	How to deal with setting the right return level in the DNX constructor
 	Repair emptying the buffer when writing - read does not read single byte at a call
-	Check readbytesuntil as well
+	Turn macros into functions	
 */
 
 
@@ -15,13 +16,9 @@ class DNXServo{
 
 public:
 
-	DNXServo(HardwareSerial& portIn, const long int& baudIn, const int& DebugLvlIn =0);
+	DNXServo(mbed::Serial* portIn, const long int& baudIn);
 
 	virtual ~DNXServo();
-
-	unsigned char getPort() const;
-	void EnableDebugging();
-	void DisableDebugging();
 
     int SetID(const int& ID, const int& newID);
 	int GetValue(const int& ID, const int& address);
@@ -41,7 +38,7 @@ protected:
 	
 	void flush();
 	void write(unsigned char* buf, const int& n);
-	int read(const int& ID, unsigned char* buf, const int& nMax=255);
+	int read(unsigned char* buf, const int& nMax=255);
 
 	int angleScale(const double& angle);
 	int AddressLenght(const int& address, const unsigned char * TWO_BYTE_ADDRESSES);
@@ -56,14 +53,12 @@ protected:
 
 	// REPLY BUFFER - SIZE 64 so that there is extra space available for extreme cases. NOTE that currently if 12 servos reply 
 	//at once, buffer will overflow. That should not happen though, since read/write is done with one servo at a time
-    unsigned char reply_buf[64];		
+    unsigned char reply_buf[256];		
 
-    HardwareSerial* port;
-    unsigned char port_num;
+    mbed::Serial* port;
     long int baud;
     double bitPeriod;
-    int DebugLvl;
-    int ReturnLvl;
+    int ReturnLvl = 1;
 
 };
 

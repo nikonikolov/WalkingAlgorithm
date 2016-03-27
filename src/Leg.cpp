@@ -15,10 +15,10 @@ const double Leg::AngleLimits[JOINT_COUNT*2] = { 	wkquad::radians(0), wkquad::ra
 
 
 Leg::Leg 	(const int& ID_knee, const int& ID_hip, const int& ID_arm, const int& ID_wing,
-			DNXServo* Knees, DNXServo* Hips, DNXServo* ArmsWings, const double& height_in) :
+			DNXServo* HipKnees, DNXServo* ArmsWings, const double& height_in) :
 			
 	// Instantiate Legs
-	Joints[KNEE](ID_knee, Knees), Joints[HIP](ID_hip, Hips), Joints[ARM](ID_arm, ArmsWings), Joints[WING](ID_wing, ArmsWings){
+	Joints[KNEE](ID_knee, HipKnees), Joints[HIP](ID_hip, HipKnees), Joints[ARM](ID_arm, ArmsWings), Joints[WING](ID_wing, ArmsWings){
 
 	// Check if RIGHT or LEFT
 	if(ID_knee>wkquad::knee_left_back) 	LegRight=-1.0;
@@ -474,42 +474,3 @@ int Leg::SetJointPosition(const int& JointIdx, const double& position){
 
 /* ----------------------------------- END OF DOUBLE OVERLOADING ----------------------------------- */
 
-
-/* ----------------------------------- INT OVERLOADING ----------------------------------- */
-/* Currently no use of these - if you want them back, remember to declare them in the header
-void Leg::SetLegPosition(const int& knee_pos, const int& hip_pos, const int& arm_pos, const int& wing_pos){
-	
-	SetJointPosition(ARM, arm_pos);
-	SetJointPosition(HIP, hip_pos);
-	SetJointPosition(KNEE, knee_pos);
-	SetJointPosition(WING, wing_pos);
-}
-
-void Leg::SetLegPosition(const int& knee_pos, const int& hip_pos, const int& arm_pos){
-	
-	SetJointPosition(ARM, arm_pos);
-	SetJointPosition(HIP, hip_pos);
-	SetJointPosition(KNEE, knee_pos);
-}
-
-int Leg::SetJointPosition(const int& JointIdx, const int& position){
-	UpdateServoAngle(JointIdx, ServoAngleToRad(position) );
-	return Joints[JointIdx].SetGoalPosition(LegRight * ServoAngles[JointIdx]);
-}
-
-// Function required in order to save the proper values in ServoAngles[] when using int inputs
-// CW - positive output, CCW - negative output
-double Leg::ServoAngleToRad(const int& angle){
-	
-	// 5.23598775598 rad = 300 degrees
-	// 2.61799387799 rad = 150 degrees
-	double result = 2.61799387799 - ((angle/1024)*5.23598775598);
-
-	if (result>2.61799387799) return 2.61799387799;
-	else if (result<-2.61799387799) return -2.61799387799; 
-	else return result;
-}
-
-/* ----------------------------------- END OF INT OVERLOADING ----------------------------------- */
-
-/* =================================== END SET LEG POSITION MANUALLY ======================================= */

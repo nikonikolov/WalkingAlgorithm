@@ -3,15 +3,14 @@
 #ifndef AX12A_H
 #define AX12A_H
 
-//#include <DNXServo.h>
-#include "../DNXServo/DNXServo.h"
+#include "DNXServo.h"
 
 class AX12A : public DNXServo{
  
 public:
  	
  	// Create Dynamixel Communication protocol 2.0
-    AX12A(HardwareSerial& portIn, const long int& baudIn, const int& DebugLvlIn =0);
+    AX12A(mbed::Serial* portIn, const long int& baudIn);
 
 	~AX12A();
 

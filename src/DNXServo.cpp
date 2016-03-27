@@ -2,44 +2,13 @@
 
 /* ******************************** PUBLIC METHODS ************************************** */
 
-DNXServo::DNXServo(HardwareSerial& portIn, const long int& baudIn, const int& DebugLvlIn /*=0*/):
-	port(&portIn), baud(baudIn), ReturnLvl(1), DebugLvl(DebugLvlIn) {
+DNXServo::DNXServo(mbed::Serial* portIn, const long int& baudIn):
+	port(portIn), baud(baudIn), ReturnLvl(1) {
 
-	bitPeriod = 1000000.0/baud;
-	
-	if(port==&Serial1) port_num=1;
-	else if(port==&Serial2) port_num=2;
-	else if(port==&Serial3) port_num=3;
-	else Serial.println("Unknown port");
-	
-	port->begin(baud);
-
-	if(DebugLvl){
-		Serial.print("Serial");
-		Serial.print(port_num);
-		Serial.print(" started at ");
-		Serial.print(baud);
-		Serial.print(" baud rate and ");	
-		Serial.print(bitPeriod);
-		Serial.println(" bit period");
-	}
+	bitPeriod = 1.0/baud;
 }
 
 DNXServo::~DNXServo(){}
-
-unsigned char DNXServo::getPort() const{
-	return port_num;
-}
-
-// Enable Printing Debugging Messages on Serial
-void DNXServo::EnableDebugging(){
-	DebugLvl = 1;
-}
-
-// Disable Printing Debugging Messages on Serial
-void DNXServo::DisableDebugging(){
-	DebugLvl = 0;
-}
 
 // SetID
 int DNXServo::SetID(const int& ID, const int& newID){
@@ -64,28 +33,30 @@ int DNXServo::GetValue(const int& ID, const int& address){
 
 // Clear input buffer
 void DNXServo::flush() {	
-	while (port->available()) {
-		port->read();
+	while (port->readable()) {
+		port->getc();
 	}
 }
 
 
 // Write buffer to servo 
 void DNXServo::write(unsigned char* buf, const int& n) {
-	for (int i=0; i < n; i++) {
-		port->write(buf[i]);
+	int i=0;
+	for (; i < n; i++) {
+		port->putc(buf[i]);
 	}
 
+	i=0;
 	while(i<n){
-		if (port->available()){	
-			port->read();			//empty buffer because tx has written to rx	(only in case of tx and rx connected)																
+		if (port->readable()){	
+			port->getc();			//empty buffer because tx has written to rx	(only in case of tx and rx connected)																
 			i++;					//rate of the loop does not equal rate of communication
 		}
 	}
 
 	/*for (int i=0; i < n; ) {
-		if (port->available()){	
-			port->read();			//empty buffer because tx has written to rx	(only in case of tx and rx connected)																
+		if (port->readable()){	
+			port->getc();			//empty buffer because tx has written to rx	(only in case of tx and rx connected)																
 			i++;					//rate of the loop does not equal rate of communication
 		}
 	}*/
@@ -93,19 +64,19 @@ void DNXServo::write(unsigned char* buf, const int& n) {
 
 
 // Read reply returns payload length, 0 if error.
-int DNXServo::read(const int& ID, unsigned char* buf, const int& nMax /* =255 */) {			//check readBytesUntil()
+int DNXServo::read(unsigned char* buf, const int& nMax /* =255 */) {			//check readBytesUntil()
 
 	int n = 0; 		 	// Bytes read
 	int timeout = 0; 	// Timeout
 
 	while ((timeout < 500) && (n < nMax)) {
-		if (port->available()) {
-			buf[n] = port->read();
+		if (port->readable()) {
+			buf[n] = port->getc();
 			n++;
 			timeout = 0;
 		}
 																	
-		delayMicroseconds(bitPeriod);																	
+		wait(bitPeriod);																	
 		timeout++;		
 	}
 
@@ -121,12 +92,12 @@ int DNXServo::angleScale(const double& angle){
 	// 0 is end CW and 1024 is end CCW
 
 	if (result>1024){
-		if(DebugLvl) Serial.println("CCW out of range");
+		pc.print_debug("CCW out of range\n");
 		return 1024;	
 	} 
 
 	else if (result<0){
-		if(DebugLvl) Serial.println("CW out of range");
+		pc.print_debug("CW out of range\n");
 		return 0;	
 	}  
 	
@@ -149,12 +120,12 @@ int DNXServo::AddressLenght(const int& address, const unsigned char * TWO_BYTE_A
 
 // packetPrint
 void DNXServo::packetPrint(const int& bytes, unsigned char* buf) {
-	Serial.print("PACKET {");
+	if(!pc.get_debug()) return;
+	pc.print_debug("PACKET {");
 	for (int i=0; i < bytes; i++) {
-		Serial.print(buf[i], HEX);
-		Serial.print(" ");
+		pc.print_debug(to_hex(buf[i])+" ");
 	}
-	Serial.println(" } ");
+	pc.print_debug(" } \n");
 }
 
 

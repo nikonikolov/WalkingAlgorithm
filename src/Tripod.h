@@ -38,7 +38,7 @@ SUGGESTED IMPROVEMENTS:
 #ifndef TRIPOD_H
 #define TRIPOD_H
 
-#include "../Leg/Leg.h"
+#include "Leg.h"
 
 #define FRONTLEG 	0
 #define MIDDLELEG 	1

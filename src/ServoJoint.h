@@ -1,7 +1,7 @@
 #ifndef SERVOJOINT_H
 #define SERVOJOINT_H
 
-#include "../DNXServo/DNXServo.h"
+#include "DNXServo.h"
 
 class ServoJoint{
 

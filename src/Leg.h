@@ -32,9 +32,9 @@ FUNCTIONALITY:
 -------------------------------------------------------------------------------------------
 
 FRAMEWORK:
-	1. ALWAYS THINK ABOUT THE CONFIGURATION IN TERMS OF LEFT LEG. THE ALGORITHM DEALS EXCLUSIVELY WITH LEFT LEG ONLY.
-		VALUES ARE STORED FOR LEFT LEG ONLY. CONVERSION TO RIGHT LEG HAPPENS ONLY AT THE TIME OF WRITING TO SERVO
-	
+	1. Algorithm and servo values stored are for LEDT LEGS only. Values for RIGHT LEG are exactly the opposite and are
+	converted at the time of writing to the servos
+
 	2. ServoAngles[] 	-	Operate Directly - value stored is the offset of the servo from it's central position
 	3. StateVars[]		-	Use UpdateStateVars(). Function automatically updates square value for the variable
 							and the rest of the variables by calling UpdateState()
@@ -52,76 +52,13 @@ FRAMEWORK:
 
 -------------------------------------------------------------------------------------------
 
-FIXES TO BE DONE:
-
-	UPDATE ALGORTITHM TO TAKE INTO ACCOUNT THE LIFT ALONG FEMUR - THIS WILL BE PROBABLY FIXED MECHANICALLY
-	
-	1. Stand and BodyRaise all require some testing in order to be written. Both are required for take-off, landing and
-		additional functionality. Think about which part is managed from Tripod and which from Leg. As a side note, 
-		depending on mechanical implementation, is #define HEIGHT_STANDING Params[TIBIA]-0.9
-
-	2. Make sure that all angles are properly handled when calculating a movement, i.e. calculations are for LEFT LEG. 
-	3. Consider making a function to update state when only angles are changed
-	4. Verify angle limits
-	5. Make sure that flight-related operations use ClearState()
-	7. PutDownForStepForward() - currently default height assumed. Change to take account of current height - use 
-		the constructor help functions - construct_hip/knee_angle() - add excpetion throwing and handling to make sure a possible 
-		configuration is found
-	8. Reset() - assumes default height - has to be repaired somehow - maybe keeping the HEIGHT the same ??
-	9. Overload PutStraightDown() so that it uses construct_hip/knee_angle() rather than input height for the end effector
-	10. A better idea for WriteAngles() might be to do it in order ARM, HIP, KNEE
-	11. Make InitializeState(), CenterHip(), CenterKnee(), UpdateVars/State/HipKnee, LiftBodyUp make checks and throw exceptions
-	12. To finish LiftBodyUp() make a function for putting legs down on the ground when centered - save height in Robot class to
-	13. Think about making a function that dynamically adjusts the angle limits for hip and knee for the current height - 
-		sth similar to the simulation which computes all possible angle configurations
-	14. Try enums instead of #define
-
-	NOT NECESSARILY NEEDED FIXES, BUT HIGHLY PROBABLE SOURCES OF BUGS
-	1. Straighten(), LiftLegUp(), PutStraightDown() and PutDownForStepForward()
-		need to keep StateVars[] consistent
-	2. PutDownInDefault() - decide whether needed and make sure it takes account of current height and corrects the state
-		- you may use construct_hip/knee_angle()
-	Suggestions: Activation and Multiple write to servos - this needs to be coordinated with Tripod
-
-	NOTE: Calls to Initialize State after landing should be done from the top level, after confirmation from Pixhawk that
-	it has landed
-
-	
-	IDEA ABOUT SAFETY CHECKS - create a function that performs the check and throws exceptions. Catch them in Tripod class 
-	and repair by scaling the input passed to the function in Leg class.
-	Disadvantages - this may go on forever - 
-		1. no guarantees that this is the source of the exception (it should be, though, still we know that the state 
-			was valid before this movement was started)
-		2. You need to save all results of the computations in a temporary object and overwrite the results only if computation
-			was successful - you might need to do that anyways...
-		3. What if exception is thrown by the last leg to do the computation - you need to somehow save and overwrite this 
-			temporary object from the Tripod class. Solution might be to deal with Legs using Dynamic memory and simply copy the
-			state after being done. (copy constructor and a good idea)
-		4. Some functions need to be rewritten to take input arguments
-
-
-	Advantages: 
-		1. Centralized way of managing and fixing exceptions
-		2. Universality of the way a movement is performed
-
-	List and framework for functions that may generate exceptions
-	void PutDownForStepForward(const double& dist);
-	void IKForward(const double& dist);			// Change angles and state of Leg for a step forward
-	void IKRotate(const double& angle);			// Change angles and state of Leg for a rotation around central axis
-	void LiftBodyUp(const double& hraise);
-	void InitializeState();								// Computes valid StateVars[] basing on ServoAngles[]
-	void InitializeState(const double& height_in);		// Computes valid StateVars[] basing on height_in 
-	double CenterHip();									// Compute median HIP angle basing on Params[] ONLY
-	// Compute KNEE angle basing on HIP angle, Params[] and HEIGHT (if no input provided)
-	double CenterKnee(const double& height_hip = StateVars[HEIGHT]);	
-
 */
-
 
 #ifndef LEG_H
 #define LEG_H
-#include "../ServoJoint/ServoJoint.h"
-#include "../wkquad/wkquad.h"
+
+#include "ServoJoint.h"
+#include "wkquad.h"
 #include <cmath>
 
 
@@ -194,7 +131,7 @@ class Leg{
 public:
 	
 	Leg(const int& ID_knee, const int& ID_hip, const int& ID_arm, const int& ID_wing,
-		DNXServo* Knees, DNXServo* Hips, DNXServo* ArmsWings, const double& height_in);
+		DNXServo* HipKnees, DNXServo* ArmsWings, const double& height_in);
 
 	~Leg();
 

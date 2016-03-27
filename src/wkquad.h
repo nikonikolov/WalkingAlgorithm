@@ -1,5 +1,5 @@
-#ifndef WALKING_QUAD_NAMESPACE
-#define WALKING_QUAD_NAMESPACE
+#ifndef WKQUAD_NAMESPACE_H
+#define WKQUAD_NAMESPACE_H
 
 namespace wkquad{
 

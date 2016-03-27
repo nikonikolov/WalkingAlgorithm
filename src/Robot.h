@@ -36,7 +36,7 @@ FIXES TO BE DONE:
 #ifndef ROBOT_H
 #define ROBOT_H
 
-#include "../Tripod/Tripod.h"
+#include "Tripod.h"
 
 #define TRIPOD_COUNT 	2
 #define TRIPOD_LEFT 	0	
