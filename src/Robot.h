@@ -71,7 +71,7 @@ private:
 	//double MaxRotationAngle;
 	
 	double MaxStepSize;
-	wkquad::robot_state_t state;
+	wkquad::RobotState_t state;
 };
 
 #endif //ROBOT_H

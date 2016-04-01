@@ -16,7 +16,7 @@ class DNXServo{
 
 public:
 
-	DNXServo(mbed::Serial* portIn, const long int& baudIn);
+	DNXServo(mbed::Serial* portIn, const int& baudIn, const int ReturnLvlIn = 1);
 
 	virtual ~DNXServo();
 
@@ -56,9 +56,9 @@ protected:
     unsigned char reply_buf[256];		
 
     mbed::Serial* port;
-    long int baud;
+    int baud;
     double bitPeriod;
-    int ReturnLvl = 1;
+    int ReturnLvl = 2;
 
 };
 

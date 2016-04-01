@@ -24,16 +24,16 @@ Leg::Leg 	(const int& ID_knee, const int& ID_hip, const int& ID_arm, const int& 
 	if(ID_knee>wkquad::knee_left_back) 	LegRight=-1.0;
 	else 								LegRight=1.0;
 
-	// Order of HIP and KNEE calculation is important
+	// Set ServoAngles. Order of HIP and KNEE calculation is important!
 	ServoAngles[HIP] = CenterHip();
 	ServoAngles[KNEE] = CenterKnee(height_in);
 	ServoAngles[ARM] = 0.0;
 	ServoAngles[WING] = 0.0;
 
 	// Calculate AngleOffset
-	if(ID_knee == wkquad::knee_left_front || ID_knee == wkquad::knee_right_front) AngleOffset = wkquad::radians(30);
-	if(ID_knee == wkquad::knee_left_middle || ID_knee == wkquad::knee_right_middle) AngleOffset = wkquad::radians(30+60);
-	if(ID_knee == wkquad::knee_left_back || ID_knee == wkquad::knee_right_back) AngleOffset = wkquad::radians(30+120);
+	if(ID_knee == wkquad::knee_left_front 	|| ID_knee == wkquad::knee_right_front) 	AngleOffset = wkquad::radians(30);
+	if(ID_knee == wkquad::knee_left_middle 	|| ID_knee == wkquad::knee_right_middle) 	AngleOffset = wkquad::radians(30+60);
+	if(ID_knee == wkquad::knee_left_back 	|| ID_knee == wkquad::knee_right_back) 		AngleOffset = wkquad::radians(30+120);
 
 	// Initialize Robot state
 	InitializeState(height_in);

@@ -6,7 +6,7 @@ PCSerial::PCSerial(const bool& debug_in /*= false*/) : pc_usb(USBTX, USBRX), deb
 PCSerial::~PCSerial(){}
 
 void PCSerial::print_debug(const std::string& msg){
-	if(debug) return;
+	if(!debug) return;
 	pc_usb.printf(msg.c_str());
 }
 

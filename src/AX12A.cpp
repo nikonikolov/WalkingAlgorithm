@@ -3,11 +3,10 @@
 
 /* ******************************** PUBLIC METHODS ************************************** */
 
-AX12A::AX12A(mbed::Serial* portIn, const long int& baudIn):
-	DNXServo(portIn, baudIn) {
-	// make sure Return level matches
+AX12A::AX12A(mbed::Serial* portIn, const int& baudIn, const int ReturnLvlIn /*=1*/):
+	DNXServo(portIn, baudIn, ReturnLvlIn){
+		
 	SetReturnLevel(ID_Broadcast, ReturnLvl);
-
 	pc.print_debug("AX12A object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + itos(bitPeriod) + "\n");
 }
 

@@ -59,28 +59,28 @@ namespace wkquad{
 	const int arm_max =					1024;
 
 
-	enum robot_state_t{
-		state_idle 			= 0,			// not doing anything
-		state_in_flight 	= 1,			// flying with legs fully flat
-		state_walking 		= 2,			// walking
-		state_landing 		= 3,			// currently landing - knees on 90 degrees for landing
-		state_error 		= 4,			// not sure what is happening
-		state_default 		= 5,			// all servos configured to default positions
-		state_hex			= 6,			// not completely defined yet
-		state_quad			= 7,			// not completely defined yet
-		state_standing		= 8,			// body height equal to knee height, all knees to 90 degrees, the rest centered
+	enum RobotState_t{
+		RS_idle 		= 0,			// not doing anything
+		RS_in_flight 	= 1,			// flying with legs fully flat
+		RS_walking 		= 2,			// walking
+		RS_landing 		= 3,			// currently landing - knees on 90 degrees for landing
+		RS_error 		= 4,			// not sure what is happening
+		RS_default 		= 5,			// all servos configured to default positions
+		RS_hex			= 6,			// not completely defined yet
+		RS_quad			= 7,			// not completely defined yet
+		RS_standing		= 8,			// body height equal to knee height, all knees to 90 degrees, the rest centered
 	}; 
 
 
-	enum leg_state_t{
-		leg_knee_max_overflow 	= 0,
-		leg_knee_min_overflow 	= 1,
-		leg_hip_max_overflow 	= 2,
-		leg_hip_min_overflow 	= 3,
-		leg_arm_max_overflow 	= 4,
-		leg_arm_min_overflow 	= 5,
-		leg_wing_max_overflow 	= 6,
-		leg_wing_min_overflow 	= 7,
+	enum LegState_t{
+		LS_knee_max_overflow 	= 0,
+		LS_knee_min_overflow 	= 1,
+		LS_hip_max_overflow 	= 2,
+		LS_hip_min_overflow 	= 3,
+		LS_arm_max_overflow 	= 4,
+		LS_arm_min_overflow 	= 5,
+		LS_wing_max_overflow 	= 6,
+		LS_wing_min_overflow 	= 7,
 
 	}; 
 

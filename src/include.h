@@ -13,7 +13,7 @@ using std::stringstream;
 //using std::to_string;
 
 extern PCSerial pc;
-extern mbed::Serial deviceHipKnees;
+extern mbed::Serial deviceHipsKnees;
 extern mbed::Serial deviceArmsWings;
 
 string to_hex(const int& dec);

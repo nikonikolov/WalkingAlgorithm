@@ -2,10 +2,10 @@
 
 /* ******************************** PUBLIC METHODS ************************************** */
 
-DNXServo::DNXServo(mbed::Serial* portIn, const long int& baudIn):
-	port(portIn), baud(baudIn), ReturnLvl(1) {
-
-	bitPeriod = 1.0/baud;
+DNXServo::DNXServo(mbed::Serial* portIn, const int& baudIn, const int ReturnLvlIn /*=1*/):
+	port(portIn), baud(baudIn), ReturnLvl(ReturnLvlIn){
+	bitPeriod = ((double)1000000.0)/double(baud);
+	//bitPeriod = 1000000.0/baud;
 }
 
 DNXServo::~DNXServo(){}
@@ -41,43 +41,35 @@ void DNXServo::flush() {
 
 // Write buffer to servo 
 void DNXServo::write(unsigned char* buf, const int& n) {
-	int i=0;
-	for (; i < n; i++) {
+	for (int i=0; i < n; i++) {
 		port->putc(buf[i]);
 	}
 
-	i=0;
+	int i=0;
 	while(i<n){
 		if (port->readable()){	
 			port->getc();			//empty buffer because tx has written to rx	(only in case of tx and rx connected)																
 			i++;					//rate of the loop does not equal rate of communication
 		}
 	}
-
-	/*for (int i=0; i < n; ) {
-		if (port->readable()){	
-			port->getc();			//empty buffer because tx has written to rx	(only in case of tx and rx connected)																
-			i++;					//rate of the loop does not equal rate of communication
-		}
-	}*/
 }
 
 
 // Read reply returns payload length, 0 if error.
 int DNXServo::read(unsigned char* buf, const int& nMax /* =255 */) {			//check readBytesUntil()
-
 	int n = 0; 		 	// Bytes read
 	int timeout = 0; 	// Timeout
 
-	while ((timeout < 500) && (n < nMax)) {
+	while ((timeout < 16) && (n < nMax)) {
 		if (port->readable()) {
 			buf[n] = port->getc();
 			n++;
 			timeout = 0;
 		}
-																	
-		wait(bitPeriod);																	
-		timeout++;		
+		else{
+			wait_ms(bitPeriod);																	
+			timeout++;		
+		}															
 	}
 
 	return n;
