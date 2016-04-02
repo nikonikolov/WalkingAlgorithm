@@ -4,13 +4,11 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-//#include "../mbed/api/mbed.h"
 #include "mbed.h"
 #include "PCSerial.h"
 
 using std::string;
 using std::stringstream;
-//using std::to_string;
 
 extern PCSerial pc;
 extern mbed::Serial deviceHipsKnees;
