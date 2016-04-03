@@ -18,3 +18,9 @@ string itos(const int& num){
 	ss<<num;
 	return ss.str();
 }
+
+string dtos(const double& num){
+	stringstream ss;
+	ss<<num;
+	return ss.str();	
+}

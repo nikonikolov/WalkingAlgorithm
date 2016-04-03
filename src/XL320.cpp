@@ -7,7 +7,7 @@ XL320::XL320(mbed::Serial* portIn, const int& baudIn, const int ReturnLvlIn /*=1
 	DNXServo(portIn, baudIn, ReturnLvlIn) {
 
 	SetReturnLevel(ID_Broadcast, ReturnLvl);
-	pc.print_debug("XL320 object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + itos(bitPeriod) + "\n");
+	pc.print_debug("XL320 object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + dtos(bitPeriod) + "\n");
 }
 
 XL320::~XL320(){}

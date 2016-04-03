@@ -16,5 +16,6 @@ extern mbed::Serial deviceArmsWings;
 
 string to_hex(const int& dec);
 string itos(const int& num);
+string dtos(const double& num);
 
 #endif

@@ -4,12 +4,12 @@
 
 DNXServo::DNXServo(mbed::Serial* portIn, const int& baudIn, const int ReturnLvlIn /*=1*/):
 	port(portIn), baud(baudIn), ReturnLvl(ReturnLvlIn){
-	// For some reason result is not currently double
-	bitPeriod = ((double)1000000.0)/double(baud);
-	//bitPeriod = 1000000.0/baud;
+	
+	//bitPeriod = ((double)1000000.0)/double(baud);
+	bitPeriod = 1000000.0/baud;
 
 	// Set the baud rate of the port
-	port.baud(baud);
+	port->baud(baud);
 }
 
 DNXServo::~DNXServo(){}
