@@ -2,10 +2,6 @@
 
 PCSerial pc(false);
 
-mbed::Serial deviceHipsKnees(p9,p10);
-mbed::Serial deviceArmsWings(p13,p14);
-
-
 string to_hex(const uint8_t& dec){
 	stringstream ss;
 	ss<<std::hex<<(int)((uint32_t)dec);

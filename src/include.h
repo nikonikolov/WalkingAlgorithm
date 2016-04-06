@@ -11,8 +11,6 @@ using std::string;
 using std::stringstream;
 
 extern PCSerial pc;
-extern mbed::Serial deviceHipsKnees;
-extern mbed::Serial deviceArmsWings;
 
 string to_hex(const uint8_t& dec);
 string itos(const int& num);

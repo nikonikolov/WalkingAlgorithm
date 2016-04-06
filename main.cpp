@@ -26,11 +26,9 @@ int main(){
 	// Remember to set that to 1000000 - both for servos and for mbed
 	int baud = 115200;
 
-	deviceHipsKnees.baud(baud);
-	deviceArmsWings.baud(baud);
+	XL320 ArmsWings(p9, p10, baud);
+	AX12A HipsKnees(p13, p14, baud);
 
-	XL320 ArmsWings(&deviceArmsWings, baud);
-	//AX12A HipsKnees(&deviceHipsKnees, baud);
 /*
 	pc.print_debug("HipsKnees initialized\n");
 
