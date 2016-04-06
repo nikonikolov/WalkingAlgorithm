@@ -6,9 +6,9 @@ mbed::Serial deviceHipsKnees(p9,p10);
 mbed::Serial deviceArmsWings(p13,p14);
 
 
-string to_hex(const int& dec){
+string to_hex(const uint8_t& dec){
 	stringstream ss;
-	ss<<std::hex<<dec;
+	ss<<std::hex<<(int)((uint32_t)dec);
 	return ss.str();
 }
 

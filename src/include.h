@@ -14,7 +14,7 @@ extern PCSerial pc;
 extern mbed::Serial deviceHipsKnees;
 extern mbed::Serial deviceArmsWings;
 
-string to_hex(const int& dec);
+string to_hex(const uint8_t& dec);
 string itos(const int& num);
 string dtos(const double& num);
 

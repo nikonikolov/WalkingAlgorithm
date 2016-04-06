@@ -30,8 +30,8 @@ int main(){
 	deviceArmsWings.baud(baud);
 
 	XL320 ArmsWings(&deviceArmsWings, baud);
-	AX12A HipsKnees(&deviceHipsKnees, baud);
-
+	//AX12A HipsKnees(&deviceHipsKnees, baud);
+/*
 	pc.print_debug("HipsKnees initialized\n");
 
 	int val = HipsKnees.GetValue(14, AX_RETURN_LEVEL);
@@ -43,23 +43,21 @@ int main(){
 	HipsKnees.SetGoalPosition(XL_ID_Broadcast, 512);
 
 	pc.print_debug("Goal Position set\n");
+*/
 
+	int ID = 27;
+	pc.print_debug("ArmsWings initialized\n");
 
-/*	pc.print_debug("ArmsWings initialized\n");
+	int val = ArmsWings.GetValue(ID, XL_RETURN_LEVEL);
+	pc.print_debug("Return level is " + itos(val) + "\n");
 
-	int val = ArmsWings.GetValue(25, 3);
-	pc.print_debug("ID read from id 25 is " + itos(val) + "\n");
+	val = ArmsWings.GetValue(ID, 4);
+	pc.print_debug("baud rate is " + itos(val) + "\n");
 
-	val = ArmsWings.GetValue(XL_ID_Broadcast, 3);
-	pc.print_debug("ID read from id 25 is " + itos(val) + "\n");
-
-	val = ArmsWings.GetValue(25, 4);
-	pc.print_debug("baud rate read from id 25 is " + itos(val) + "\n");
-
-	ArmsWings.SetGoalPosition(XL_ID_Broadcast, 0);
+	ArmsWings.SetGoalPosition(ID, 3.14/4);
 
 	pc.print_debug("Goal Position set\n");
-*/
+
 	return 0;
 }
 
