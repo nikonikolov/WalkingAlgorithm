@@ -1,31 +1,73 @@
 #include "Robot.h"
 
 
-Robot::Robot (DNXServo* Knees, DNXServo* Hips, DNXServo* ArmsWings, const double& height_in) : 
-Tripods[TRIPOD_LEFT](wkquad::knee_left_front, wkquad::knee_right_middle, wkquad::knee_left_back, Knees, Hips, ArmsWings, height_in),
-Tripods[TRIPOD_RIGHT](wkquad::knee_right_front, wkquad::knee_left_middle, wkquad::knee_right_back, Knees, Hips, ArmsWings, height_in),
-	Height(height_in), state(wkquad::state_default){
-	WriteAngles();
+Robot::Robot(DNXServo* HipsKnees, DNXServo* ArmsWings, const double& height_in, wkq::RobotState_t state_in /*= wkq::RS_default*/) : 
+	
+	Tripods{
+		Tripod(wkq::knee_left_front, wkq::knee_right_middle, wkq::knee_left_back, HipsKnees, ArmsWings, height_in),
+		Tripod(wkq::knee_right_front, wkq::knee_left_middle, wkq::knee_right_back, HipsKnees, ArmsWings, height_in)
+	}, 
+	state(state_in){
+	
+	// Calculate max size for movements
+	max_step_size = 		CalcMaxStepSize();
+	max_rotation_angle = 	CalcMaxRotationAngle();
+	
+	// Initialize servos according to state
+	if 		(state == wkq::RS_default) 				Default();
+	else if (state == wkq::RS_standing) 			Stand();
+	else if (state == wkq::RS_standing_quad) 		StandQuad();
+	else if (state == wkq::RS_standing_flat_quad) 	{ StandQuad(); FlattenLegs(); }
+
+	//else throw string("Robot cannot be initialized to non-standing position");
 }
 
 
 Robot::~Robot(){}
 
-void Robot::Reset(){
+
+/* ================================================= STANDING POSITIONS ================================================= */
+
+void Robot::Default(){
+	state = wkq::RS_default;
 	for(int i=0; i<TRIPOD_COUNT; i++){
-		Tripods[i].Reset();
+		Tripods[i].Default();
 	}
 }
 
-
-void Robot::WriteAngles(){
+void Robot::Center(){
+	state = wkq::RS_centered;
 	for(int i=0; i<TRIPOD_COUNT; i++){
-		Tripods[i].WriteAngles(distance);
+		Tripods[i].Center();
 	}
 }
+
+void Robot::Stand(){
+	state = wkq::RS_standing;
+	RaiseBody(Tripods[0].Standing());
+	for(int i=0; i<TRIPOD_COUNT; i++){
+		Tripods[i].Stand();
+	}
+}
+
+void Robot::StandQuad(){
+	state = wkq::RS_standing_quad;
+	Stand();
+	for(int i=0; i<TRIPOD_COUNT; i++){
+		Tripods[i].StandQuad();
+	}
+}
+
+void Robot::FlattenLegs(){
+	for(int i=0; i<TRIPOD_COUNT; i++){
+		Tripods[i].FlattenLegs();
+	}
+}
+
 
 /* ================================================= WALK RELATED FUNCTIONALITY ================================================= */
 
+/*
 void Robot::WalkForward (const double& coeff){
 	
 	Tripods[TRIPOD_LEFT].LiftTripodUp(5);
@@ -44,9 +86,11 @@ void Robot::Rotate(double angle){
 }
 
 
-
-void Robot::LiftBodyUp(const double& hraise){
-	Tripods[TRIPOD_LEFT].LiftBodyUp(hraise);
+/*
+void Robot::RaiseBody(const double& hraise){
+	if(almost_equals(0.0, hraise)) return;
+	// Note: Coppying tripod state not a good idea since angles might be different for arms...
+	Tripods[TRIPOD_LEFT].RaiseBody(hraise);
 	Tripods[TRIPOD_RIGHT].CopyTripodState(Tripods[TRIPOD_LEFT]);
 }
 
@@ -58,16 +102,23 @@ void Robot::PutRobotDown(const double& height){
 	WriteAngles();
 }
 
-/* ================================================= END WALK RELATED FUNCTIONALITY ================================================= */
+void Robot::WriteAngles(){
+	for(int i=0; i<TRIPOD_COUNT; i++){
+		Tripods[i].WriteAngles(distance);
+	}
+}
+*/
+
+void Robot::RaiseBody(const double& hraise){}
 
 
-/* ================================================= FLIGHT RELATED FUNCTIONALITY ================================================= */
+/* ================================================= PRIVATE METHODS ================================================= */
 
-
-void Robot::ConfigureQuadcopter(){
-
+double Robot::CalcMaxStepSize(){
+	return 11.0;
 }
 
-void Robot::ConfigureHexacopter(){
-
+double Robot::CalcMaxRotationAngle(){
+	return (wkq::PI)/3;
 }
+

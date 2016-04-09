@@ -1,12 +1,8 @@
 #include "ServoJoint.h"
 
-ServoJoint::ServoJoint(int ID_in, DNXServo* SerialObjPtrIn):
-	ID(ID_in), SerialObjPtr(SerialObjPtr) {}
+ServoJoint::ServoJoint() :	ID(0), SerialObjPtr(NULL) {}
 
-
-int ServoJoint::GetPort() const {
-	return SerialObjPtr->getPort();
-}
+ServoJoint::ServoJoint(int ID_in, DNXServo* SerialObjPtrIn) : ID(ID_in), SerialObjPtr(SerialObjPtr) {}
 
 // return ID of the object, not of the physical servo
 int ServoJoint::GetID() const {
@@ -51,4 +47,11 @@ int ServoJoint::SetGoalTorque(int torque){
 
 int ServoJoint::SetPunch(int punch){
 	return SerialObjPtr->SetPunch(ID, punch);
+}
+
+void ServoJoint::operator=(const ServoJoint& obj_in){
+	if(this != &obj_in){
+		ID = obj_in.ID;
+		SerialObjPtr = obj_in.SerialObjPtr;
+	}
 }

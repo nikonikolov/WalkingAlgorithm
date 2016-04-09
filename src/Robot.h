@@ -24,11 +24,12 @@ FRAMEWORK:
 
 FIXES TO BE DONE:
 	1. Configuring as Quad/Hex - need to coordinate with robot and clarify the sequence order
-	2. Initializing and keeping State
-	3. Calculating max step size - needed so that you can pass proper parameters to functions
-	4. Compute somehow max rotation angle
 	5. Introduce a way to vary angle and step size in functions - use a coeff<1 as input and multiply it to param
 
+	6. Body for CalcMaxStepSize
+	7. Body for CalcMaxRotationAngle
+	8. Add function for modifying state out of the class and automatically making the movement
+	9. Have a look at movement functions
 
 */
 
@@ -36,7 +37,10 @@ FIXES TO BE DONE:
 #ifndef ROBOT_H
 #define ROBOT_H
 
+#include "wkq.h"
 #include "Tripod.h"
+
+using wkq::RobotState_t;
 
 #define TRIPOD_COUNT 	2
 #define TRIPOD_LEFT 	0	
@@ -46,32 +50,39 @@ FIXES TO BE DONE:
 class Robot{
 
 public:
-	Robot(DNXServo* Knees, DNXServo* Hips, DNXServo* ArmsWings, const double& height_in); 
-	~Robot ();
+	Robot(DNXServo* HipsKnees, DNXServo* ArmsWings, const double& height_in, wkq::RobotState_t state_in = wkq::RS_default); 
+	~Robot();
 
-	void Reset();			
+	/* ------------------------------------ STANDING POSITIONS ----------------------------------- */
+
+	void Default();					// Reset all Leg parameters to their default values
+	void Center();					// Reset all Legs to their central positions and keep current height
+	void Stand();					// Set all Legs to a standing state where height = Tibia
+	void StandQuad();				// Same as Stand() but arms configured as quad
+	void FlattenLegs();				// Flatten the knee
 
 	/* ------------------------------------ WALK RELATED FUNCTIONALITY ----------------------------------- */
+	
+	void RaiseBody(const double& hraise);
 	//void WalkForward(const double& coeff);
 	//void Rotate(const double& angle);
-	void LiftBodyUp(const double& hraise);
-
-	/* ------------------------------------ FLIGHT RELATED FUNCTIONALITY ----------------------------------- */
-
-	//void ConfigureQuadcopter();
-	//void ConfigureHexacopter();
-
-	//void Stand();
-	//void Default();
+	//void LiftBodyUp(const double& hraise);
 
 
 private:
+	double CalcMaxStepSize();
+	double CalcMaxRotationAngle();
+
+
+	/* ------------------------------------ MEMBER DATA ----------------------------------- */
+
 	Tripod Tripods[TRIPOD_COUNT];
-	//double Height;
-	//double MaxRotationAngle;
 	
-	double MaxStepSize;
-	wkquad::RobotState_t state;
+	// Both MAXes always positive; Negative limit same number
+	double max_rotation_angle;
+	double max_step_size;
+
+	wkq::RobotState_t state;
 };
 
 #endif //ROBOT_H

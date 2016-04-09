@@ -16,4 +16,6 @@ string to_hex(const uint8_t& dec);
 string itos(const int& num);
 string dtos(const double& num);
 
+bool almost_equals(const double& a, const double& b);
+
 #endif

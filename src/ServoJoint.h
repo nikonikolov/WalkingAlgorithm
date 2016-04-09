@@ -7,9 +7,9 @@ class ServoJoint{
 
 public:
 
+	ServoJoint();
 	ServoJoint(int ID_in, DNXServo* SerialObjPtrIn);
 
-	int GetPort() const;
 	int GetID() const;
 
     int SetID(int newID);
@@ -22,6 +22,8 @@ public:
 	int SetGoalVelocity(int velocity);
 	int SetGoalTorque(int torque);
 	int SetPunch(int punch);
+
+	void operator=(const ServoJoint& obj_in);
 
 private:
 

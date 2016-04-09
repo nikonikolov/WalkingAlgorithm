@@ -23,15 +23,6 @@ FRAMEWORK:
 
 -------------------------------------------------------------------------------------------
 
-FIXES TO BE DONE:
-	1. Configuring as Quad/Hex - need to coordinate with robot and clarify the sequence order
-	2. NOTE: If a leg throws that movement 
-
--------------------------------------------------------------------------------------------
-
-SUGGESTED IMPROVEMENTS:
-	1. Leg collission and other safety checks. Note this cannot be performed in the 
-	2. Step size correction - this has to be coordinated with the Leg class as it holds the parameters of the robot
 */
 
 
@@ -50,16 +41,23 @@ class Tripod{
 
 public:
 	Tripod(const int& ID_front_knee, const int& ID_middle_knee, const int& ID_back_knee,
-		DNXServo* Knees, DNXServo* Hips, DNXServo* ArmsWings, const double& height_in);
+			DNXServo* HipsKnees, DNXServo* ArmsWings, const double& height_in);
 
 	~Tripod ();
 
+	/* ------------------------------------ STANDING POSITIONS ----------------------------------- */
 
-	void Reset();									// Reset all Legs to their default states
-	void Center();									// Reset all Legs to their central positions but keep current height
+	void Default();					// Reset all Leg parameters to their default values
+	void Center();					// Reset all Legs to their central positions and keep current height
+	void Stand();					// Set all Legs to a standing state where height = Tibia
+	void StandQuad();				// Same as Stand() but arms configured as quad
+	void FlattenLegs();				// Flatten the knee
 
+	double Standing();				// Determines if standing, and if not returns by how much should be lifted
+	
 	/* ------------------------------------ WALK RELATED FUNCTIONALITY ----------------------------------- */
 	
+	/*
 	void BodyForward(const double& distance);
 	void BodyRotate(const double& angle);
 
@@ -69,17 +67,17 @@ public:
 	//void PutTripodStraightDown(); - Leg Function needed to be overloaded to make valid
 	
 	void LiftBodyUp(const double& hraise);
-
-	/* ------------------------------------ FLIGHT RELATED FUNCTIONALITY ----------------------------------- */
-	//void ConfigureQuadcopter();
-	//void ConfigureHexacopter();
-
-
+	*/
 private:
 	void WriteAngles();
+	void WriteAllAngles();
 	void WriteHipKneeAngles();
 
 	Leg Legs[LEG_COUNT];
+
+	static const double leg_lift;
 };
 
-#endif //TRIPOD_H
+#endif 
+
+

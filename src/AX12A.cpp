@@ -263,7 +263,7 @@ int AX12A::dataPull(const int& ID, const int& address){
    	}
 
    	else{
-   		pc.print_debug("WRONG ID REPLIED\n");
+   		pc.print_debug("WRONG ID " + to_hex(reply_buf[2]) + " REPLIED\n");
    		return -1;
    	}
 }

@@ -3,7 +3,9 @@
 
 GCC_BIN = 
 PROJECT = bin/wkquad
-OBJECTS = ./main.o ./src/include.o ./src/DNXServo.o ./src/AX12A.o ./src/XL320.o ./src/PCSerial.o
+OBJECTS = ./main.o $(LIB_OBJS) $(ROBOT_OBJS)
+LIB_OBJS = ./src/include.o ./src/DNXServo.o ./src/AX12A.o ./src/XL320.o ./src/PCSerial.o 
+ROBOT_OBJS = ./src/ServoJoint.o ./src/State_t.o ./src/Leg.o ./src/Tripod.o ./src/Robot.o ./src/wkq.o
 SYS_OBJECTS = ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/board.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/cmsis_nvic.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/retarget.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/startup_LPC17xx.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/system_LPC17xx.o 
 INCLUDE_PATHS = -I. -I./mbed -I./mbed/TARGET_LPC1768 -I./mbed/TARGET_LPC1768/TARGET_NXP -I./mbed/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X -I./mbed/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X/TARGET_MBED_LPC1768 -I./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM 
 LIBRARY_PATHS = -L./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM 
