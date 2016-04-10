@@ -21,19 +21,19 @@ void Tripod::Default(){
 }
 
 void Tripod::Center(){
-	/*LiftTripodUp(5);
+	LiftUp(5);
 	for(int i=0; i<LEG_COUNT; i++){
 		if(i==0) Legs[i].Center();
 		// All Legs have same defaults so save some computations
 		else Legs[i].CopyState(Legs[0]);
 		Legs[i].WriteAllAngles();
-	}*/
+	}
 }
 
 void Tripod::Stand(){
 	// Robot already has made sure that body was lifted if necessary. Do it leg by leg to ensure you don't overload servos
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].Raise(leg_lift);
+		Legs[i].LiftUp(leg_lift);
 		Legs[i].WriteAngles();
 		Legs[i].Stand();
 		Legs[i].WriteAllAngles();
@@ -43,7 +43,7 @@ void Tripod::Stand(){
 void Tripod::StandQuad(){
 	// Robot already has made sure that body was lifted if necessary. Do it leg by leg to ensure you don't overload servos
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].Raise(leg_lift);
+		Legs[i].LiftUp(leg_lift);
 		Legs[i].WriteAllAngles();
 		Legs[i].StandQuad();
 		Legs[i].WriteAllAngles();
@@ -63,80 +63,81 @@ double Tripod::Standing(){
 	if(!almost_equals(height, height_stand)) return 0.0;
 	else return height_stand - height;
 }
-/*
-void Tripod::CopyTripodState(const Tripod& TripodIn){
-	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].CopyState(TripodIn.Legs[i]);
-	}
-	WriteAngles();
-}
-*/
 
-/* ================================================= WALK RELATED FUNCTIONALITY ================================================= */
-/*
-void Tripod::BodyForward (const double& distance){
+void Tripod::CopyState(const Tripod& tripod_in){
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].IKForward(distance);
+		Legs[i].CopyState(tripod_in.Legs[i]);
 	}
 	WriteAngles();
 }
 
-void Tripod::BodyRotate(double angle){
+
+/* ================================================= WALKING ALGORITHMS ================================================= */
+
+void Tripod::BodyForward (const double& step_size){
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].IKRotate(angle);
+		Legs[i].IKBodyForward(step_size);
 	}
 	WriteAngles();
 }
 
-void Tripod::LiftTripodUp(const double& height){
+void Tripod::StepForward (const double& step_size){
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].Raise(height);
+		Legs[i].StepForward(step_size);
 	}
 	WriteAngles();
 }
 
-void Tripod::PutTripodDownForStepForward(const double& distance){
+
+void Tripod::BodyRotate(const double& angle){
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].PutDownForStepForward(distance);
+		Legs[i].IKBodyRotate(angle);
 	}
 	WriteAngles();
 }
 
-void Tripod::PutTripodStraightDown(){
+void Tripod::StepRotate(const double& angle){
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].PutStraightDown();
+		Legs[i].StepRotate(angle);
 	}
 	WriteAngles();
 }
 
-void Tripod::PutTripodStraightDown(const double& height){
-	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].PutStraightDown(height);
-	}
-	WriteAngles();
-}
 
-/* ================================================= END WALK RELATED FUNCTIONALITY ================================================= */
-
-
-/* ================================================= FLIGHT RELATED FUNCTIONALITY ================================================= */
-/*
-void Tripod::LiftBodyUp(const double& hraise){
+void Tripod::RaiseBody(const double& hraise){
 	Center();
 	for(int i=0; i<LEG_COUNT; i++){
-		if(i==0) Legs[i].LiftBodyUp(hraise);
-		else Legs[i].CopyState(Legs[0]);
+		if(i==0) 	Legs[i].RaiseBody(hraise);
+		else 		Legs[i].CopyState(Legs[0]);
 	}
 	WriteHipKneeAngles();
 }
 
-/*
-void Tripod::ConfigureQuadcopter(){
-	if(Param[HEIGHT]!=HEIGHT_STANDING) LiftTripodUp(HEIGHT_STANDING-Param[HEIGHT]);
-}
-*/
 
-/* ================================================= END FLIGHT RELATED FUNCTIONALITY ================================================= */
+/* ================================================= RAISE AND LOWER ================================================= */
+
+
+void Tripod::LiftUp(const double& height_up){
+	for(int i=0; i<LEG_COUNT; i++){
+		Legs[i].LiftUp(height_up);
+	}
+	WriteAngles();
+}
+
+void Tripod::LowerDown(const double& height_down){
+	for(int i=0; i<LEG_COUNT; i++){
+		Legs[i].LowerDown(height_down);
+	}
+	WriteAngles();
+}
+
+void Tripod::FinishStep(){
+	for(int i=0; i<LEG_COUNT; i++){
+		Legs[i].FinishStep();
+	}
+	WriteAngles();
+}
+
 
 /* ================================================= PRIVATE FUNCTIONALITY ================================================= */
 

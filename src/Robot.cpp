@@ -67,40 +67,55 @@ void Robot::FlattenLegs(){
 
 /* ================================================= WALK RELATED FUNCTIONALITY ================================================= */
 
-/*
+
 void Robot::WalkForward (const double& coeff){
-	
-	Tripods[TRIPOD_LEFT].LiftTripodUp(5);
-	Tripods[TRIPOD_RIGHT].BodyForward(step);
-	Tripods[TRIPOD_LEFT].PutTripodDownForStepForward(step);
-	Tripods[TRIPOD_RIGHT].LiftTripodUp(5);
+
+	double step_size = coeff*max_step_size;
+	double ef_raise = 5.0;
+
+	bool continue_movement = true;
+	int tripod_up = TRIPOD_LEFT, tripod_down = TRIPOD_RIGHT;
+	while(continue_movement){
+		Tripods[tripod_up].LiftUp(ef_raise);
+		Tripods[tripod_down].BodyForward(step_size);
+
+		// Read Input and find out whether movement should go on
+		//continue_movement = InputWalkForward();
+
+		// Movement goes on
+		if(continue_movement){
+			Tripods[tripod_up].StepForward(step_size);
+			std::swap(tripod_up, tripod_down);
+		}
+		
+		// Movement stops
+		else{
+			Tripods[tripod_up].FinishStep();
+			Tripods[tripod_down].LiftUp(ef_raise);
+			Tripods[tripod_down].FinishStep();
+		}
+	}
 }
 
 
-void Robot::Rotate(double angle){
-	for(int i=0; i<TRIPOD_COUNT; i++){
-		Tripods[i].IKRotate(angle);
+void Robot::Rotate(const double& angle){
+	/*for(int i=0; i<TRIPOD_COUNT; i++){
+		Tripods[i].BodyRotate(angle);
 	}
 
 	WriteAngles();
+	*/
 }
 
-
-/*
 void Robot::RaiseBody(const double& hraise){
 	if(almost_equals(0.0, hraise)) return;
-	// Note: Coppying tripod state not a good idea since angles might be different for arms...
 	Tripods[TRIPOD_LEFT].RaiseBody(hraise);
-	Tripods[TRIPOD_RIGHT].CopyTripodState(Tripods[TRIPOD_LEFT]);
+	Tripods[TRIPOD_RIGHT].CopyState(Tripods[TRIPOD_LEFT]);
 }
 
-void Robot::PutRobotDown(const double& height){
-	for(int i=0; i<TRIPOD_COUNT; i++){
-		Tripods[i].PutStraightDown(height);
-	}
 
-	WriteAngles();
-}
+
+/*
 
 void Robot::WriteAngles(){
 	for(int i=0; i<TRIPOD_COUNT; i++){
@@ -109,7 +124,6 @@ void Robot::WriteAngles(){
 }
 */
 
-void Robot::RaiseBody(const double& hraise){}
 
 
 /* ================================================= PRIVATE METHODS ================================================= */

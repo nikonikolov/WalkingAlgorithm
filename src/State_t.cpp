@@ -8,10 +8,10 @@ const double State_t::Params[PARAM_COUNT] = { 10.95, 2.65, 17.5, 30.0, 12.0, 2.2
 
 // Values are valid for a left leg and correspond to values that are written to the servo
 const double State_t::AngleLimits[JOINT_COUNT*2] = { 	wkq::radians(0), wkq::radians(150),					/* KNEE */ 
-													wkq::radians(-(90-20)), wkq::radians(90-20),		/* HIP - JUST A GUESS */
-													wkq::radians(-(90-20)), wkq::radians(90-20),		/* ARM - JUST A GUESS */
-													wkq::radians(-150), wkq::radians(150)				/* WING */
-												};
+														wkq::radians(-(90-20)), wkq::radians(90-20),		/* HIP - JUST A GUESS */
+														wkq::radians(-(90-20)), wkq::radians(90-20),		/* ARM - JUST A GUESS */
+														wkq::radians(-150), wkq::radians(150)				/* WING */
+													};
 
 double State_t::DefaultVars[VAR_COUNT] 	= { 0.0 };
 double State_t::DefaultAngles[JOINT_COUNT] = { 0.0 };
@@ -29,18 +29,12 @@ State_t::State_t(const double& height_in) : ServoAngles { 0.0 }, Vars{ 0.0 } {
 	if(!defaults_calculated){
 		defaults_calculated = true;
 
-		// Find Default ServoAngles for Hip and Knee. Order of HIP and KNEE calculation is important!
-		ServoAngles[HIP] = CenterHip();
-		ServoAngles[KNEE] = CenterKnee(height_in);
-
-		// Compute Vars
-		ComputeVars();
-
+		// Find Default ServoAngles for Hip and Knee. Automatically Computes the state as well
+		CenterAngles(height_in);
 
 		// Save Default Variables
 		for(int i=0; i<VAR_COUNT; i++){
-			if(i<VAR_STEP) 	DefaultVars[i] = Vars[i]; 				// Normal values
-			else 			DefaultVars[i] = pow(DefaultVars[i],2);		// Square values
+			DefaultVars[i] = Vars[i]; 				
 		}
 
 		// Save Default Angles
@@ -103,17 +97,11 @@ void State_t::LegDefault(){
 void State_t::LegCenter(){
 	ServoAngles[WING] = DefaultAngles[WING];
 	ServoAngles[ARM] = DefaultAngles[ARM];
-	CenterHip();
-	CenterKnee();
-	ComputeVars();
+	CenterAngles();
 }
 
 void State_t::LegStand(){
-	ServoAngles[KNEE] = (wkq::PI)/2;
-	ServoAngles[HIP] = 0.0;
-	ServoAngles[ARM] = 0.0;
-	ServoAngles[WING] = 0.0;
-	ComputeVars();
+	SetAngles((wkq::PI)/2, 0.0, 0.0, 0.0);		// Automatically calls ComputeVars[] and computes new state
 }
 
 void State_t::LegFlatten(){	
@@ -163,8 +151,9 @@ void State_t::Update(const int& idx){
 			UpdateVar(HIPTOEND_SQ, pow((Vars[ARMGTOEND]-Params[COXA]),2) + Vars[HEIGHT_SQ], false);
 			break;
 		case HEIGHT:
-			// Only HIPTOEND is affected
+			// Only EFCENTER and HIPTOEND affected. ARMGTOEND is not affected by height change
 			UpdateVar(HIPTOEND_SQ, pow((Vars[ARMGTOEND]-Params[COXA]),2) + Vars[HEIGHT_SQ], false);
+			UpdateVar(EFCENTER, Vars[ARMGTOEND]+Params[DISTCENTER], false);
 			break;
 		//default:	// Good idea is to throw exception or signal somehow
 	}
@@ -188,19 +177,8 @@ void State_t::UpdateAngles(){
 }
 
 
-// Computes valid Vars[] basing on ServoAngles[] and assumes all Vars[] can be defined
-void State_t::ComputeVars(){
-	double knee_height = Params[TIBIA]*cos(wkq::radians(90) - abs(ServoAngles[HIP]) - (wkq::PI - ServoAngles[KNEE]) );
-	
-	double height = knee_height - Params[FEMUR]*sin(abs(ServoAngles[HIP]));
-	UpdateVar(HEIGHT, height, false);					// Only updates HEIGHT
-	
-	double hip_to_end_sq = pow(Params[FEMUR],2) + pow(Params[TIBIA],2) - 2*Params[FEMUR]*Params[TIBIA]*cos(wkq::PI - ServoAngles[KNEE]);
-	UpdateVar(HIPTOEND_SQ, hip_to_end_sq, false); 		// Only updates HIPTOEND
 
-	double arm_g_to_end = sqrt(Vars[HIPTOEND_SQ]-Vars[HEIGHT_SQ]) + Params[COXA];
-	UpdateVar(ARMGTOEND, arm_g_to_end, false); 			// Only updates ARMGTOEND
-}
+
 
 void State_t::Clear(){
 	for(int i=0; i<VAR_COUNT; i++){
@@ -240,24 +218,60 @@ void State_t::Verify(){
 */
 
 
-/* --------------------------------------- FIND CENTRALIZED ANGLE VALUES --------------------------------------- */
-
-
-
-double State_t::CenterHip(){
+void State_t::CenterAngles(const double& height /*=0.0*/){
+	// Center HIP
 	double hip_max=asin(Params[HIPKNEEMAXHDIST]/Params[FEMUR]);
-	return wkq::radians(90) - ( hip_max + ( wkq::radians(90) - AngleLimits[HIP_MIN] ) )/2;
-}
+	ServoAngles[HIP] = wkq::radians(90) - ( hip_max + ( wkq::radians(90) - AngleLimits[HIP_MIN] ) )/2;
 
-double State_t::CenterKnee(const double& height_hip_in /*=0.0*/){
+	// Center KNEE
 	double height_hip;
-	if(height_hip_in==0.0) height_hip = Vars[HEIGHT];
-	else height_hip = height_hip_in;
+	if(height==0.0) height_hip = Vars[HEIGHT];
+	else height_hip = height;
 
 	double height_knee = height_hip + Params[FEMUR]*sin(ServoAngles[HIP]);
 	double knee_angle = wkq::radians(90) - ServoAngles[HIP] - acos(height_knee/Params[TIBIA]);
-	return wkq::radians(180) - knee_angle;
+	ServoAngles[KNEE] = wkq::radians(180) - knee_angle;
+
+	ComputeEFVars(height);			// Update Vars[] - needs to be passed the same argument
+}
+
+void State_t::SetAngles(const double& knee, const double& hip, const double& arm, const double& wing){
+	ServoAngles[KNEE] = knee;
+	ServoAngles[HIP] = hip;
+	ServoAngles[ARM] = arm;
+	ServoAngles[WING] = wing;
+	ComputeVars();
 }
 
 
 
+// Computes valid Vars[] basing on ServoAngles[] and assumes all Vars[] can be defined
+void State_t::ComputeVars(){
+	double knee_height = Params[TIBIA]*cos(wkq::radians(90) - abs(ServoAngles[HIP]) - (wkq::PI - ServoAngles[KNEE]) );
+	
+	double height = knee_height - Params[FEMUR]*sin(abs(ServoAngles[HIP]));
+	UpdateVar(HEIGHT, height, false);					// Only updates HEIGHT
+	
+	double hip_to_end_sq = pow(Params[FEMUR],2) + pow(Params[TIBIA],2) - 2*Params[FEMUR]*Params[TIBIA]*cos(wkq::PI - ServoAngles[KNEE]);
+	UpdateVar(HIPTOEND_SQ, hip_to_end_sq, false); 		// Only updates HIPTOEND
+
+	double arm_g_to_end = sqrt(Vars[HIPTOEND_SQ]-Vars[HEIGHT_SQ]) + Params[COXA];
+	UpdateVar(ARMGTOEND, arm_g_to_end, false); 			// Only updates ARMGTOEND
+
+	// Note that angles are already centered so EFCENTER will be fine
+	UpdateVar(EFCENTER, Vars[ARMGTOEND]+Params[DISTCENTER], false);
+}
+
+
+void State_t::ComputeEFVars(const double& height /*=0.0*/){
+	if(height!=0.0) UpdateVar(HEIGHT, height, false); 	// Only updates HEIGHT
+
+	double hip_to_end_sq = pow(Params[FEMUR],2) + pow(Params[TIBIA],2) - 2*Params[FEMUR]*Params[TIBIA]*cos(wkq::PI - ServoAngles[KNEE]);
+	UpdateVar(HIPTOEND_SQ, hip_to_end_sq, false); 		// Only updates HIPTOEND
+
+	double arm_g_to_end = sqrt(Vars[HIPTOEND_SQ]-Vars[HEIGHT_SQ]) + Params[COXA];
+	UpdateVar(ARMGTOEND, arm_g_to_end, false); 			// Only updates ARMGTOEND
+
+	// Note that angles are already centered so EFCENTER will be fine
+	if(height!=0.0) UpdateVar(EFCENTER, Vars[ARMGTOEND]+Params[DISTCENTER], false);
+}

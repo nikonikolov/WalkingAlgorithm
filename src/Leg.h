@@ -29,22 +29,18 @@ FUNCTIONALITY:
 -------------------------------------------------------------------------------------------
 
 FRAMEWORK:
-	1. Algorithms deal work only for LEFT LEG. Values for RIGHT LEG are computed at the time of writing as opposite to Left Leg
+	1. Algorithms work only for LEFT LEG. Values for RIGHT LEG are computed at the time of writing as opposite to Left Leg
 
-	2. ServoAngles[] 	-	Operate Directly - value stored is the offset of the servo from it's central position
-	3. StateVars[]		-	Use StateUpdateVars(). Function automatically updates square value for the variable
+	2. StateVars[]		-	Use UpdateVar(). Function automatically updates square value for the variable
 							and the rest of the variables by calling StateUpdate()
-	4. DefaultVars[]	-	Operate Directly 
-	5. DefaultAngles[]	-	Operate Directly 
-	6. Params[] 		-	Operate Directly
-	7. AngleLimits[]  	-	Operate Directly
-	8. StateUpdateVars()- 	When you use this to update HIPTOEND it is assumed the change is in ENDEFFECTOR
+	3. UpdateVar() 		- 	When you use this to update HIPTOEND it is assumed the change is in ENDEFFECTOR
 							rather than in the HEIGHT of the robot. If change is in the HEIGHT, the StateVars[HEIGHT]
 							will not be updates
-	9. StateUpdateHipKnee()	-	Function automatically called when StateUpdateVars() is called. Basing on StateVars[]
+	4. UpdateAngles()	-	Function automatically called when UpdateVar() is called. Basing on StateVars[]
 							function computes new angles for Hip and Knee
-	10. Center()		-	Assumes Leg is already lifted up, otherwise robot will probably fall down
-
+	5. Center()			-	Assumes Leg is already lifted up, otherwise robot will probably fall down
+	6. ComputeVars() 	- 	Computes all Vars[] based on the current ServoAngles[] does not use Update(), but computes variables
+							manually to ensure no call to UpdateAngles()
 
 -------------------------------------------------------------------------------------------
 
@@ -55,6 +51,7 @@ FRAMEWORK:
 
 #include "ServoJoint.h"
 #include "State_t.h"
+#include "Point.h"
 #include "wkq.h"
 #include "include.h"
 #include <cmath>
@@ -82,25 +79,23 @@ public:
 	inline void Flatten();					// Flatten the knee
 	void StandQuad();						// Same as Stand() but arms configured as quad
 
-	void Raise(const double& height);		// Lift End Effector in the air
 
-	/* ---------------------------------------- MANUAL LEG MANIPULATIONS ---------------------------------------- 
+	/* ---------------------------------------- RAISE AND LOWER ---------------------------------------- */
 
-
-	// Lower and Raise
-	void LiftLegUp(const double& height);		// Lift End Effector in the air
-	void PutStraightDown(const double& height);	// Put End Effector straight down
-	//void PutDownInDefault();					//
-	void PutDownForStepForward(const double& dist);
-
-	void LiftBodyUp(const double& hraise);
+	void LiftUp(const double& height);				// Lift End Effector in the air
+	void LowerDown(const double& height);			// Put End Effector straight down
+	void FinishStep();								// Put End Effector down with ARM, HIP and KNEE centered
 
 
-	/* ---------------------------------------- WALKING ALGORITHMS ---------------------------------------- 
+	/* ---------------------------------------- WALKING ALGORITHMS ---------------------------------------- */
 
-	void IKForward(const double& dist);			// Change angles and state of Leg for a step forward
-	void IKRotate(const double& angle);			// Change angles and state of Leg for a rotation around central axis
+	void IKBodyForward(const double& step_size);	// Change angles and state of Leg for a step forward
+	void StepForward(const double& step_size);		// Put End Effector down by making a step forward. Leg must be already lifted
 	
+	void IKBodyRotate(const double& angle);			// Change angles and state of Leg for a rotation around central axis
+	void StepRotate(const double& angle);			// Put End Effector down by making a rotation step. Leg must be already lifted
+	
+	void RaiseBody(const double& hraise);
 	
 	/* ---------------------------------------- WRITE TO SERVOS ---------------------------------------- */
 

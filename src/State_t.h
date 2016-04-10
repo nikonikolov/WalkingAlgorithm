@@ -41,8 +41,14 @@ FRAMEWORK:
 	4. UpdateAngles()	-	Function automatically called when UpdateVar() is called. Basing on StateVars[]
 							function computes new angles for Hip and Knee
 	5. Center()			-	Assumes Leg is already lifted up, otherwise robot will probably fall down
-	6. ComputeVars() 	- 	Computes all Vars[] based on the current ServoAngles[] does not use Update(), but computes variables
-							manually to ensure no call to UpdateAngles()
+	6. ComputeVars() 	- 	Used when state changes and new Vars[] need to be computed. Computes all Vars[] based on the current 
+							ServoAngles[] does not use Update(), but computes variables manually to ensure no call to UpdateAngles()
+	7. ComputeEFVars() 	- 	Called only by CenterAngles(). Computes HIPTOEND, ARMGTOEND and EFCENTER (if needed) basing on 
+							Params[] and KNEE
+	8. CenterAngles() 	- 	Computed median HIP and KNEE basing on Params[] and current HEIGHT or the input HEIGHT if provided.
+							Calls ComputeEFVars automatically in order to keep state consistent
+	9. SetAngles() 		- 	Should be called only on complete state change because automatically calls ComputeVars() and this
+							updates all vars, including EFCENTER
 
 -------------------------------------------------------------------------------------------
 
@@ -100,9 +106,11 @@ FRAMEWORK:
 #define HIPTOEND		0						// Direct distance from hip mount point to the point where the end effector touches ground
 #define HEIGHT 			1						// Vertical distance from hip mount point to ground
 #define ARMGTOEND		2						// Distance from arm ground projection to end effector
+#define EFCENTER		3						// Distance from End Effector to robot center for centered HIP and KNEE
 #define HIPTOEND_SQ		(HIPTOEND+VAR_STEP)		
 #define HEIGHT_SQ 		(HEIGHT+VAR_STEP)
 #define ARMGTOEND_SQ	(ARMGTOEND+VAR_STEP)
+#define EFCENTER_SQ		(EFCENTER+VAR_STEP)
 
 
 /* ====================================== Indices for Getter Decoding ====================================== */
@@ -143,16 +151,12 @@ public:
 
 	void UpdateVar(const int& idx, const double& value, const bool& update_state=true);
 	void UpdateVar(const int& idx, const double& value, const double& valueSQ);
-	void ComputeVars();										// Computes valid StateVars[] basing on ServoAngles[]
 
-	void Clear();											// Clears StateVars[] - needed for flight-related actions
-	//void StateVerify();									// Verifies the current leg state is physically possible and accurate
+	void Clear();										// Clears StateVars[] - needed for flight-related actions
+	//void StateVerify();								// Verifies the current leg state is physically possible and accurate
 
-	/* ------------------------------------ FIND CENTRALIZED ANGLE VALUES ----------------------------------- */
-
-	double CenterHip();										// Compute median HIP angle basing on Params[] ONLY
-	double CenterKnee(const double& height_hip_in = 0.0);	// Compute KNEE basing on HIP, Params[] and HEIGHT
-
+	void CenterAngles(const double& height =0.0); // Compute median HIP, KNEE based on Params[] and HEIGHT/height. Calls ComputeEFVars()
+	void SetAngles(const double& knee, const double& hip, const double& arm, const double& wing);	// Calls ComputeVars()
 
 	/* ============================================== PUBLIC MEMBER DATA ============================================== */
 
@@ -164,8 +168,12 @@ public:
 
 private:
 
+	/* ------------------------------------ MAINTAINING LEG STATE ----------------------------------- */
+
 	void Update(const int& idx);				// Auto-invoked when any StateVars[] changes in order to keep leg state consistent
 	void UpdateAngles();						// Update KNEE and HIP angles basing on the current HIPTOEND and HEIGHT
+	void ComputeEFVars(const double& height=0.0); // Compute HIPTOEND, ARMGTOEND based on KNEE, HEIGHT/height; called by CenterAngles()
+	void ComputeVars();							// Computes valid Vars[] basing on ServoAngles[]
 
 
 	/* ============================================== PRIVATE MEMBER DATA ============================================== */

@@ -30,6 +30,7 @@ FIXES TO BE DONE:
 	7. Body for CalcMaxRotationAngle
 	8. Add function for modifying state out of the class and automatically making the movement
 	9. Have a look at movement functions
+	10. InputForward() - improvize some momentary solution
 
 */
 
@@ -63,10 +64,10 @@ public:
 
 	/* ------------------------------------ WALK RELATED FUNCTIONALITY ----------------------------------- */
 	
+	void WalkForward(const double& coeff);
+	void Rotate(const double& angle);
+
 	void RaiseBody(const double& hraise);
-	//void WalkForward(const double& coeff);
-	//void Rotate(const double& angle);
-	//void LiftBodyUp(const double& hraise);
 
 
 private:

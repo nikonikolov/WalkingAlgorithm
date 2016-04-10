@@ -45,6 +45,10 @@ public:
 
 	~Tripod ();
 
+	/* ------------------------------------ COPYING STATE ----------------------------------- */
+
+	void CopyState(const Tripod& tripod_in);
+
 	/* ------------------------------------ STANDING POSITIONS ----------------------------------- */
 
 	void Default();					// Reset all Leg parameters to their default values
@@ -54,20 +58,23 @@ public:
 	void FlattenLegs();				// Flatten the knee
 
 	double Standing();				// Determines if standing, and if not returns by how much should be lifted
-	
-	/* ------------------------------------ WALK RELATED FUNCTIONALITY ----------------------------------- */
-	
-	/*
-	void BodyForward(const double& distance);
-	void BodyRotate(const double& angle);
 
-	void LiftTripodUp(const double& height);
-	void PutTripodDownForStepForward(const double& distance);
-	void PutTripodStraightDown(const double& height);
-	//void PutTripodStraightDown(); - Leg Function needed to be overloaded to make valid
+	/* ------------------------------------ RAISE AND LOWER ----------------------------------- */
+
+	void LiftUp(const double& height_up);
+	void LowerDown(const double& height_down);
+	void FinishStep();
+
+	/* ------------------------------------ WALKING ALGORITHMS ----------------------------------- */
 	
-	void LiftBodyUp(const double& hraise);
-	*/
+	void BodyForward(const double& step_size);
+	void StepForward(const double& step_size);
+
+	void BodyRotate(const double& angle);
+	void StepRotate(const double& angle);
+	
+	void RaiseBody(const double& hraise);
+
 private:
 	void WriteAngles();
 	void WriteAllAngles();
