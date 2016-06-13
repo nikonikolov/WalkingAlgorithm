@@ -9,17 +9,22 @@ Robot::Robot(DNXServo* HipsKnees, DNXServo* ArmsWings, const double& height_in, 
 	}, 
 	state(state_in){
 	
+	pc.print_debug("Robot start\n");
+	
 	// Calculate max size for movements
 	max_step_size = 		CalcMaxStepSize();
 	max_rotation_angle = 	CalcMaxRotationAngle();
 	
+	pc.print_debug("Robot calculating state\n");
+
 	// Initialize servos according to state
 	if 		(state == wkq::RS_default) 				Default();
 	else if (state == wkq::RS_standing) 			Stand();
 	else if (state == wkq::RS_standing_quad) 		StandQuad();
 	else if (state == wkq::RS_standing_flat_quad) 	{ StandQuad(); FlattenLegs(); }
+	else throw string("Robot cannot be initialized to non-standing position");
 
-	//else throw string("Robot cannot be initialized to non-standing position");
+	pc.print_debug("Robot done\n");
 }
 
 

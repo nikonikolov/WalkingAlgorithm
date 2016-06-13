@@ -4,8 +4,11 @@
 
 XL320::XL320(const PinName tx, const PinName rx, const int& baudIn, const int ReturnLvlIn /*=1*/) :
 	DNXServo(tx, rx, baudIn, ReturnLvlIn){
-
+	/*
 	SetReturnLevel(ID_Broadcast, ReturnLvl);
+	SetReturnLevel(ID_Broadcast, ReturnLvl);
+	SetReturnLevel(ID_Broadcast, ReturnLvl);
+	*/
 	pc.print_debug("XL320 object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + dtos(bitPeriod) + "\n");
 }
 
@@ -25,7 +28,8 @@ int XL320::SetBaud(const int& ID, const int& rate) {
 
 // Set which commands return status; 0: None, 1: Read, 2: All.
 int XL320::SetReturnLevel(const int& ID, const int& lvl) {
-	return dataPush(ID, XL_RETURN_LEVEL, lvl);
+	ReturnLvl=lvl;
+	return dataPush(ID, XL_RETURN_LEVEL, ReturnLvl);
 }
 
 

@@ -39,8 +39,8 @@ namespace wkq{
 	const int wing_left_front =			23; 			// M18
 	const int wing_left_middle =		24; 			// M13
 	const int wing_left_back =			25; 			// M14
-	const int wing_right_front =		26; 			// M16
-	const int wing_right_middle =		27; 			// M17
+	const int wing_right_front =		26; 			// M17
+	const int wing_right_middle =		27; 			// M16
 	const int wing_right_back =			28; 			// M15
 
 	// SERIAL TX-13 RX-14 - ARMS

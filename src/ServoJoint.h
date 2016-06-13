@@ -7,7 +7,6 @@ class ServoJoint{
 
 public:
 
-	ServoJoint();
 	ServoJoint(int ID_in, DNXServo* SerialObjPtrIn);
 
 	int GetID() const;

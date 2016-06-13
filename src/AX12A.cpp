@@ -5,8 +5,11 @@
 
 AX12A::AX12A(const PinName tx, const PinName rx, const int& baudIn, const int ReturnLvlIn /*=1*/) :
 	DNXServo(tx, rx, baudIn, ReturnLvlIn){
-		
+	/*	
 	SetReturnLevel(ID_Broadcast, ReturnLvl);
+	SetReturnLevel(ID_Broadcast, ReturnLvl);
+	SetReturnLevel(ID_Broadcast, ReturnLvl);
+	*/
 	pc.print_debug("AX12A object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + dtos(bitPeriod) + "\n");
 }
 
@@ -28,7 +31,8 @@ int AX12A::SetBaud(const int& ID, const int& rate) {
 
 // Set which commands return status; 0: None, 1: Read, 2: All.
 int AX12A::SetReturnLevel(const int& ID, const int& lvl) {
-	return dataPush(ID, AX_RETURN_LEVEL, lvl);
+	ReturnLvl=lvl;
+	return dataPush(ID, AX_RETURN_LEVEL, ReturnLvl);
 }
 
 
@@ -171,6 +175,7 @@ int AX12A::send(const int& ID, const int& packetLength, uint8_t* parameters, con
 
 	// Transmit
 	write(buf, packetLength+6);
+	//pc.print_debug("Packet written");
 	
 	// Broadcast and Reply Lvl less than 2 do not reply
 	if (ID == ID_Broadcast || ReturnLvl==0 || (ReturnLvl==1 && ins!=AX_INS_Read)) {
@@ -179,8 +184,8 @@ int AX12A::send(const int& ID, const int& packetLength, uint8_t* parameters, con
 
 	
 	// Read reply
-	pc.print_debug("Reading reply\n");
-	
+	pc.print_debug("Reading reply\n");	
+
 	int n = read(reply_buf);
 	if (n == 0) {
 		pc.print_debug("Could not read status packet\n");

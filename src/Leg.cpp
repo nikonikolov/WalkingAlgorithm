@@ -13,7 +13,6 @@ Leg::Leg 	(const int& ID_knee, const int& ID_hip, const int& ID_arm, const int& 
 				ServoJoint(ID_arm, ArmsWings), 
 				ServoJoint(ID_wing, ArmsWings)
 			} {
-
 	// Check if RIGHT or LEFT
 	if(ID_knee>wkq::knee_left_back) 	LegRight=-1.0;
 	else 								LegRight=1.0;
@@ -22,7 +21,6 @@ Leg::Leg 	(const int& ID_knee, const int& ID_hip, const int& ID_arm, const int& 
 	if(ID_knee == wkq::knee_left_front 	|| ID_knee == wkq::knee_right_front) 	AngleOffset = wkq::radians(30);
 	if(ID_knee == wkq::knee_left_middle || ID_knee == wkq::knee_right_middle) 	AngleOffset = wkq::radians(30+60);
 	if(ID_knee == wkq::knee_left_back 	|| ID_knee == wkq::knee_right_back) 	AngleOffset = wkq::radians(30+120);
-
 }
 
 Leg::~Leg(){}
@@ -135,7 +133,7 @@ void Leg::StepForward(const double& step_size){
 void Leg::IKBodyRotate(const double& angle){
 
 	// Sine Rule to find rotation distance
-	double RotDist = 2 * state.Params[DISTCENTER] * sin (std::abs(angle)/2);
+	double RotDist = 2 * state.Params[DISTCENTER] * sin (fabs(angle)/2);
 
 	double RotDistSQ = pow(RotDist, 2);
 

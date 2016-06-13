@@ -46,12 +46,28 @@ void DNXServo::write(uint8_t* buf, const int& n) {
 	}
 
 	int i=0;
+
 	while(i<n){
 		if (port->readable()){	
-			port->getc();			//empty buffer because tx has written to rx	(only in case of tx and rx connected)																
+			int inf = port->getc();			//empty buffer because tx has written to rx	(only in case of tx and rx connected)																
 			i++;					//rate of the loop does not equal rate of communication
 		}
 	}
+/*
+	int i=0;
+	int timeout = 0; 	// Timeout
+	while ((timeout < 16) && (i<n)) {
+		if (port->readable()) {
+			port->getc();			//empty buffer because tx has written to rx	(only in case of tx and rx connected)																
+			i++;					//rate of the loop does not equal rate of communication
+			timeout = 0;
+		}
+		else{
+			wait_ms(bitPeriod);																	
+			timeout++;		
+		}															
+	}
+*/
 }
 
 

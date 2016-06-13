@@ -83,7 +83,7 @@ void State_t::operator=(const State_t& StateIn){
 
 /* -------------------------------------------- STANDING POSITIONS -------------------------------------------- */
 
-void State_t::LegDefault(){
+void State_t::LegDefault(){	
 	// Change State Variables
 	for(int i=0; i<VAR_COUNT; i++){
 		Vars[i] = DefaultVars[i];
@@ -247,9 +247,9 @@ void State_t::SetAngles(const double& knee, const double& hip, const double& arm
 
 // Computes valid Vars[] basing on ServoAngles[] and assumes all Vars[] can be defined
 void State_t::ComputeVars(){
-	double knee_height = Params[TIBIA]*cos(wkq::radians(90) - abs(ServoAngles[HIP]) - (wkq::PI - ServoAngles[KNEE]) );
+	double knee_height = Params[TIBIA]*cos(wkq::radians(90) - fabs(ServoAngles[HIP]) - (wkq::PI - ServoAngles[KNEE]) );
 	
-	double height = knee_height - Params[FEMUR]*sin(abs(ServoAngles[HIP]));
+	double height = knee_height - Params[FEMUR]*sin(fabs(ServoAngles[HIP]));
 	UpdateVar(HEIGHT, height, false);					// Only updates HEIGHT
 	
 	double hip_to_end_sq = pow(Params[FEMUR],2) + pow(Params[TIBIA],2) - 2*Params[FEMUR]*Params[TIBIA]*cos(wkq::PI - ServoAngles[KNEE]);

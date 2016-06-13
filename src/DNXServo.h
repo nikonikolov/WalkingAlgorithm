@@ -57,7 +57,7 @@ protected:
     mbed::Serial* port;
     int baud;
     double bitPeriod;
-    int ReturnLvl = 2;
+    int ReturnLvl = 1;
 
 };
 
