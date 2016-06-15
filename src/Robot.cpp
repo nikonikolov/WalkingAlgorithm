@@ -17,11 +17,12 @@ Robot::Robot(DNXServo* HipsKnees, DNXServo* ArmsWings, const double& height_in, 
 	
 	pc.print_debug("Robot calculating state\n");
 
+	state = wkq::RS_standing_flat_quad;
 	// Initialize servos according to state
-	if 		(state == wkq::RS_default) 				Default();
-	else if (state == wkq::RS_standing) 			Stand();
-	else if (state == wkq::RS_standing_quad) 		StandQuad();
-	else if (state == wkq::RS_standing_flat_quad) 	{ StandQuad(); FlattenLegs(); }
+	if 		(state_in == wkq::RS_default) 				Default();
+	else if (state_in == wkq::RS_standing) 				Stand();
+	else if (state_in == wkq::RS_standing_quad) 		StandQuad();
+	else if (state_in == wkq::RS_standing_flat_quad) 	{ StandQuad(); FlattenLegs(); }
 	else throw string("Robot cannot be initialized to non-standing position");
 
 	pc.print_debug("Robot done\n");
@@ -34,39 +35,45 @@ Robot::~Robot(){}
 /* ================================================= STANDING POSITIONS ================================================= */
 
 void Robot::Default(){
-	state = wkq::RS_default;
 	for(int i=0; i<TRIPOD_COUNT; i++){
 		Tripods[i].Default();
 	}
+	state = wkq::RS_default;
 }
 
 void Robot::Center(){
-	state = wkq::RS_centered;
 	for(int i=0; i<TRIPOD_COUNT; i++){
 		Tripods[i].Center();
 	}
+	state = wkq::RS_centered;
 }
 
 void Robot::Stand(){
-	state = wkq::RS_standing;
-	RaiseBody(Tripods[0].Standing());
-	for(int i=0; i<TRIPOD_COUNT; i++){
-		Tripods[i].Stand();
+	bool meaningless_state = true;
+	if(state!=wkq::RS_standing_flat_quad){
+		RaiseBody(Tripods[0].Standing());
+		meaningless_state = false;
 	}
+	for(int i=0; i<TRIPOD_COUNT; i++){
+		Tripods[i].Stand(meaningless_state);
+	}
+	state = wkq::RS_standing;
 }
 
 void Robot::StandQuad(){
-	state = wkq::RS_standing_quad;
 	Stand();
 	for(int i=0; i<TRIPOD_COUNT; i++){
 		Tripods[i].StandQuad();
 	}
+	state = wkq::RS_standing_quad;
 }
 
-void Robot::FlattenLegs(){
+// input specifies the overall state of the quad - otherwise we only know the legs are flat
+void Robot::FlattenLegs(wkq::RobotState_t state_in /*= wkq::RS_standing_flat_quad*/){
 	for(int i=0; i<TRIPOD_COUNT; i++){
 		Tripods[i].FlattenLegs();
 	}
+	state = state_in;
 }
 
 

@@ -83,4 +83,5 @@ inline uint16_t DNXServo::makeword(const T1& num1, const T2& num2){
 }
 
 
-#endif
+
+#endif	

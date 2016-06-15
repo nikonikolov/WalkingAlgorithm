@@ -4,8 +4,22 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include "mbed.h"
+#include <cmath>
+
 #include "PCSerial.h"
+
+#ifndef SIMULATION
+
+#include "mbed.h"
+
+#else
+typedef int DNXServo;
+
+using std::cout;
+using std::endl;
+using std::fabs;
+
+#endif	//SIMULATION
 
 using std::string;
 using std::stringstream;

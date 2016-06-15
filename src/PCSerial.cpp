@@ -1,5 +1,6 @@
 #include "PCSerial.h"
 
+#ifndef SIMULATION
 
 PCSerial::PCSerial(const bool& debug_in /*= false*/) : pc_usb(USBTX, USBRX), debug(debug_in) {}
 
@@ -13,3 +14,6 @@ void PCSerial::set_debug(){
 bool PCSerial::get_debug(){
 	return debug;
 }
+
+
+#endif

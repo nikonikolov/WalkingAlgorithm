@@ -67,13 +67,17 @@ namespace wkq{
 	const int arm_max =					1024;
 
 
+	
+	/* *** NOTE: Be very careful when introducing new states - if the new state is meaningless in terms of leg configuration
+			on the ground, i.e. backwards consistency with current position does no need to be kept, you need to signify that
+			somehow in Robot::Stand()
+	***/
 	enum RobotState_t{
 		RS_default 				= 0,			// all servos configured to default positions, i.e. centralized for stable stand
 		RS_standing				= 1,			// body height equal to knee height, all knees to 90 degrees, the rest centered
 		RS_centered				= 2,			// body height equal to knee height, all knees to 90 degrees, the rest centered
 		RS_standing_quad 		= 4, 			// Standing with legs configured in Quad mode and configured to stand on the ground
 		RS_standing_flat_quad	= 5, 			// Standing with legs configured in Quad mode and fully flat
-
 
 		RS_flying_quad 			= 20, 			// Flying with legs configured in Quad mode but not fully flat
 		RS_flying_flat_quad 	= 21, 			// Flying with legs configured in Quad mode and fully flat

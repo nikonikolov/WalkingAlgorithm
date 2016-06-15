@@ -6,11 +6,17 @@ PROJECT = bin/wkquad
 OBJECTS = ./main.o $(LIB_OBJS) $(ROBOT_OBJS)
 LIB_OBJS = ./src/include.o ./src/DNXServo.o ./src/AX12A.o ./src/XL320.o ./src/PCSerial.o 
 ROBOT_OBJS = ./src/ServoJoint.o ./src/State_t.o ./src/Point.o ./src/Leg.o ./src/Tripod.o ./src/Robot.o ./src/wkq.o
+
+ROBOT_SRCS = ./src/ServoJoint.cpp ./src/State_t.cpp ./src/Point.cpp ./src/Leg.cpp ./src/Tripod.cpp ./src/Robot.cpp ./src/wkq.cpp
+ROBOT_HDRS = ./src/ServoJoint.h ./src/State_t.h ./src/Point.h ./src/Leg.h ./src/Tripod.h ./src/Robot.h ./src/wkq.h
+
 SYS_OBJECTS = ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/board.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/cmsis_nvic.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/retarget.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/startup_LPC17xx.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/system_LPC17xx.o 
 INCLUDE_PATHS = -I. -I./mbed -I./mbed/TARGET_LPC1768 -I./mbed/TARGET_LPC1768/TARGET_NXP -I./mbed/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X -I./mbed/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X/TARGET_MBED_LPC1768 -I./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM 
 LIBRARY_PATHS = -L./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM 
 LIBRARIES = -lmbed 
 LINKER_SCRIPT = ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/LPC1768.ld
+
+GDB =
 
 ############################################################################### 
 AS      = $(GCC_BIN)arm-none-eabi-as
@@ -36,14 +42,18 @@ else
   CC_FLAGS += -DNDEBUG -Os
 endif
 
-.PHONY: all clean lst size
+.PHONY: all clean lst size cleansim
 
 all: $(PROJECT).bin $(PROJECT).hex size
 
+bin/sim: $(ROBOT_SRCS) $(ROBOT_HDRS) ./src/include.cpp ./src/include.h ./src/PCSerial.cpp ./src/PCSerial.h simulation.cpp 
+	g++ -DSIMULATION -std=gnu++11 $(GDB) simulation.cpp $(ROBOT_SRCS) ./src/PCSerial.cpp ./src/include.cpp -o bin/sim
 
 clean:
-	rm -f $(PROJECT).bin $(PROJECT).elf $(PROJECT).hex $(PROJECT).map $(PROJECT).lst $(OBJECTS) $(DEPS)
+	-rm -f $(PROJECT).bin $(PROJECT).elf $(PROJECT).hex $(PROJECT).map $(PROJECT).lst $(OBJECTS) $(DEPS)
 
+cleansim:
+	-rm -f bin/sim
 
 .asm.o:
 	$(CC) $(CPU) -c -x assembler-with-cpp -o $@ $<
@@ -59,7 +69,6 @@ clean:
 	$(CPP) $(CC_FLAGS) $(CC_SYMBOLS) -std=gnu++11 -fno-rtti $(INCLUDE_PATHS) -o $@ $<
 # Original version of the above line:
 #	$(CPP) $(CC_FLAGS) $(CC_SYMBOLS) -std=gnu++98 -fno-rtti $(INCLUDE_PATHS) -o $@ $<
-
 
 
 

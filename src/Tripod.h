@@ -53,7 +53,7 @@ public:
 
 	void Default();					// Reset all Leg parameters to their default values
 	void Center();					// Reset all Legs to their central positions and keep current height
-	void Stand();					// Set all Legs to a standing state where height = Tibia
+	void Stand(bool meaningless_state = false);		// Set all Legs to a standing state where height = Tibia
 	void StandQuad();				// Same as Stand() but arms configured as quad
 	void FlattenLegs();				// Flatten the knee
 

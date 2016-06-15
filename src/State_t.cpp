@@ -170,7 +170,7 @@ void State_t::UpdateAngles(){
 	// Convert to actual angle for the servo
 	ServoAngles[KNEE] = wkq::PI - KneeTmp;													// Input valid for a LEFT LEG
 
-	// Cosine Rule to find new Knee Servo Angle
+	// Cosine Rule to find new Hip Servo Angle
 	double HipTmp = acos( (Params[FEMUR_SQ] + Vars[HIPTOEND_SQ] - Params[TIBIA_SQ] ) / ( 2 * Params[FEMUR] * Vars[HIPTOEND]) );
 	// Convert to actual angle for the servo
 	ServoAngles[HIP] = (wkq::PI)/2 - HipTmp - acos(Vars[HEIGHT]/Vars[HIPTOEND]);		// Input valid for a LEFT LEG
@@ -221,16 +221,17 @@ void State_t::Verify(){
 void State_t::CenterAngles(const double& height /*=0.0*/){
 	// Center HIP
 	double hip_max=asin(Params[HIPKNEEMAXHDIST]/Params[FEMUR]);
-	ServoAngles[HIP] = wkq::radians(90) - ( hip_max + ( wkq::radians(90) - AngleLimits[HIP_MIN] ) )/2;
+	ServoAngles[HIP] = ( hip_max + ( wkq::radians(90) - fabs(AngleLimits[HIP_MIN]) ) )/2 - wkq::radians(90);
 
 	// Center KNEE
 	double height_hip;
 	if(height==0.0) height_hip = Vars[HEIGHT];
 	else height_hip = height;
 
-	double height_knee = height_hip + Params[FEMUR]*sin(ServoAngles[HIP]);
-	double knee_angle = wkq::radians(90) - ServoAngles[HIP] - acos(height_knee/Params[TIBIA]);
-	ServoAngles[KNEE] = wkq::radians(180) - knee_angle;
+	double height_knee = height_hip + Params[FEMUR]*sin(fabs(ServoAngles[HIP]));
+	double knee_angle = wkq::PI/2 - fabs(ServoAngles[HIP]) - acos(height_knee/Params[TIBIA]);
+	if(knee_angle<0.0) knee_angle = wkq::PI/2 - fabs(ServoAngles[HIP]) + acos(height_knee/Params[TIBIA]);
+	ServoAngles[KNEE] = wkq::PI - knee_angle;
 
 	ComputeEFVars(height);			// Update Vars[] - needs to be passed the same argument
 }

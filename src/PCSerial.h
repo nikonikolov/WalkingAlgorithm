@@ -1,11 +1,12 @@
 #ifndef PCSERIAL_H
 #define PCSERIAL_H
 
-//#include "../mbed/api/mbed.h"
-#include "mbed.h"
 #include <string>
-
 using std::string;
+
+#ifndef SIMULATION
+
+#include "mbed.h"
 
 class PCSerial{
 
@@ -31,5 +32,28 @@ inline void PCSerial::print_debug(const std::string& msg){
 	pc_usb.printf(msg.c_str());
 }
 
+#else
 
-#endif
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+class PCSerial{
+
+public:
+
+	PCSerial(bool debug_in){}
+	~PCSerial(){}
+
+	inline void print_debug(const std::string& msg){
+		cout<<msg<<endl;
+	}
+
+private:
+
+};
+
+#endif	//SIMULATION
+
+#endif	//PC_SERIAL_H
