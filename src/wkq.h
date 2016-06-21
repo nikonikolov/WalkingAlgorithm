@@ -1,6 +1,8 @@
 #ifndef wkq_NAMESPACE_H
 #define wkq_NAMESPACE_H
 
+#include <cmath>
+
 namespace wkq{
 
 
@@ -104,6 +106,89 @@ namespace wkq{
 		LS_wing_min_overflow 	= 7,
 
 	}; 
+
+
+/* ------------------------------------------------- POINT ------------------------------------------------- */ 
+
+	class Point{
+
+	public:
+		Point();
+		Point(double x_in, double y_in);
+		Point(double x_in, double y_in, double mod_in, double arg_in);
+		Point(const Point& p_in);
+		~Point();
+		
+		inline double get_x() const;
+		inline double get_y() const;
+		inline double get_mag() const;
+		inline double get_arg() const;
+		
+		inline double origin_dist() const;
+		//void origin_symmetric();
+
+		inline void translate_y(const double& delta_y);
+		inline void translate_x(const double& delta_x);
+		inline void translate(const Point& p2);
+		
+		inline double dist(const Point& p_in) const;
+		inline double dist_sq(const Point& p_in) const;
+	
+		void set_arg(double arg_in);
+		void set_mag(double mag_in);
+	/*
+		friend bool operator<(const Point& p1, const Point& p2);
+		friend bool operator==(const Point& p1, const Point& p2);
+	*/
+
+	private:
+		void rect_coord();
+
+		double x = 0;
+		double y = 0;
+
+		double mag = 0;
+		double arg = 0;
+	};
+
+
+	double Point::get_x() const{
+		return x;
+	}
+	double Point::get_y() const{
+		return y;
+	}
+	double Point::get_arg() const{
+		return arg;
+	}
+	double Point::get_mag() const{
+		return mag;
+	}
+
+	double Point::origin_dist() const{
+		return sqrt(pow(x,2) + pow(y,2));
+	}
+
+	double Point::dist(const Point& p_in) const{
+		return sqrt( pow((x-p_in.x),2) + pow((y-p_in.y),2) );
+	}
+
+	double Point::dist_sq(const Point& p_in) const{
+		return pow((x-p_in.x),2) + pow((y-p_in.y),2);
+	}
+
+	void Point::translate_y(const double& delta_y){
+		y += delta_y;
+	}
+
+	void Point::translate_x(const double& delta_x){
+		x += delta_x;
+	}
+
+
+/* ------------------------------------------------- END POINT ------------------------------------------------- */ 
+
+
 
 }
 

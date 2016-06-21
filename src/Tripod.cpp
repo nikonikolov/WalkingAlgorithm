@@ -3,10 +3,16 @@
 const double Tripod::leg_lift = 5.0; 
 
 Tripod::Tripod (const int& ID_front_knee, const int& ID_middle_knee, const int& ID_back_knee,
-				DNXServo* HipsKnees, DNXServo* ArmsWings, const double& height_in) :
-	Legs{	Leg(ID_front_knee, 	ID_front_knee+6, 	ID_front_knee+18, 	ID_front_knee+12, 	HipsKnees, ArmsWings, height_in),
-			Leg(ID_middle_knee, ID_middle_knee+6, 	ID_middle_knee+18, 	ID_middle_knee+12, 	HipsKnees, ArmsWings, height_in),
-			Leg(ID_back_knee, 	ID_back_knee+6, 	ID_back_knee+18, 	ID_back_knee+12, 	HipsKnees, ArmsWings, height_in)
+				DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]) :
+/* After removing wing servo
+	Legs{	Leg(ID_front_knee, 	ID_front_knee+6, 	ID_front_knee+18, 	HipsKnees, ArmsWings, height_in, robot_params),
+			Leg(ID_middle_knee, ID_middle_knee+6, 	ID_middle_knee+18, 	HipsKnees, ArmsWings, height_in, robot_params),
+			Leg(ID_back_knee, 	ID_back_knee+6, 	ID_back_knee+18, 	HipsKnees, ArmsWings, height_in, robot_params)
+		} {}
+*/
+	Legs{	Leg(ID_front_knee, 	ID_front_knee+6, 	ID_front_knee+18, 	ID_front_knee+12, 	HipsKnees, ArmsWings, height_in, robot_params),
+			Leg(ID_middle_knee, ID_middle_knee+6, 	ID_middle_knee+18, 	ID_middle_knee+12, 	HipsKnees, ArmsWings, height_in, robot_params),
+			Leg(ID_back_knee, 	ID_back_knee+6, 	ID_back_knee+18, 	ID_back_knee+12, 	HipsKnees, ArmsWings, height_in, robot_params)
 		} {}
 
 Tripod::~Tripod(){}

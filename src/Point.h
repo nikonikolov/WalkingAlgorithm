@@ -1,4 +1,4 @@
-#ifndef POINT_H
+/*#ifndef POINT_H
 #define POINT_H
 
 #include <cmath>
@@ -26,7 +26,7 @@ public:
 /*
 	friend bool operator<(const Point& p1, const Point& p2);
 	friend bool operator==(const Point& p1, const Point& p2);
-*/
+*
 
 private:
 	double x;
@@ -65,3 +65,4 @@ void Point::translate_x(const double& delta_x){
 
 
 #endif
+*/

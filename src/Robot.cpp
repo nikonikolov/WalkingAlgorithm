@@ -1,13 +1,12 @@
 #include "Robot.h"
 
-
-Robot::Robot(DNXServo* HipsKnees, DNXServo* ArmsWings, const double& height_in, wkq::RobotState_t state_in /*= wkq::RS_default*/) : 
-	
+Robot::Robot(MController* pixhawk_in, DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, 
+		const double robot_params[], wkq::RobotState_t state_in /*= wkq::RS_default*/) :
 	Tripods{
-		Tripod(wkq::knee_left_front, wkq::knee_right_middle, wkq::knee_left_back, HipsKnees, ArmsWings, height_in),
-		Tripod(wkq::knee_right_front, wkq::knee_left_middle, wkq::knee_right_back, HipsKnees, ArmsWings, height_in)
+		Tripod(wkq::knee_left_front, wkq::knee_right_middle, wkq::knee_left_back, HipsKnees, ArmsWings, height_in, robot_params),
+		Tripod(wkq::knee_right_front, wkq::knee_left_middle, wkq::knee_right_back, HipsKnees, ArmsWings, height_in, robot_params)
 	}, 
-	state(state_in){
+	pixhawk(pixhawk_in), state(state_in){
 	
 	pc.print_debug("Robot start\n");
 	
@@ -80,37 +79,49 @@ void Robot::FlattenLegs(wkq::RobotState_t state_in /*= wkq::RS_standing_flat_qua
 /* ================================================= WALK RELATED FUNCTIONALITY ================================================= */
 
 
-void Robot::WalkForward (const double& coeff){
+void Robot::WalkForward (double coeff){
+	if(coeff<0.0) coeff=0.1;
+	if(coeff>1.0) coeff=1.0;
 
 	double step_size = coeff*max_step_size;
 	double ef_raise = 5.0;
 
 	bool continue_movement = true;
 	int tripod_up = TRIPOD_LEFT, tripod_down = TRIPOD_RIGHT;
+
+	pc.print_debug("Movement forward starts\n");
+	
+	// repeat until walkforward signal stops
 	while(continue_movement){
 		Tripods[tripod_up].LiftUp(ef_raise);
+		pc.print_debug("First tripod lifted\n");
 		Tripods[tripod_down].BodyForward(step_size);
+		pc.print_debug("Second tripod moved body forward\n");
 
 		// Read Input and find out whether movement should go on
-		//continue_movement = InputWalkForward();
+		continue_movement = pixhawk->InputWalkForward();
 
 		// Movement goes on
 		if(continue_movement){
 			Tripods[tripod_up].StepForward(step_size);
-			std::swap(tripod_up, tripod_down);
+			pc.print_debug("First tripod put down legs for another step forward\n");
+			std::swap(tripod_up, tripod_down);			// swap the roles of the Tripods
 		}
 		
 		// Movement stops
 		else{
 			Tripods[tripod_up].FinishStep();
+			pc.print_debug("First tripod finished step\n");
 			Tripods[tripod_down].LiftUp(ef_raise);
+			pc.print_debug("Second tripod lifted\n");
 			Tripods[tripod_down].FinishStep();
+			pc.print_debug("Second tripod finished step\n");
 		}
 	}
 }
 
 
-void Robot::Rotate(const double& angle){
+void Robot::Rotate(double angle){
 	/*for(int i=0; i<TRIPOD_COUNT; i++){
 		Tripods[i].BodyRotate(angle);
 	}
@@ -141,7 +152,7 @@ void Robot::WriteAngles(){
 /* ================================================= PRIVATE METHODS ================================================= */
 
 double Robot::CalcMaxStepSize(){
-	return 11.0;
+	return 5.0;
 }
 
 double Robot::CalcMaxRotationAngle(){

@@ -4,9 +4,14 @@
 
 // Tripod constructor does not write to angles, so Leg constrcutor is only responsible for calculating the proper defaults
 Leg::Leg 	(const int& ID_knee, const int& ID_hip, const int& ID_arm, const int& ID_wing,
-			DNXServo* HipsKnees, DNXServo* ArmsWings, const double& height_in) :
+			DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]) :
+
+/* 	After removing wing servos
+	Leg::Leg 	(const int& ID_knee, const int& ID_hip, const int& ID_arm, const int& ID_wing,
+			DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double& robot_params) :
+*/
 	
-	state(height_in), 
+	state(height_in, robot_params), 
 	// Instantiate Joints
 	Joints	{ 	ServoJoint(ID_knee, HipsKnees), 
 				ServoJoint(ID_hip, HipsKnees), 
@@ -96,7 +101,8 @@ void Leg::StepForward(const double& step_size){
 
 	// Create Point representing the new END EFFECTOR position
 	double x_EFNew, y_EFNew;
-	if(almost_equals(AngleOffset, wkq::PI/2)) {			// Middle Joint
+	if(almost_equals(AngleOffset, wkq::PI/2)){			// Middle Joint
+		//x_EFNew = ef_center - step_size/sqrt(3); - change when you have prev and current step size as inputs
 		x_EFNew = ef_center - step_size/sqrt(3);
 		y_EFNew = 0.0;
 	}	
@@ -104,16 +110,17 @@ void Leg::StepForward(const double& step_size){
 		x_EFNew = ef_center/2.0 + step_size/sqrt(3);
 		y_EFNew = sqrt(3)*x_EFNew; 						// Front Joint
 
-		if(almost_equals(AngleOffset, wkq::radians(150.0))) 	y_EFNew -= 4/(3*sqrt(3)*ef_center); 	// Back Joint
+		//if(almost_equals(AngleOffset, wkq::radians(150.0))) 	y_EFNew -= 4/(3*sqrt(3)*ef_center); 	// Back Joint
+		if(almost_equals(AngleOffset, wkq::radians(150.0))) 	y_EFNew -= sqrt(3)*ef_center; 			// Back Joint
 	}		
-	Point EFNew(x_EFNew, y_EFNew);
+	wkq::Point EFNew(x_EFNew, y_EFNew);
 
 	// Create Point representing current HIP position
 	double hip_arg = wkq::PI/2 -AngleOffset;
-	Point Hip(state.Params[DISTCENTER]*cos(hip_arg), state.Params[DISTCENTER]*sin(hip_arg));
+	wkq::Point Hip(state.Params[DISTCENTER]*cos(hip_arg), state.Params[DISTCENTER]*sin(hip_arg));
 
 	// Create Point representing the new HIP position
-	Point HipNew(Hip);
+	wkq::Point HipNew(Hip);
 	HipNew.translate_y(step_size*2);
 
 	// Calculate new ARMGTOEND

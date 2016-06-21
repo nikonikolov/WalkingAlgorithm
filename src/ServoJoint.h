@@ -43,7 +43,8 @@ class ServoJoint{
 
 public:
 
-	ServoJoint(int ID_in, DNXServo* SerialObjPtrIn);
+	// remember typedef GeomView DNXServo - defined so that same interface is kept between simulation and reality
+	ServoJoint(int ID_in, DNXServo* robot_view_in);
 
 	int GetID() const;
 
@@ -65,6 +66,7 @@ private:
 	int ID;
 	string servo_name;
 	double angle = 0;
+	//GeomView* robot_view;
 };
 
 #endif 	// SIMUALTION

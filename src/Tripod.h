@@ -41,7 +41,7 @@ class Tripod{
 
 public:
 	Tripod(const int& ID_front_knee, const int& ID_middle_knee, const int& ID_back_knee,
-			DNXServo* HipsKnees, DNXServo* ArmsWings, const double& height_in);
+			DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]);
 
 	~Tripod ();
 

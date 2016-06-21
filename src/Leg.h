@@ -51,7 +51,7 @@ FRAMEWORK:
 
 #include "ServoJoint.h"
 #include "State_t.h"
-#include "Point.h"
+//#include "Point.h"
 #include "wkq.h"
 #include "include.h"
 #include <cmath>
@@ -62,8 +62,12 @@ class Leg{
 public:
 	
 	Leg(const int& ID_knee, const int& ID_hip, const int& ID_arm, const int& ID_wing,
-		DNXServo* HipsKnees, DNXServo* ArmsWings, const double& height_in);
+		DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]);
 
+/*	After removing wing servo
+	Leg(const int& ID_knee, const int& ID_hip, const int& ID_arm, 
+		DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double& robot_params);
+*/
 	~Leg();
 
 	/* ---------------------------------------- GETTER AND COPY ---------------------------------------- */

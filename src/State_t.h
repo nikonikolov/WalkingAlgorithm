@@ -100,7 +100,7 @@ FRAMEWORK:
 
 
 /* ====================================== Indices for StateVars and DefaultVar array ====================================== */
-#define VAR_STEP 		3						// Help-macro to get indices in the array with state variables
+#define VAR_STEP 		4						// Help-macro to get indices in the array with state variables
 #define VAR_COUNT		(2*VAR_STEP)			// Size of the array holding the state variables
 
 #define HIPTOEND		0						// Direct distance from hip mount point to the point where the end effector touches ground
@@ -129,7 +129,7 @@ class State_t{
 
 public:
 	
-	State_t(const double& height_in);
+	State_t(double height_in, const double robot_params[]);
 
 	~State_t();
 
@@ -162,7 +162,7 @@ public:
 
 	double ServoAngles[JOINT_COUNT];						// In radians: 0.0 - center, positive - CW, negative - CCW
 
-	static const double Params[PARAM_COUNT];				// Store const parameters of the robot
+	static double Params[PARAM_COUNT];						// Store const parameters of the robot
 	static const double AngleLimits[JOINT_COUNT*2];			// Store angle limits of the robot
 
 

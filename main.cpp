@@ -12,6 +12,8 @@
 #include "src/XL320.h"
 #include "src/include.h"
 
+#include "src/MController.h"
+
 /* Global vars:
 	PC pc - specifies connected pc for debugging purposes
 */
@@ -19,6 +21,9 @@
 int main(){
 
 	pc.set_debug();
+
+	// PARAM_STEP defined in State_t.h. Meaning of each value defined in the same header
+	const double robot_params[PARAM_STEP] = { 10.95, 2.65, 17.5, 30.0, 12.0, 2.25};
 	
 	pc.print_debug("MAIN started\n");
 
@@ -26,17 +31,19 @@ int main(){
 	int baud = 115200;
 	double init_height = 10.0;
 
-	//Serial deviceHipsKnees(p9, p10);
+	MController* pixhawk = new MController();
+
+	pc.print_debug("Pixhawk initialized\n");
+
 	// Instantiate Servo Objects
 	AX12A HipsKnees(p9, p10, baud);
-	//AX12A HipsKnees(p13, p14, baud);
 	XL320 ArmsWings(p13, p14, baud);
 
 	
 	Robot* WkQuad;
 	// Instantiate Robot
 	try{
-		WkQuad = new Robot(&HipsKnees, &ArmsWings, init_height, wkq::RS_standing);
+		WkQuad = new Robot(pixhawk, &HipsKnees, &ArmsWings, init_height, robot_params, wkq::RS_standing);
 	}
 	catch(const string& msg){
 		pc.print_debug(msg);
@@ -45,6 +52,8 @@ int main(){
 	pc.print_debug("Robot Initialized\n");
 
 	WkQuad->Stand();
+
+	pc.print_debug("Robot Standing\n");
 
 
 // SINGLE SERVO TESTING
@@ -80,11 +89,22 @@ int main(){
 	for(int i=11; i<=22; i++){
 		HipsKnees.SetGoalPosition(i, 512);
 	}
-
 	for(int i=23; i<=34; i++){
 		ArmsWings.SetGoalPosition(i, 512);
+		wait(1);
 	}
+
 */
+	wait(2);
+	ArmsWings.SetGoalPosition(27, 512);
+	
+
+	int pr_pos = ArmsWings.GetValue(27, XL_PRESENT_POSITION);
+
+	pc.print_debug("Present post" + itos(pr_pos) + "\n");
+
+	pc.print_debug("Servos set\n");
+
 	return 0;
 }
 

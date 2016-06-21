@@ -9,26 +9,33 @@
 
 #include "src/include.h"
 
+#include "src/MController.h"
 
 int main(){
 
+	// PARAM_STEP defined in State_t.h. Meaning of each value defined in the same header
+	const double robot_params[PARAM_STEP] = { 10.95, 2.65, 17.5, 30.0, 12.0, 2.25};
 	
-	cout<<"MAIN started"<<endl;
+	pc.print_debug("MAIN started\n");
 
 	int baud = 115200;
 	double init_height = 10.0;
+
+	MController* pixhawk = new MController();
+
+	pc.print_debug("Pixhawk initialized\n");
 	
 	Robot* WkQuad;
 	// Instantiate Robot
 	try{
-		WkQuad = new Robot(NULL, NULL, init_height, wkq::RS_standing);
+		WkQuad = new Robot(pixhawk, NULL, NULL, init_height, robot_params, wkq::RS_standing);
 	}
 	catch(const string& msg){
 		pc.print_debug(msg);
 		exit(EXIT_FAILURE);
 	}
 
-	cout<<"Robot Initialized\n";
+	pc.print_debug("Robot Initialized\n");
 
 	WkQuad->Stand();
 	pc.print_debug("Robot Standing\n");
@@ -40,9 +47,14 @@ int main(){
 	pc.print_debug("Legs in Default position\n");
 	WkQuad->Center();
 	pc.print_debug("Legs Centered\n");
+	WkQuad->WalkForward(0.7);
+	pc.print_debug("Robot walked\n");
 
 	// Further tests - lifting body after center to stand
 	// Centering for arbitrary height
+	// Moving forward
+	// 
+
 
 	return 0;
 }

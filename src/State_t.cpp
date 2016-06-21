@@ -3,8 +3,12 @@
 
 /* ===================================================== PUBLIC METHODS ===================================================== */
 
+/*
 const double State_t::Params[PARAM_COUNT] = { 10.95, 2.65, 17.5, 30.0, 12.0, 2.25,
 										pow(10.95,2), pow(2.65,2), pow(17.5,2), pow(30.0,2), pow(12.0,2), pow(2.25,2)	};
+*/
+
+double State_t::Params[PARAM_COUNT] = { 0.0 };
 
 // Values are valid for a left leg and correspond to values that are written to the servo
 const double State_t::AngleLimits[JOINT_COUNT*2] = { 	wkq::radians(0), wkq::radians(150),					/* KNEE */ 
@@ -23,13 +27,19 @@ bool State_t::defaults_calculated = false;
 	Tripod and Leg constructors do not write to angles, so State constrcutor is only responsible for initializing to meaningless
 	 state and calculating the defaults if not already
 */
-State_t::State_t(const double& height_in) : ServoAngles { 0.0 }, Vars{ 0.0 } {
+State_t::State_t(double height_in, const double robot_params[]) : ServoAngles { 0.0 }, Vars{ 0.0 } {
 
-	// Calculate Defaults only if not calculated already
+	// Calculate Defaults only if not calculated already - note defaults are static members for the class
 	if(!defaults_calculated){
 		defaults_calculated = true;
 
-		// Find Default ServoAngles for Hip and Knee. Automatically Computes the state as well
+		// Initialize the parameters
+		for(int i=0; i<PARAM_COUNT; i++){
+			if(i<PARAM_STEP) Params[i] = robot_params[i];
+			else Params[i] = pow(robot_params[i-PARAM_STEP],2);
+		}
+
+		// Find Default ServoAngles for Hip and Knee. Automatically computes the state and sets the height
 		CenterAngles(height_in);
 
 		// Save Default Variables
@@ -162,6 +172,7 @@ void State_t::Update(const int& idx){
 	UpdateAngles();			
 }
 
+
 // Update KNEE and HIP angles basing on the current HIPTOEND and HEIGHT
 void State_t::UpdateAngles(){
 
@@ -217,7 +228,9 @@ void State_t::Verify(){
 }
 */
 
-
+/* 	height should be 0.0 when the current StateVar[HEIGHT] should be used; if this variable has not been set to a meaningful value, 
+	the height that needs to be used should be passed as parameter - ComputeEFVars() will set the value in StateVar[HEIGHT]
+*/
 void State_t::CenterAngles(const double& height /*=0.0*/){
 	// Center HIP
 	double hip_max=asin(Params[HIPKNEEMAXHDIST]/Params[FEMUR]);
@@ -230,7 +243,9 @@ void State_t::CenterAngles(const double& height /*=0.0*/){
 
 	double height_knee = height_hip + Params[FEMUR]*sin(fabs(ServoAngles[HIP]));
 	double knee_angle = wkq::PI/2 - fabs(ServoAngles[HIP]) - acos(height_knee/Params[TIBIA]);
+	// if the argument of TIBIA relative to the ground is not acute but obtuse:
 	if(knee_angle<0.0) knee_angle = wkq::PI/2 - fabs(ServoAngles[HIP]) + acos(height_knee/Params[TIBIA]);
+
 	ServoAngles[KNEE] = wkq::PI - knee_angle;
 
 	ComputeEFVars(height);			// Update Vars[] - needs to be passed the same argument
