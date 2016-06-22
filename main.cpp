@@ -44,6 +44,8 @@ int main(){
 	// Instantiate Robot
 	try{
 		WkQuad = new Robot(pixhawk, &HipsKnees, &ArmsWings, init_height, robot_params, wkq::RS_standing);
+	//	WkQuad = new Robot(pixhawk, &HipsKnees, &ArmsWings, init_height, robot_params, wkq::RS_standing_quad);
+	//	WkQuad = new Robot(pixhawk, &HipsKnees, &ArmsWings, init_height, robot_params, wkq::RS_default);
 	}
 	catch(const string& msg){
 		pc.print_debug(msg);
@@ -51,7 +53,7 @@ int main(){
 	}
 	pc.print_debug("Robot Initialized\n");
 
-	WkQuad->Stand();
+	//WkQuad->Stand();
 
 	pc.print_debug("Robot Standing\n");
 
@@ -113,6 +115,14 @@ int main(){
 	}
 
 	pc.print_debug("Servos set\n");
+	for(int i=11; i<=22; i++){
+		HipsKnees.SetGoalPosition(i, 512);
+	}
+	pc.print_debug("HipsKnees set\n");
+	
+	for(int i=29; i<=34; i++){
+		ArmsWings.SetGoalPosition(i, 512);
+	}
 */
 
 	return 0;

@@ -22,7 +22,7 @@ void Tripod::Default(){
 	for(int i=0; i<LEG_COUNT; i++){
 		Legs[i].Default();
 	}
-	WriteAllAngles();
+	WriteAngles();
 }
 
 void Tripod::Center(){
@@ -31,7 +31,7 @@ void Tripod::Center(){
 		if(i==0) Legs[i].Center();
 		// All Legs have same defaults so save some computations
 		else Legs[i].CopyState(Legs[0]);
-		Legs[i].WriteAllAngles();
+		Legs[i].WriteAngles();
 	}
 }
 
@@ -45,17 +45,19 @@ void Tripod::Stand(bool meaningless_state /*= false*/){
 			Legs[i].WriteAngles();
 		} 
 		Legs[i].Stand();
-		Legs[i].WriteAllAngles();
+		Legs[i].WriteAngles();
 	}
 }
 
-void Tripod::StandQuad(){
+void Tripod::StandQuad(bool meaningless_state /*= false*/){
 	// Robot already has made sure that body was lifted if necessary. Do it leg by leg to ensure you don't overload servos
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].LiftUp(leg_lift);
-		Legs[i].WriteAllAngles();
+		if(!meaningless_state){
+			Legs[i].LiftUp(leg_lift);
+			Legs[i].WriteAngles();
+		} 
 		Legs[i].StandQuad();
-		Legs[i].WriteAllAngles();
+		Legs[i].WriteAngles();
 	}
 }
 
@@ -163,8 +165,10 @@ void Tripod::WriteAngles(){
 	}
 }
 
+/*
 void Tripod::WriteAllAngles(){
 	for(int i=0; i<LEG_COUNT; i++){
 		Legs[i].WriteAllAngles();
 	}
 }
+*/

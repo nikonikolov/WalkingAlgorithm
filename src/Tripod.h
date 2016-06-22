@@ -54,7 +54,7 @@ public:
 	void Default();					// Reset all Leg parameters to their default values
 	void Center();					// Reset all Legs to their central positions and keep current height
 	void Stand(bool meaningless_state = false);		// Set all Legs to a standing state where height = Tibia
-	void StandQuad();				// Same as Stand() but arms configured as quad
+	void StandQuad(bool meaningless_state = false);	// Same as Stand() but arms configured as quad
 	void FlattenLegs();				// Flatten the knee
 
 	double Standing();				// Determines if standing, and if not returns by how much should be lifted
@@ -77,7 +77,7 @@ public:
 
 private:
 	void WriteAngles();
-	void WriteAllAngles();
+	//void WriteAllAngles();
 	void WriteHipKneeAngles();
 
 	Leg Legs[LEG_COUNT];

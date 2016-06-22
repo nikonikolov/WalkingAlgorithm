@@ -198,11 +198,11 @@ void Leg::WriteAngles(){
 }
 
 // Write state.ServoAngles[] to physcial servos in order WING, ARM, HIP, KNEE
-void Leg::WriteAllAngles(){
-	//Joints[WING].SetGoalPosition(LegRight * state.ServoAngles[WING]);
+/*void Leg::WriteAllAngles(){
+	Joints[WING].SetGoalPosition(LegRight * state.ServoAngles[WING]);
 	WriteAngles();
 }
-
+*/
 // WRITE only a single angle contained in state.ServoAngles[] TO PHYSCIAL SERVO
 void Leg::WriteJoint(const int& idx){
 	Joints[idx].SetGoalPosition(LegRight * state.ServoAngles[idx]);

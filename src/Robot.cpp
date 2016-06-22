@@ -48,21 +48,28 @@ void Robot::Center(){
 }
 
 void Robot::Stand(){
-	/*bool meaningless_state = true;
+	bool meaningless_state = true;
+	if(state!=wkq::RS_standing_flat_quad){
+		RaiseBody(Tripods[0].Standing());
+		meaningless_state = false;
+	}
+	Tripods[TRIPOD_LEFT].Stand(meaningless_state);
+	wait(0.2);
+	Tripods[TRIPOD_RIGHT].Stand(meaningless_state);
+	/*for(int i=0; i<TRIPOD_COUNT; i++){
+		Tripods[i].Stand(meaningless_state);
+	}*/
+	state = wkq::RS_standing;
+}
+
+void Robot::StandQuad(){
+	bool meaningless_state = true;
 	if(state!=wkq::RS_standing_flat_quad){
 		RaiseBody(Tripods[0].Standing());
 		meaningless_state = false;
 	}
 	for(int i=0; i<TRIPOD_COUNT; i++){
-		Tripods[i].Stand(meaningless_state);
-	}
-	state = wkq::RS_standing;
-*/}
-
-void Robot::StandQuad(){
-	Stand();
-	for(int i=0; i<TRIPOD_COUNT; i++){
-		Tripods[i].StandQuad();
+		Tripods[i].StandQuad(meaningless_state);
 	}
 	state = wkq::RS_standing_quad;
 }

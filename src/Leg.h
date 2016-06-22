@@ -103,7 +103,7 @@ public:
 	/* ---------------------------------------- WRITE TO SERVOS ---------------------------------------- */
 
 	void WriteAngles();							// Write ServoAngles[] to physcial servos in order ARM, HIP, KNEE
-	void WriteAllAngles();						// Write ServoAngles[] to physcial servos in order WING, ARM, HIP, KNEE
+	//void WriteAllAngles();						// Write ServoAngles[] to physcial servos in order WING, ARM, HIP, KNEE
 	void WriteJoint(const int& idx);			// Write only a single angle contained in ServoAngles[] to physcial servo
 
 
