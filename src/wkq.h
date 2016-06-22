@@ -46,12 +46,12 @@ namespace wkq{
 	const int wing_right_back =			28; 			// M15
 
 	// SERIAL TX-13 RX-14 - ARMS
-	const int arm_left_front =			29;
-	const int arm_left_middle =			30;
-	const int arm_left_back =			31;
-	const int arm_right_front =			32;
-	const int arm_right_middle =		33;
-	const int arm_right_back =			34;
+	const int arm_left_front =			29; 			// M18
+	const int arm_left_middle =			30; 			// M13
+	const int arm_left_back =			31; 			// M14
+	const int arm_right_front =			32; 			// M17
+	const int arm_right_middle =		33; 			// M16
+	const int arm_right_back =			34; 			// M15
 
 	const int knees_start = 			11;
 	const int hips_start = 				17;

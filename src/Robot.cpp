@@ -48,7 +48,7 @@ void Robot::Center(){
 }
 
 void Robot::Stand(){
-	bool meaningless_state = true;
+	/*bool meaningless_state = true;
 	if(state!=wkq::RS_standing_flat_quad){
 		RaiseBody(Tripods[0].Standing());
 		meaningless_state = false;
@@ -57,7 +57,7 @@ void Robot::Stand(){
 		Tripods[i].Stand(meaningless_state);
 	}
 	state = wkq::RS_standing;
-}
+*/}
 
 void Robot::StandQuad(){
 	Stand();

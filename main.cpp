@@ -51,7 +51,7 @@ int main(){
 	}
 	pc.print_debug("Robot Initialized\n");
 
-	WkQuad->Stand();
+	//WkQuad->Stand();
 
 	pc.print_debug("Robot Standing\n");
 
@@ -95,13 +95,23 @@ int main(){
 	}
 
 */
-	wait(2);
+/*	wait(2);
 	ArmsWings.SetGoalPosition(27, 512);
 	
 
-	int pr_pos = ArmsWings.GetValue(27, XL_PRESENT_POSITION);
+	int pr_pos = ArmsWings.GetValue(23, XL_PRESENT_POSITION);
 
-	pc.print_debug("Present post" + itos(pr_pos) + "\n");
+	pc.print_debug("Present pos" + itos(pr_pos) + "\n");
+
+	int pr_baud = ArmsWings.GetValue(23, XL_BAUD_RATE);
+
+	pc.print_debug("Present baud" + itos(pr_baud) + "\n");
+*/
+
+	for(int i=23; i<=34; i++){
+		ArmsWings.SetGoalPosition(i, 512);
+		wait(0.2);
+	}
 
 	pc.print_debug("Servos set\n");
 
