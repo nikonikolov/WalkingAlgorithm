@@ -3,20 +3,20 @@
 /* ===================================================== PUBLIC METHODS ===================================================== */
 
 // Tripod constructor does not write to angles, so Leg constrcutor is only responsible for calculating the proper defaults
+/*
 Leg::Leg 	(const int& ID_knee, const int& ID_hip, const int& ID_arm, const int& ID_wing,
 			DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]) :
-
-/* 	After removing wing servos
-	Leg::Leg 	(const int& ID_knee, const int& ID_hip, const int& ID_arm, const int& ID_wing,
-			DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double& robot_params) :
 */
+
+Leg::Leg 	(const int& ID_knee, const int& ID_hip, const int& ID_arm,
+			DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]) :
 	
 	state(height_in, robot_params), 
 	// Instantiate Joints
 	Joints	{ 	ServoJoint(ID_knee, HipsKnees), 
 				ServoJoint(ID_hip, HipsKnees), 
 				ServoJoint(ID_arm, ArmsWings), 
-				ServoJoint(ID_wing, ArmsWings)
+				//ServoJoint(ID_wing, ArmsWings)
 			} {
 	// Check if RIGHT or LEFT
 	if(ID_knee>wkq::knee_left_back) 	LegRight=-1.0;
@@ -199,7 +199,7 @@ void Leg::WriteAngles(){
 
 // Write state.ServoAngles[] to physcial servos in order WING, ARM, HIP, KNEE
 void Leg::WriteAllAngles(){
-	Joints[WING].SetGoalPosition(LegRight * state.ServoAngles[WING]);
+	//Joints[WING].SetGoalPosition(LegRight * state.ServoAngles[WING]);
 	WriteAngles();
 }
 

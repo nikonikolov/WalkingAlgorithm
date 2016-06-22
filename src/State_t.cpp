@@ -14,7 +14,7 @@ double State_t::Params[PARAM_COUNT] = { 0.0 };
 const double State_t::AngleLimits[JOINT_COUNT*2] = { 	wkq::radians(0), wkq::radians(150),					/* KNEE */ 
 														wkq::radians(-(90-20)), wkq::radians(90-20),		/* HIP - JUST A GUESS */
 														wkq::radians(-(90-20)), wkq::radians(90-20),		/* ARM - JUST A GUESS */
-														wkq::radians(-150), wkq::radians(150)				/* WING */
+														//wkq::radians(-150), wkq::radians(150)				/* WING */
 													};
 
 double State_t::DefaultVars[VAR_COUNT] 	= { 0.0 };
@@ -105,13 +105,14 @@ void State_t::LegDefault(){
 }
 
 void State_t::LegCenter(){
-	ServoAngles[WING] = DefaultAngles[WING];
+	//ServoAngles[WING] = DefaultAngles[WING];
 	ServoAngles[ARM] = DefaultAngles[ARM];
 	CenterAngles();
 }
 
 void State_t::LegStand(){
-	SetAngles((wkq::PI)/2, 0.0, 0.0, 0.0);		// Automatically calls ComputeVars[] and computes new state
+	SetAngles((wkq::PI)/2, 0.0, 0.0);		// Automatically calls ComputeVars[] and computes new state
+	//SetAngles((wkq::PI)/2, 0.0, 0.0, 0.0);		// Automatically calls ComputeVars[] and computes new state
 }
 
 void State_t::LegFlatten(){	
@@ -251,11 +252,12 @@ void State_t::CenterAngles(const double& height /*=0.0*/){
 	ComputeEFVars(height);			// Update Vars[] - needs to be passed the same argument
 }
 
-void State_t::SetAngles(const double& knee, const double& hip, const double& arm, const double& wing){
+//void State_t::SetAngles(const double& knee, const double& hip, const double& arm, const double& wing){
+void State_t::SetAngles(const double& knee, const double& hip, const double& arm){
 	ServoAngles[KNEE] = knee;
 	ServoAngles[HIP] = hip;
 	ServoAngles[ARM] = arm;
-	ServoAngles[WING] = wing;
+//	ServoAngles[WING] = wing;
 	ComputeVars();
 }
 

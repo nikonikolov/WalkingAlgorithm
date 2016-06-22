@@ -51,7 +51,7 @@ int main(){
 	}
 	pc.print_debug("Robot Initialized\n");
 
-	//WkQuad->Stand();
+	WkQuad->Stand();
 
 	pc.print_debug("Robot Standing\n");
 
@@ -106,7 +106,6 @@ int main(){
 	int pr_baud = ArmsWings.GetValue(23, XL_BAUD_RATE);
 
 	pc.print_debug("Present baud" + itos(pr_baud) + "\n");
-*/
 
 	for(int i=23; i<=34; i++){
 		ArmsWings.SetGoalPosition(i, 512);
@@ -114,6 +113,7 @@ int main(){
 	}
 
 	pc.print_debug("Servos set\n");
+*/
 
 	return 0;
 }

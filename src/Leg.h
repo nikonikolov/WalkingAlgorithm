@@ -61,13 +61,12 @@ class Leg{
 
 public:
 	
-	Leg(const int& ID_knee, const int& ID_hip, const int& ID_arm, const int& ID_wing,
+/*	Leg(const int& ID_knee, const int& ID_hip, const int& ID_arm, const int& ID_wing,
+		DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]);
+*/
+	Leg(const int& ID_knee, const int& ID_hip, const int& ID_arm, 
 		DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]);
 
-/*	After removing wing servo
-	Leg(const int& ID_knee, const int& ID_hip, const int& ID_arm, 
-		DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double& robot_params);
-*/
 	~Leg();
 
 	/* ---------------------------------------- GETTER AND COPY ---------------------------------------- */

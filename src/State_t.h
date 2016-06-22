@@ -63,12 +63,12 @@ FRAMEWORK:
 
 
 /* ====================================== Indices for Joints and ServoAngle arrays ====================================== */
-#define JOINT_COUNT		4
+#define JOINT_COUNT		3
 
 #define KNEE			0
 #define HIP				1
 #define ARM				2
-#define WING 			3
+//#define WING 			3
 
 /* ====================================== Indices for AngleLimits arrays ====================================== */
 #define KNEE_MIN		(2*KNEE)
@@ -156,7 +156,8 @@ public:
 	//void StateVerify();								// Verifies the current leg state is physically possible and accurate
 
 	void CenterAngles(const double& height =0.0); // Compute median HIP, KNEE based on Params[] and HEIGHT/height. Calls ComputeEFVars()
-	void SetAngles(const double& knee, const double& hip, const double& arm, const double& wing);	// Calls ComputeVars()
+//	void SetAngles(const double& knee, const double& hip, const double& arm, const double& wing);	// Calls ComputeVars()
+	void SetAngles(const double& knee, const double& hip, const double& arm);	// Calls ComputeVars()
 
 	/* ============================================== PUBLIC MEMBER DATA ============================================== */
 
