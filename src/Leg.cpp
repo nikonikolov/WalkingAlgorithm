@@ -3,11 +3,6 @@
 /* ===================================================== PUBLIC METHODS ===================================================== */
 
 // Tripod constructor does not write to angles, so Leg constrcutor is only responsible for calculating the proper defaults
-/*
-Leg::Leg 	(const int& ID_knee, const int& ID_hip, const int& ID_arm, const int& ID_wing,
-			DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]) :
-*/
-
 Leg::Leg 	(const int& ID_knee, const int& ID_hip, const int& ID_arm,
 			DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]) :
 	
@@ -16,7 +11,6 @@ Leg::Leg 	(const int& ID_knee, const int& ID_hip, const int& ID_arm,
 	Joints	{ 	ServoJoint(ID_knee, HipsKnees), 
 				ServoJoint(ID_hip, HipsKnees), 
 				ServoJoint(ID_arm, ArmsWings), 
-				//ServoJoint(ID_wing, ArmsWings)
 			} {
 	// Check if RIGHT or LEFT
 	if(ID_knee>wkq::knee_left_back) 	LegRight=-1.0;
@@ -34,13 +28,13 @@ Leg::~Leg(){}
 
 void Leg::StandQuad(){
 	state.LegStand();
+	if(almost_equals(AngleOffset, wkq::PI/2)) return;
 
 	double MotorAngle = 
-			asin( (state.Params[COXA]+state.Params[FEMUR]-state.Params[KNEEMOTORDIST])/state.Params[DISTCENTER] * sin(wkq::PI/12) );
+			asin( state.Params[DISTCENTER] * sin(wkq::PI/12)/(state.Params[COXA]+state.Params[FEMUR]-state.Params[KNEEMOTORDIST]) );
 	// MotorAngle valid for a LEFT LEG servo facing downwards
-	if 		(almost_equals(AngleOffset, wkq::PI/3)) state.ServoAngles[ARM] = -(MotorAngle + (wkq::PI/12));
-	else if (almost_equals(AngleOffset, wkq::PI/2)) state.ServoAngles[ARM] = 0.0;
-	else 											state.ServoAngles[ARM] = MotorAngle + (wkq::PI/12);
+	if 		(almost_equals(AngleOffset, wkq::PI/6)) state.ServoAngles[ARM] = MotorAngle + (wkq::PI/12);
+	else 											state.ServoAngles[ARM] = -(MotorAngle + (wkq::PI/12));
 }
 
 
@@ -187,6 +181,16 @@ void Leg::RaiseBody(const double& hraise){
 */
 }
 
+/* ------------------------------------------------- TESTING FUNCTIONS ------------------------------------------------- */
+
+void Leg::QuadSetup(){
+	state.Clear();
+	state.ServoAngles[ARM] = 0;
+	state.ServoAngles[HIP] = wkq::radians(50);
+	state.ServoAngles[KNEE] = wkq::PI/2;
+}
+
+
 /* ------------------------------------------------- WRITING TO SERVOS ------------------------------------------------- */
 
 
@@ -197,12 +201,6 @@ void Leg::WriteAngles(){
 	Joints[KNEE].SetGoalPosition(LegRight * state.ServoAngles[KNEE]);
 }
 
-// Write state.ServoAngles[] to physcial servos in order WING, ARM, HIP, KNEE
-/*void Leg::WriteAllAngles(){
-	Joints[WING].SetGoalPosition(LegRight * state.ServoAngles[WING]);
-	WriteAngles();
-}
-*/
 // WRITE only a single angle contained in state.ServoAngles[] TO PHYSCIAL SERVO
 void Leg::WriteJoint(const int& idx){
 	Joints[idx].SetGoalPosition(LegRight * state.ServoAngles[idx]);

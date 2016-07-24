@@ -75,9 +75,12 @@ public:
 	
 	void RaiseBody(const double& hraise);
 
+	/* ------------------------------------ TESTING FUNCTIONS ----------------------------------- */
+
+	void QuadSetup();
+
 private:
 	void WriteAngles();
-	//void WriteAllAngles();
 	void WriteHipKneeAngles();
 
 	Leg Legs[LEG_COUNT];

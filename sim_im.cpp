@@ -5,6 +5,14 @@
 
 using namespace cv;
 
+/*
+ * main() for simulating the robot behaviour and debugging the algorithm using opencv
+ * 
+ * To compile run $ make bin/sim
+ * 
+ */
+
+
 int main(){
 
 	Mat img(800, 800, CV_8UC3);

@@ -1,9 +1,11 @@
-#include "MController.h"
+#include "Master.h"
 
-/*MController::MController(PinName tx, PinName rx, int baud_in) :
+#ifndef SIMULATION
+Master::Master(PinName tx, PinName rx, int baud_in) :
 	port(new mbed::Serial(tx, rx)), baud(baud_in), bitPeriod(1000000.0/baud_in){}
-*/
-bool MController::InputWalkForward(){
+#endif
+
+bool Master::InputWalkForward(){
 	static int out=0;
 	if(out<2){
 		out++;

@@ -26,3 +26,10 @@ bool almost_equals(const double& a, const double& b){
 	return fabs(a - b) <= 0.01;
 }
 
+#ifdef SIMULATION
+
+double wait(double arg){
+	return 0;
+}
+
+#endif

@@ -68,7 +68,6 @@ FRAMEWORK:
 #define KNEE			0
 #define HIP				1
 #define ARM				2
-//#define WING 			3
 
 /* ====================================== Indices for AngleLimits arrays ====================================== */
 #define KNEE_MIN		(2*KNEE)

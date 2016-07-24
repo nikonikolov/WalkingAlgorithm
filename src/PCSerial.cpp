@@ -15,5 +15,9 @@ bool PCSerial::get_debug(){
 	return debug;
 }
 
+char PCSerial::read(){
+	if(pc_usb.readable()) return pc_usb.getc();
+	return 0;
+}
 
 #endif

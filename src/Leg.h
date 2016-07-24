@@ -61,9 +61,6 @@ class Leg{
 
 public:
 	
-/*	Leg(const int& ID_knee, const int& ID_hip, const int& ID_arm, const int& ID_wing,
-		DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]);
-*/
 	Leg(const int& ID_knee, const int& ID_hip, const int& ID_arm, 
 		DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]);
 
@@ -99,11 +96,14 @@ public:
 	void StepRotate(const double& angle);			// Put End Effector down by making a rotation step. Leg must be already lifted
 	
 	void RaiseBody(const double& hraise);
+
+	/* ---------------------------------------- TESTING FUNCTIONS ---------------------------------------- */
+
+	void QuadSetup();
 	
 	/* ---------------------------------------- WRITE TO SERVOS ---------------------------------------- */
 
 	void WriteAngles();							// Write ServoAngles[] to physcial servos in order ARM, HIP, KNEE
-	//void WriteAllAngles();						// Write ServoAngles[] to physcial servos in order WING, ARM, HIP, KNEE
 	void WriteJoint(const int& idx);			// Write only a single angle contained in ServoAngles[] to physcial servo
 
 

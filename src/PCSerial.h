@@ -15,6 +15,9 @@ public:
 	PCSerial(const bool& debug_in = false);
 	~PCSerial();
 
+	char read();
+//	char write();
+
 	inline void print_debug(const std::string& msg);
 
 	void set_debug();

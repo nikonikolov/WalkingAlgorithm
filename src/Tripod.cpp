@@ -8,12 +8,6 @@ Tripod::Tripod (const int& ID_front_knee, const int& ID_middle_knee, const int& 
 			Leg(ID_middle_knee, ID_middle_knee+6, 	ID_middle_knee+18, 	HipsKnees, ArmsWings, height_in, robot_params),
 			Leg(ID_back_knee, 	ID_back_knee+6, 	ID_back_knee+18, 	HipsKnees, ArmsWings, height_in, robot_params)
 		} {}
-/*/
-	Legs{	Leg(ID_front_knee, 	ID_front_knee+6, 	ID_front_knee+18, 	ID_front_knee+12, 	HipsKnees, ArmsWings, height_in, robot_params),
-			Leg(ID_middle_knee, ID_middle_knee+6, 	ID_middle_knee+18, 	ID_middle_knee+12, 	HipsKnees, ArmsWings, height_in, robot_params),
-			Leg(ID_back_knee, 	ID_back_knee+6, 	ID_back_knee+18, 	ID_back_knee+12, 	HipsKnees, ArmsWings, height_in, robot_params)
-		} {}
-*/
 Tripod::~Tripod(){}
 
 /* ================================================= STANDING POSITIONS ================================================= */
@@ -149,6 +143,15 @@ void Tripod::FinishStep(){
 	WriteAngles();
 }
 
+/* ================================================= TESTING FUNCTIONS ================================================= */
+
+void Tripod::QuadSetup(){
+	Legs[0].StandQuad();
+	Legs[1].QuadSetup();
+	Legs[2].StandQuad();
+	WriteAngles();
+}
+
 
 /* ================================================= PRIVATE FUNCTIONALITY ================================================= */
 
@@ -164,11 +167,3 @@ void Tripod::WriteAngles(){
 		Legs[i].WriteAngles();
 	}
 }
-
-/*
-void Tripod::WriteAllAngles(){
-	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].WriteAllAngles();
-	}
-}
-*/

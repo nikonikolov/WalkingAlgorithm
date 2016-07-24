@@ -9,7 +9,15 @@
 
 #include "src/include.h"
 
-#include "src/MController.h"
+#include "src/Master.h"
+
+/*
+ * main() for simulating the robot behaviour and debugging the algorithm without using the mbed
+ * 
+ * To compile run $ make bin/sim
+ * 
+ */
+
 
 int main(){
 
@@ -18,10 +26,10 @@ int main(){
 	
 	pc.print_debug("MAIN started\n");
 
-	int baud = 115200;
+	int baud = 1000000;
 	double init_height = 10.0;
 
-	MController* pixhawk = new MController();
+	Master* pixhawk = new Master();
 
 	pc.print_debug("Pixhawk initialized\n");
 	
@@ -52,8 +60,6 @@ int main(){
 
 	// Further tests - lifting body after center to stand
 	// Centering for arbitrary height
-	// Moving forward
-	// 
 
 
 	return 0;

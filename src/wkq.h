@@ -80,6 +80,7 @@ namespace wkq{
 		RS_centered				= 2,			// body height equal to knee height, all knees to 90 degrees, the rest centered
 		RS_standing_quad 		= 4, 			// Standing with legs configured in Quad mode and configured to stand on the ground
 		RS_standing_flat_quad	= 5, 			// Standing with legs configured in Quad mode and fully flat
+		RS_quad_setup			= 6, 			// Legs set so that pixhawk configuration can be perfromed 
 
 		RS_flying_quad 			= 20, 			// Flying with legs configured in Quad mode but not fully flat
 		RS_flying_flat_quad 	= 21, 			// Flying with legs configured in Quad mode and fully flat

@@ -12,14 +12,19 @@
 #include "src/XL320.h"
 #include "src/include.h"
 
-#include "src/MController.h"
+#include "src/Master.h"
 
-/* Global vars:
-	PC pc - specifies connected pc for debugging purposes
-*/
+/*  
+ * main() that runs on the mbed. To compile run $ make
+ *
+ *
+ *	Global vars defined in other header files:
+ *	PC pc - specifies connected pc for debugging purposes - initialized in include.h and include.cpp
+ */
 
 int main(){
 
+	// Set the debug level so that debug messages are printed on the USB serial connection
 	pc.set_debug();
 
 	// PARAM_STEP defined in State_t.h. Meaning of each value defined in the same header
@@ -27,104 +32,44 @@ int main(){
 	
 	pc.print_debug("MAIN started\n");
 
-	// Remember to set that to 1000000 - both for servos and for mbed
-	int baud = 115200;
-	double init_height = 10.0;
+	int baud = 1000000; 		// No resistor between Rx and Tx
+//	int baud = 115200; 			// resistor between Rx and Tx - can possibly work without one
+	double init_height = 10.0;	// initial height for the robot
 
-	MController* pixhawk = new MController();
+	Master* pixhawk = new Master();
 
 	pc.print_debug("Pixhawk initialized\n");
 
-	// Instantiate Servo Objects
+	// Instantiate objects for communication with the servo motors 
 	AX12A HipsKnees(p9, p10, baud);
 	XL320 ArmsWings(p13, p14, baud);
 
+	pc.print_debug("Communication ready\n");
 	
-	Robot* WkQuad;
+
 	// Instantiate Robot
+	Robot* WkQuad;
 	try{
-		WkQuad = new Robot(pixhawk, &HipsKnees, &ArmsWings, init_height, robot_params, wkq::RS_standing);
-	//	WkQuad = new Robot(pixhawk, &HipsKnees, &ArmsWings, init_height, robot_params, wkq::RS_standing_quad);
+		WkQuad = new Robot(pixhawk, &HipsKnees, &ArmsWings, init_height, robot_params, wkq::RS_standing_flat_quad);		// initialize to a ready for flight position
+	//	WkQuad = new Robot(pixhawk, &HipsKnees, &ArmsWings, init_height, robot_params, wkq::RS_standing);				// initialize to a standing position
+	//	WkQuad = new Robot(pixhawk, &HipsKnees, &ArmsWings, init_height, robot_params, wkq::RS_standing_quad);			
 	//	WkQuad = new Robot(pixhawk, &HipsKnees, &ArmsWings, init_height, robot_params, wkq::RS_default);
+
 	}
 	catch(const string& msg){
 		pc.print_debug(msg);
 		exit(EXIT_FAILURE);
 	}
+
 	pc.print_debug("Robot Initialized\n");
 
-	//WkQuad->Stand();
+	// Make the robot do something. Examples shown below. Check Robot.h for possible functions
+	//WkQuad->Stand();							// make the robot stand on its legs
+	//pc.print_debug("Robot Standing\n");		// make the robot walk
+	//WkQuad->WalkForward(0.5);
 
-	pc.print_debug("Robot Standing\n");
 
-
-// SINGLE SERVO TESTING
-
-/*	int ID = 18;
-	pc.print_debug("HipsKnees initialized\n");
-
-	int val = HipsKnees.GetValue(ID, AX_RETURN_LEVEL);
-	pc.print_debug("Return level is " + itos(val) + "\n");
-
-	val = HipsKnees.GetValue(ID, AX_BAUD_RATE);
-	pc.print_debug("baud rate read is " + itos(val) + "\n");
-	HipsKnees.SetGoalPosition(AX_ID_Broadcast, 512);
-	pc.print_debug("Goal Position set\n");
-*/
-
-/*
-	int ID = 27;
-	pc.print_debug("ArmsWings initialized\n");
-
-	int val = ArmsWings.GetValue(ID, XL_RETURN_LEVEL);
-	pc.print_debug("Return level is " + itos(val) + "\n");
-
-	val = ArmsWings.GetValue(ID, 4);
-	pc.print_debug("baud rate is " + itos(val) + "\n");
-
-	ArmsWings.SetGoalPosition(ID, 3.14/4);
-	ArmsWings.SetGoalPosition(XL_ID_Broadcast, 512);
-	pc.print_debug("Goal Position set\n");
-
-*/
-/*
-	for(int i=11; i<=22; i++){
-		HipsKnees.SetGoalPosition(i, 512);
-	}
-	for(int i=23; i<=34; i++){
-		ArmsWings.SetGoalPosition(i, 512);
-		wait(1);
-	}
-
-*/
-/*	wait(2);
-	ArmsWings.SetGoalPosition(27, 512);
-	
-
-	int pr_pos = ArmsWings.GetValue(23, XL_PRESENT_POSITION);
-
-	pc.print_debug("Present pos" + itos(pr_pos) + "\n");
-
-	int pr_baud = ArmsWings.GetValue(23, XL_BAUD_RATE);
-
-	pc.print_debug("Present baud" + itos(pr_baud) + "\n");
-
-	for(int i=23; i<=34; i++){
-		ArmsWings.SetGoalPosition(i, 512);
-		wait(0.2);
-	}
-
-	pc.print_debug("Servos set\n");
-	for(int i=11; i<=22; i++){
-		HipsKnees.SetGoalPosition(i, 512);
-	}
-	pc.print_debug("HipsKnees set\n");
-	
-	for(int i=29; i<=34; i++){
-		ArmsWings.SetGoalPosition(i, 512);
-	}
-*/
-
+	pc.print_debug("End of Program\n");
 	return 0;
 }
 

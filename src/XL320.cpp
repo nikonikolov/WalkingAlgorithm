@@ -5,7 +5,7 @@
 
 XL320::XL320(const PinName tx, const PinName rx, const int& baudIn, const int ReturnLvlIn /*=1*/) :
 	DNXServo(tx, rx, baudIn, ReturnLvlIn){
-	pc.print_debug("XL320 object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + dtos(bitPeriod) + "\n");
+	pc.print_debug("XL320 object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + dtos(bitPeriod) + " us\n");
 }
 
 

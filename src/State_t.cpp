@@ -112,7 +112,6 @@ void State_t::LegCenter(){
 
 void State_t::LegStand(){
 	SetAngles((wkq::PI)/2, 0.0, 0.0);		// Automatically calls ComputeVars[] and computes new state
-	//SetAngles((wkq::PI)/2, 0.0, 0.0, 0.0);		// Automatically calls ComputeVars[] and computes new state
 }
 
 void State_t::LegFlatten(){	
@@ -236,6 +235,8 @@ void State_t::CenterAngles(const double& height /*=0.0*/){
 	// Center HIP
 	double hip_max=asin(Params[HIPKNEEMAXHDIST]/Params[FEMUR]);
 	ServoAngles[HIP] = ( hip_max + ( wkq::radians(90) - fabs(AngleLimits[HIP_MIN]) ) )/2 - wkq::radians(90);
+	
+	ServoAngles[HIP] = AngleLimits[HIP_MIN];
 
 	// Center KNEE
 	double height_hip;

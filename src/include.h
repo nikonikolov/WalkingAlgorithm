@@ -1,6 +1,12 @@
 #ifndef INCLUDE_H
 #define INCLUDE_H
 
+
+/*
+ * General header including libraries and defining functions
+ */
+
+
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -18,6 +24,8 @@ typedef int DNXServo;
 using std::cout;
 using std::endl;
 using std::fabs;
+
+double wait(double arg);
 
 #endif	//SIMULATION
 

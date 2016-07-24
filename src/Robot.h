@@ -41,7 +41,7 @@ FIXES TO BE DONE:
 #include "wkq.h"
 #include "Tripod.h"
 #include "include.h"
-#include "MController.h"
+#include "Master.h"
 
 using wkq::RobotState_t;
 
@@ -53,7 +53,7 @@ using wkq::RobotState_t;
 class Robot{
 
 public:
-	Robot(MController* pixhawk_in, DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, 
+	Robot(Master* pixhawk_in, DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, 
 		const double robot_params[], wkq::RobotState_t state_in = wkq::RS_default); 
 	~Robot();
 
@@ -70,22 +70,31 @@ public:
 	void WalkForward(double coeff);
 	void Rotate(double angle);
 
-	void RaiseBody(const double& hraise);
+	void RaiseBody(double hraise);
 
+	/* ------------------------------------ TESTING FUNCTIONS ----------------------------------- */
+
+	void Test();
+	void SingleStepForwardTest(double coeff);
+	void QuadSetup();			// set the legs so that Pixhawk calibration can be performed 
 
 private:
 	double CalcMaxStepSize();
 	double CalcMaxRotationAngle();
+
+	bool no_state();		// check if the current state is meaningless for the walking configuration
 
 
 	/* ------------------------------------ MEMBER DATA ----------------------------------- */
 
 	Tripod Tripods[TRIPOD_COUNT];
 	
-	MController* pixhawk;
+	Master* pixhawk;
 	// Both MAXes always positive; Negative limit same number
 	double max_rotation_angle;
 	double max_step_size;
+
+	const double wait_time = 0.5; 	// wait time between writing angles for the two tripods
 
 	wkq::RobotState_t state;
 };
