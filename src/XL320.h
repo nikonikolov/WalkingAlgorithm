@@ -1,5 +1,29 @@
-/* Dynamixel Communication 2.0 */
-/* Implements the dynamixel communication protocol for XL-320. */
+/* 
+
+Dynamixel Communication Protocol 2.0 - implements communication for XL-320 servo motors
+===========================================================================================
+
+FUNCTIONALITY:
+	1. Connects to a Serial Port
+	2. Does not represent a single servo, rather represents a port and the associated protocol
+	3. 
+
+-------------------------------------------------------------------------------------------
+
+PROTOCOL SUPPORT:
+	1. Does not supoort all features of the protocol
+	2. Only the basic features needed to control a single servo supported
+
+-------------------------------------------------------------------------------------------
+
+FRAMEWORK:
+	1. Needs a Servo ID and corresponding value to be passed for the function being performed
+
+-------------------------------------------------------------------------------------------
+
+*/
+
+
 #ifndef XL320_H
 #define XL320_H
 
@@ -10,7 +34,6 @@ class XL320 : public DNXServo {
  
 public:
  	
- 	// Create Dynamixel Communication protocol 2.0
 	XL320(const PinName tx, const PinName rx, const int& baudIn, const int ReturnLvlIn =1);
 
     ~XL320();

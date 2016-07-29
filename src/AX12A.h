@@ -1,5 +1,29 @@
-/* Dynamixel Communication 1.0 */
-/* Implements the dynamixel communication protocol for AX-12A */
+/* 
+
+Dynamixel Communication Protocol 1.0 - implements communication for AX-12A servo motors
+===========================================================================================
+
+FUNCTIONALITY:
+	1. Connects to a Serial Port
+	2. Does not represent a single servo, rather represents a port and the associated protocol
+	3. 
+
+-------------------------------------------------------------------------------------------
+
+PROTOCOL SUPPORT:
+	1. Does not supoort all features of the protocol
+	2. Only the basic features needed to control a single servo supported
+
+-------------------------------------------------------------------------------------------
+
+FRAMEWORK:
+	1. Needs a Servo ID and corresponding value to be passed for the function being performed
+
+-------------------------------------------------------------------------------------------
+
+*/
+
+
 #ifndef AX12A_H
 #define AX12A_H
 
@@ -9,7 +33,6 @@ class AX12A : public DNXServo{
  
 public:
  	
- 	// Create Dynamixel Communication protocol 2.0
 	AX12A(const PinName tx, const PinName rx, const int& baudIn, const int ReturnLvlIn =1);
 
 	~AX12A();

@@ -1,3 +1,18 @@
+/* 
+
+Dynamixel Communication Abstract class 
+===========================================================================================
+
+FUNCTIONALITY:
+	1. Defines the basic functionality that a protocol implementation must support
+	1. Connects to a Serial Port
+	2. Provides Hardware Abstraction Layer - subclasses do not need to implement 
+		hardware writing or reading associated with the serial port
+
+-------------------------------------------------------------------------------------------
+
+*/
+
 #ifndef DNXSERVO_H
 #define DNXSERVO_H
 

@@ -1,3 +1,14 @@
+/* 
+
+Walking Quadcopter Namespace
+===========================================================================================
+
+	Used to define some functions and types specific to the robot without introducing name clashes
+
+-------------------------------------------------------------------------------------------
+
+*/
+
 #ifndef wkq_NAMESPACE_H
 #define wkq_NAMESPACE_H
 

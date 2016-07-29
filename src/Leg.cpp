@@ -104,7 +104,6 @@ void Leg::StepForward(const double& step_size){
 		x_EFNew = ef_center/2.0 + step_size/sqrt(3);
 		y_EFNew = sqrt(3)*x_EFNew; 						// Front Joint
 
-		//if(almost_equals(AngleOffset, wkq::radians(150.0))) 	y_EFNew -= 4/(3*sqrt(3)*ef_center); 	// Back Joint
 		if(almost_equals(AngleOffset, wkq::radians(150.0))) 	y_EFNew -= sqrt(3)*ef_center; 			// Back Joint
 	}		
 	wkq::Point EFNew(x_EFNew, y_EFNew);

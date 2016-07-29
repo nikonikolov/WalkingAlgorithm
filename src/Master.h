@@ -1,14 +1,22 @@
+/* 
+
+Class used to model the Master microcontroller that issues commands to the mbed
+===========================================================================================
+
+CURRENT STATE: 
+	1. Only some definitions and member data available. 
+	2. Needs to be implemented and a corresponding class needs to be implemented in the Pixhawk autopilot
+
+-------------------------------------------------------------------------------------------
+
+*/
+
+
 #ifndef MASTER_H
 #define MASTER_H
 
 #include "include.h"
 
-/*
- * Class used to model the Master microcontroller that issues commands to the mbed
- *
- * Current State: only some definitions and member data available. Needs to be implemented and a corresponding class needs to be implemented in the Pixhawk autopilot
- *
- */
 
 class Master{
 public:

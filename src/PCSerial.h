@@ -1,3 +1,20 @@
+/* 
+
+MBED USB Serial Port Wrapper: corresponds to the USB port on the mbed
+===========================================================================================
+
+FUNCTIONALITY:
+	1. Used to provide unified debugging interface to all classes
+	2. Able to switch debug mode on and off - note that printing can usually slow down operation a lot
+		and should be switched off when not needed
+	3. Provides the needed abstraction so simulation mode can run without MBED hardware; in this
+		case simply redirects all print calls to STDOUT
+
+-------------------------------------------------------------------------------------------
+
+*/
+
+
 #ifndef PCSERIAL_H
 #define PCSERIAL_H
 
