@@ -61,14 +61,14 @@ class Leg{
 
 public:
 	
-	Leg(const int& ID_knee, const int& ID_hip, const int& ID_arm, 
+	Leg(int ID_knee, int ID_hip, int ID_arm, 
 		DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]);
 
 	~Leg();
 
 	/* ---------------------------------------- GETTER AND COPY ---------------------------------------- */
 
-	double Get(const int& param_type, const int& idx) const;
+	double Get(int param_type, int idx) const;
 	void CopyState(const Leg& LegIn);								// Copy the state of input Leg
 
 	/* ---------------------------------------- STANDING POSITIONS ---------------------------------------- */
@@ -82,20 +82,20 @@ public:
 
 	/* ---------------------------------------- RAISE AND LOWER ---------------------------------------- */
 
-	void LiftUp(const double& height);				// Lift End Effector in the air
-	void LowerDown(const double& height);			// Put End Effector straight down
+	void LiftUp(double height);				// Lift End Effector in the air
+	void LowerDown(double height);			// Put End Effector straight down
 	void FinishStep();								// Put End Effector down with ARM, HIP and KNEE centered
 
 
 	/* ---------------------------------------- WALKING ALGORITHMS ---------------------------------------- */
 
-	void IKBodyForward(const double& step_size);	// Change angles and state of Leg for a step forward
-	void StepForward(const double& step_size);		// Put End Effector down by making a step forward. Leg must be already lifted
+	void IKBodyForward(double step_size);	// Change angles and state of Leg for a step forward
+	void StepForward(double step_size);		// Put End Effector down by making a step forward. Leg must be already lifted
 	
-	void IKBodyRotate(const double& angle);			// Change angles and state of Leg for a rotation around central axis
-	void StepRotate(const double& angle);			// Put End Effector down by making a rotation step. Leg must be already lifted
+	void IKBodyRotate(double angle);			// Change angles and state of Leg for a rotation around central axis
+	void StepRotate(double angle);			// Put End Effector down by making a rotation step. Leg must be already lifted
 	
-	void RaiseBody(const double& hraise);
+	void RaiseBody(double hraise);
 
 	/* ---------------------------------------- TESTING FUNCTIONS ---------------------------------------- */
 
@@ -104,7 +104,7 @@ public:
 	/* ---------------------------------------- WRITE TO SERVOS ---------------------------------------- */
 
 	void WriteAngles();							// Write ServoAngles[] to physcial servos in order ARM, HIP, KNEE
-	void WriteJoint(const int& idx);			// Write only a single angle contained in ServoAngles[] to physcial servo
+	void WriteJoint(int idx);			// Write only a single angle contained in ServoAngles[] to physcial servo
 
 
 private:

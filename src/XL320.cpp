@@ -3,7 +3,7 @@
 
 /* ******************************** PUBLIC METHODS ************************************** */
 
-XL320::XL320(const PinName tx, const PinName rx, const int& baudIn, const int ReturnLvlIn /*=1*/) :
+XL320::XL320(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn /*=1*/) :
 	DNXServo(tx, rx, baudIn, ReturnLvlIn){
 	pc.print_debug("XL320 object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + dtos(bitPeriod) + " us\n");
 }
@@ -14,7 +14,7 @@ XL320::~XL320(){}
 
 
 // 0: 9600, 1:57600, 2:115200, 3:1Mbps
-int XL320::SetBaud(const int& ID, const int& rate) {
+int XL320::SetBaud(int ID, int rate) {
 	if ((rate > 3) || rate < 0) {
 		pc.print_debug("XL320: Incorrect baud rate\n");
 		return 1;
@@ -23,7 +23,7 @@ int XL320::SetBaud(const int& ID, const int& rate) {
 }
 
 // Set which commands return status; 0: None, 1: Read, 2: All.
-int XL320::SetReturnLevel(const int& ID, const int& lvl) {
+int XL320::SetReturnLevel(int ID, int lvl) {
 	ReturnLvl=lvl;
 	return dataPush(ID, XL_RETURN_LEVEL, ReturnLvl);
 }
@@ -31,44 +31,44 @@ int XL320::SetReturnLevel(const int& ID, const int& lvl) {
 
 
 // 1024 = -150 degrees CCW, 512 = 0 degrees (ORIGIN), 0 = +150 degrees CW
-int XL320::SetGoalPosition(const int& ID, const int& angle){
+int XL320::SetGoalPosition(int ID, int angle){
 	return dataPush(ID, XL_GOAL_POSITION_L, angle);
 }
 
-int XL320::SetGoalPosition(const int& ID, const double& angle){
+int XL320::SetGoalPosition(int ID, double angle){
 	return dataPush(ID, XL_GOAL_POSITION_L, angleScale(angle));
 }
 
-int XL320::SetGoalVelocity(const int& ID, const int& velocity){
+int XL320::SetGoalVelocity(int ID, int velocity){
 	return dataPush(ID, XL_GOAL_SPEED_L, velocity);
 }
 
-int XL320::SetGoalTorque(const int& ID, const int& torque){
+int XL320::SetGoalTorque(int ID, int torque){
 	return dataPush(ID, XL_GOAL_TORQUE, torque);
 }
 
-int XL320::SetPunch(const int& ID, const int& punch){
+int XL320::SetPunch(int ID, int punch){
 	return dataPush(ID, XL_PUNCH, punch);
 }
 
 
 
-int XL320::SetP(const int& ID, const int& value){
+int XL320::SetP(int ID, int value){
 	return dataPush(ID, XL_P_GAIN, value);
 }
 
-int XL320::SetI(const int& ID, const int& value){
+int XL320::SetI(int ID, int value){
 	return dataPush(ID, XL_I_GAIN, value);
 }
 
-int XL320::SetD(const int& ID, const int& value){
+int XL320::SetD(int ID, int value){
 	return dataPush(ID, XL_D_GAIN, value);
 }
 
 
 
 // Ping
-int XL320::Ping(const int& ID /*=1*/){
+int XL320::Ping(int ID /*=1*/){
 
 	int ec = send(ID, 0, NULL, XL_INS_Ping);
 	pc.print_debug(" - ec " + itos(ec));
@@ -84,12 +84,12 @@ int XL320::Ping(const int& ID /*=1*/){
 }
 
 // Sets motor led colours. r = 1, g = 2, y = 3, b = 4, p = 5, c = 6, w = 7, o = 0
-int XL320::SetLED(const int& ID, const int& colour){
+int XL320::SetLED(int ID, int colour){
 	return dataPush(ID, XL_LED, colour);
 }
 
 // Rainbow
-int XL320::Rainbow(const int& ID){
+int XL320::Rainbow(int ID){
 	for (int i = 1; i < 8; ++i)
 	{
 		int status = SetLED(ID, i);
@@ -162,12 +162,12 @@ int XL320::PacketLength(uint8_t* buf) {
 
 
 // Returns Length of Address
-int XL320::AddressLength(const int& address) {
+int XL320::AddressLength(int address) {
 	return DNXServo::AddressLength(address, TWO_BYTE_ADDRESSES);
 }
 
 
-int XL320::statusError(uint8_t* buf, const int& n) {
+int XL320::statusError(uint8_t* buf, int n) {
 
 	// Minimum return length
 	if (n < 11) {
@@ -218,7 +218,7 @@ int XL320::statusError(uint8_t* buf, const int& n) {
 
 // Packs data and sends it to the servo
 // Dynamixel Communication 2.0 Protocol: Header, Reserved, ID, Packet Length, Instruction, Parameter, 16bit CRC
-int XL320::send(const int& ID, const int& packetLenght, uint8_t* parameters, const uint8_t& ins) {
+int XL320::send(int ID, int packetLenght, uint8_t* parameters, uint8_t ins) {
 	uint8_t buf[255]; // Packet
 
 	// Header
@@ -275,7 +275,7 @@ int XL320::send(const int& ID, const int& packetLenght, uint8_t* parameters, con
 
 
 // dataPack sets the parameters in char array and returns length.
-int XL320::dataPack(const uint8_t& ins, uint8_t ** parameters, const int& address, const int& value /*=0*/){
+int XL320::dataPack(uint8_t ins, uint8_t ** parameters, int address, int value /*=0*/){
 
 	uint8_t* data; 
 	
@@ -308,7 +308,7 @@ int XL320::dataPack(const uint8_t& ins, uint8_t ** parameters, const int& addres
 }
 
 // dataPush is a generic wrapper for single value SET instructions for public methods
-int XL320::dataPush(const int& ID, const int& address, const int& value){
+int XL320::dataPush(int ID, int address, int value){
 	flush(); // Flush reply	for safety
 	
 	uint8_t* parameters;
@@ -323,7 +323,7 @@ int XL320::dataPush(const int& ID, const int& address, const int& value){
 
 
 // dataPull is a generic wrapper for single value GET instructions for public methods
-int XL320::dataPull(const int& ID, const int& address){
+int XL320::dataPull(int ID, int address){
 	flush(); // Flush reply	for safety
 	
 	uint8_t* parameters;

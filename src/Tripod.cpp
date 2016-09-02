@@ -2,7 +2,7 @@
 
 const double Tripod::leg_lift = 5.0; 
 
-Tripod::Tripod (const int& ID_front_knee, const int& ID_middle_knee, const int& ID_back_knee,
+Tripod::Tripod (int ID_front_knee, int ID_middle_knee, int ID_back_knee,
 				DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]) :
 	Legs{	Leg(ID_front_knee, 	ID_front_knee+6, 	ID_front_knee+18, 	HipsKnees, ArmsWings, height_in, robot_params),
 			Leg(ID_middle_knee, ID_middle_knee+6, 	ID_middle_knee+18, 	HipsKnees, ArmsWings, height_in, robot_params),
@@ -79,14 +79,14 @@ void Tripod::CopyState(const Tripod& tripod_in){
 
 /* ================================================= WALKING ALGORITHMS ================================================= */
 
-void Tripod::BodyForward (const double& step_size){
+void Tripod::BodyForward (double step_size){
 	for(int i=0; i<LEG_COUNT; i++){
 		Legs[i].IKBodyForward(step_size);
 	}
 	WriteAngles();
 }
 
-void Tripod::StepForward (const double& step_size){
+void Tripod::StepForward (double step_size){
 	for(int i=0; i<LEG_COUNT; i++){
 		Legs[i].StepForward(step_size);
 	}
@@ -94,14 +94,14 @@ void Tripod::StepForward (const double& step_size){
 }
 
 
-void Tripod::BodyRotate(const double& angle){
+void Tripod::BodyRotate(double angle){
 	for(int i=0; i<LEG_COUNT; i++){
 		Legs[i].IKBodyRotate(angle);
 	}
 	WriteAngles();
 }
 
-void Tripod::StepRotate(const double& angle){
+void Tripod::StepRotate(double angle){
 	for(int i=0; i<LEG_COUNT; i++){
 		Legs[i].StepRotate(angle);
 	}
@@ -109,7 +109,7 @@ void Tripod::StepRotate(const double& angle){
 }
 
 
-void Tripod::RaiseBody(const double& hraise){
+void Tripod::RaiseBody(double hraise){
 	Center();
 	for(int i=0; i<LEG_COUNT; i++){
 		if(i==0) 	Legs[i].RaiseBody(hraise);
@@ -122,14 +122,14 @@ void Tripod::RaiseBody(const double& hraise){
 /* ================================================= RAISE AND LOWER ================================================= */
 
 
-void Tripod::LiftUp(const double& height_up){
+void Tripod::LiftUp(double height_up){
 	for(int i=0; i<LEG_COUNT; i++){
 		Legs[i].LiftUp(height_up);
 	}
 	WriteAngles();
 }
 
-void Tripod::LowerDown(const double& height_down){
+void Tripod::LowerDown(double height_down){
 	for(int i=0; i<LEG_COUNT; i++){
 		Legs[i].LowerDown(height_down);
 	}

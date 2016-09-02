@@ -69,7 +69,7 @@ State_t::~State_t(){}
 /* -------------------------------------------- GETTER AND COPY -------------------------------------------- */
 
 
-double State_t::Get(const int& param_type, const int& idx) const{
+double State_t::Get(int param_type, int idx) const{
 	if 		(param_type==SERVO_ANGLE) 	return ServoAngles[idx];
 	else if (param_type==STATE_VAR) 	return Vars[idx];
 	else if (param_type==DEFAULT_VAR) 	return DefaultVars[idx];
@@ -125,7 +125,7 @@ void State_t::LegFlatten(){
 /* ================================================= MAINTAINING LEG STATE ================================================= */
 
 
-void State_t::UpdateVar(const int& idx, const double& value, const bool& update_state /*=true*/){
+void State_t::UpdateVar(int idx, double value, const bool& update_state /*=true*/){
 	
 	Vars[idx] = value;
 
@@ -142,14 +142,14 @@ void State_t::UpdateVar(const int& idx, const double& value, const bool& update_
 	if(update_state) Update(base_idx);	
 }
 
-void State_t::UpdateVar(const int& idx, const double& value, const double& valueSQ){
+void State_t::UpdateVar(int idx, double value, double valueSQ){
 	Vars[idx] = value;
 	Vars[idx+VAR_COUNT] = valueSQ;
 	Update(idx);	
 }
 
 
-void State_t::Update(const int& idx){
+void State_t::Update(int idx){
 
 	switch(idx){
 		case HIPTOEND:
@@ -231,7 +231,7 @@ void State_t::Verify(){
 /* 	height should be 0.0 when the current StateVar[HEIGHT] should be used; if this variable has not been set to a meaningful value, 
 	the height that needs to be used should be passed as parameter - ComputeEFVars() will set the value in StateVar[HEIGHT]
 */
-void State_t::CenterAngles(const double& height /*=0.0*/){
+void State_t::CenterAngles(double height /*=0.0*/){
 	// Center HIP
 	double hip_max=asin(Params[HIPKNEEMAXHDIST]/Params[FEMUR]);
 	ServoAngles[HIP] = ( hip_max + ( wkq::radians(90) - fabs(AngleLimits[HIP_MIN]) ) )/2 - wkq::radians(90);
@@ -253,8 +253,8 @@ void State_t::CenterAngles(const double& height /*=0.0*/){
 	ComputeEFVars(height);			// Update Vars[] - needs to be passed the same argument
 }
 
-//void State_t::SetAngles(const double& knee, const double& hip, const double& arm, const double& wing){
-void State_t::SetAngles(const double& knee, const double& hip, const double& arm){
+//void State_t::SetAngles(double knee, double hip, double arm, double wing){
+void State_t::SetAngles(double knee, double hip, double arm){
 	ServoAngles[KNEE] = knee;
 	ServoAngles[HIP] = hip;
 	ServoAngles[ARM] = arm;
@@ -282,7 +282,7 @@ void State_t::ComputeVars(){
 }
 
 
-void State_t::ComputeEFVars(const double& height /*=0.0*/){
+void State_t::ComputeEFVars(double height /*=0.0*/){
 	if(height!=0.0) UpdateVar(HEIGHT, height, false); 	// Only updates HEIGHT
 
 	double hip_to_end_sq = pow(Params[FEMUR],2) + pow(Params[TIBIA],2) - 2*Params[FEMUR]*Params[TIBIA]*cos(wkq::PI - ServoAngles[KNEE]);

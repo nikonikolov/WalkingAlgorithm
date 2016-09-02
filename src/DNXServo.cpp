@@ -2,7 +2,7 @@
 
 /* ******************************** PUBLIC METHODS ************************************** */
 
-DNXServo::DNXServo(const PinName tx, const PinName rx, const int& baudIn, const int ReturnLvlIn /*=1*/):
+DNXServo::DNXServo(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn /*=1*/):
 	port(new mbed::Serial(tx, rx)), baud(baudIn), bitPeriod(1000000.0/baudIn), ReturnLvl(ReturnLvlIn){
 	
 	// Set the baud rate of the port
@@ -14,12 +14,12 @@ DNXServo::~DNXServo(){
 }
 
 // SetID
-int DNXServo::SetID(const int& ID, const int& newID){
+int DNXServo::SetID(int ID, int newID){
     return dataPush(ID, DNXSERVO_ID, newID);
 };
 
 // Read Value from Control Table
-int DNXServo::GetValue(const int& ID, const int& address){
+int DNXServo::GetValue(int ID, int address){
 	return dataPull(ID, address);
 }
 
@@ -40,7 +40,7 @@ void DNXServo::flush() {
 
 
 // Write buffer to servo 
-void DNXServo::write(uint8_t* buf, const int& n) {
+void DNXServo::write(uint8_t* buf, int n) {
 	for (int i=0; i < n; i++) {
 		port->putc(buf[i]);
 	}
@@ -79,7 +79,7 @@ void DNXServo::write(uint8_t* buf, const int& n) {
 
 
 // Read reply returns payload length, 0 if error.
-int DNXServo::read(uint8_t* buf, const int& nMax /* =255 */) {			//check readBytesUntil()
+int DNXServo::read(uint8_t* buf, int nMax /* =255 */) {			//check readBytesUntil()
 	int n = 0; 		 	// Bytes read
 	int timeout = 0; 	// Timeout
 
@@ -100,7 +100,7 @@ int DNXServo::read(uint8_t* buf, const int& nMax /* =255 */) {			//check readByt
 
 
 // CW - positive input, CCW - negative input
-int DNXServo::angleScale(const double& angle){
+int DNXServo::angleScale(double angle){
 	
 	// 2.61799387799 rad = 150 degrees
 	int result = 512 - ((angle/2.61799387799)*512);
@@ -121,7 +121,7 @@ int DNXServo::angleScale(const double& angle){
 
 
 // Length of address
-int DNXServo::AddressLength(const int& address, const uint8_t * TWO_BYTE_ADDRESSES) {
+int DNXServo::AddressLength(int address, const uint8_t * TWO_BYTE_ADDRESSES) {
 	bool found=false;
 	
 	for(int i=0; i<11 && !found; i++){
@@ -134,7 +134,7 @@ int DNXServo::AddressLength(const int& address, const uint8_t * TWO_BYTE_ADDRESS
 
 
 // packetPrint
-void DNXServo::packetPrint(const int& bytes, uint8_t* buf) {
+void DNXServo::packetPrint(int bytes, uint8_t* buf) {
 	if(!pc.get_debug()) return;
 	pc.print_debug("PACKET {");
 	for (int i=0; i < bytes; i++) {

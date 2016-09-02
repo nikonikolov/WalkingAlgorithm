@@ -3,7 +3,7 @@
 
 /* ******************************** PUBLIC METHODS ************************************** */
 
-AX12A::AX12A(const PinName tx, const PinName rx, const int& baudIn, const int ReturnLvlIn /*=1*/) :
+AX12A::AX12A(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn /*=1*/) :
 	DNXServo(tx, rx, baudIn, ReturnLvlIn){
 	pc.print_debug("AX12A object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + dtos(bitPeriod) + " us\n");
 }
@@ -15,7 +15,7 @@ AX12A::~AX12A(){}
 
 
 // 1: 1Mbps, 3: 500 000, 4: 400 000, 7: 250 000, 9: 200 000, 16: 115200, 34: 57600, 103: 19200, 207: 9600
-int AX12A::SetBaud(const int& ID, const int& rate) {
+int AX12A::SetBaud(int ID, int rate) {
 	if ( rate != 1 && rate != 3 && rate != 4 && rate != 7 && rate != 9 && rate != 16  && rate != 34 && rate != 103 && rate != 207 ) {
 		pc.print_debug("Incorrect baud rate\n");
 		return 1;
@@ -25,7 +25,7 @@ int AX12A::SetBaud(const int& ID, const int& rate) {
 }
 
 // Set which commands return status; 0: None, 1: Read, 2: All.
-int AX12A::SetReturnLevel(const int& ID, const int& lvl) {
+int AX12A::SetReturnLevel(int ID, int lvl) {
 	ReturnLvl=lvl;
 	return dataPush(ID, AX_RETURN_LEVEL, ReturnLvl);
 }
@@ -33,28 +33,28 @@ int AX12A::SetReturnLevel(const int& ID, const int& lvl) {
 
 
 // 1024 = -150 degrees CCW, 512 = 0 degrees (ORIGIN), 0 = +150 degrees CW
-int AX12A::SetGoalPosition(const int& ID, const int& angle){
+int AX12A::SetGoalPosition(int ID, int angle){
 	return dataPush(ID, AX_GOAL_POSITION, angle);
 }
 
-int AX12A::SetGoalPosition(const int& ID, const double& angle){
+int AX12A::SetGoalPosition(int ID, double angle){
 	return dataPush(ID, AX_GOAL_POSITION, angleScale(angle));
 }
 
-int AX12A::SetGoalVelocity(const int& ID, const int& velocity){
+int AX12A::SetGoalVelocity(int ID, int velocity){
 	return dataPush(ID, AX_GOAL_VELOCITY, velocity);
 }
 
-int AX12A::SetGoalTorque(const int& ID, const int& torque){
+int AX12A::SetGoalTorque(int ID, int torque){
 	return dataPush(ID, AX_MAX_TORQUE, torque);
 }
 
-int AX12A::SetPunch(const int& ID, const int& punch){
+int AX12A::SetPunch(int ID, int punch){
 	return dataPush(ID, AX_PUNCH, punch);
 }
 
 // Turn LED on (0x01) and off (0x00)
-int AX12A::SetLED(const int& ID, const int& value){
+int AX12A::SetLED(int ID, int value){
 	return dataPush(ID, AX_LED, value);
 }
 
@@ -78,12 +78,12 @@ uint8_t AX12A::update_crc(uint8_t *data_blk_ptr, const uint16_t& data_blk_size) 
 
 
 // Return Length of Address
-int AX12A::AddressLength(const int& address) {
+int AX12A::AddressLength(int address) {
 	return DNXServo::AddressLength(address, TWO_BYTE_ADDRESSES);
 }
 
 
-int AX12A::statusError(uint8_t* buf, const int& n) {
+int AX12A::statusError(uint8_t* buf, int n) {
 	
 	// Minimum return length
 	if (n < 6) {
@@ -143,7 +143,7 @@ int AX12A::statusError(uint8_t* buf, const int& n) {
 
 // Packs data and sends it to the servo
 // Dynamixel Communication 1.0 Protocol: Header, ID, Packet Length, Instruction, Parameter, 16bit CRC
-int AX12A::send(const int& ID, const int& packetLength, uint8_t* parameters, const uint8_t& ins) {
+int AX12A::send(int ID, int packetLength, uint8_t* parameters, uint8_t ins) {
 	
 	uint8_t buf[packetLength+6]; // Packet
 
@@ -194,7 +194,7 @@ int AX12A::send(const int& ID, const int& packetLength, uint8_t* parameters, con
 
 
 // dataPack sets the parameters in char array and returns length.
-int AX12A::dataPack(const uint8_t& ins, uint8_t ** parameters, const int& address, const int& value /*=0*/){
+int AX12A::dataPack(uint8_t ins, uint8_t ** parameters, int address, int value /*=0*/){
 
 	uint8_t* data; 
 	
@@ -225,7 +225,7 @@ int AX12A::dataPack(const uint8_t& ins, uint8_t ** parameters, const int& addres
 
 
 // dataPush is a generic wrapper for single value SET instructions for public methods
-int AX12A::dataPush(const int& ID, const int& address, const int& value){
+int AX12A::dataPush(int ID, int address, int value){
 	flush(); // Flush reply for safety															
 	
 	uint8_t* parameters;
@@ -240,7 +240,7 @@ int AX12A::dataPush(const int& ID, const int& address, const int& value){
 
 
 // dataPull is a generic wrapper for single value GET instructions for public methods
-int AX12A::dataPull(const int& ID, const int& address){
+int AX12A::dataPull(int ID, int address){
 	flush(); // Flush reply	for safety														
 	
 	uint8_t* parameters;

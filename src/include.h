@@ -34,10 +34,10 @@ using std::stringstream;
 
 extern PCSerial pc;
 
-string to_hex(const uint8_t& dec);
-string itos(const int& num);
-string dtos(const double& num);
+string to_hex(uint8_t dec);
+string itos(int num);
+string dtos(double num);
 
-bool almost_equals(const double& a, const double& b);
+bool almost_equals(double a, double b);
 
 #endif

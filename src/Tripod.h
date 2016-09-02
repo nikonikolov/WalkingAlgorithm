@@ -40,7 +40,7 @@ FRAMEWORK:
 class Tripod{
 
 public:
-	Tripod(const int& ID_front_knee, const int& ID_middle_knee, const int& ID_back_knee,
+	Tripod(int ID_front_knee, int ID_middle_knee, int ID_back_knee,
 			DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]);
 
 	~Tripod ();
@@ -61,19 +61,19 @@ public:
 
 	/* ------------------------------------ RAISE AND LOWER ----------------------------------- */
 
-	void LiftUp(const double& height_up);
-	void LowerDown(const double& height_down);
+	void LiftUp(double height_up);
+	void LowerDown(double height_down);
 	void FinishStep();
 
 	/* ------------------------------------ WALKING ALGORITHMS ----------------------------------- */
 	
-	void BodyForward(const double& step_size);
-	void StepForward(const double& step_size);
+	void BodyForward(double step_size);
+	void StepForward(double step_size);
 
-	void BodyRotate(const double& angle);
-	void StepRotate(const double& angle);
+	void BodyRotate(double angle);
+	void StepRotate(double angle);
 	
-	void RaiseBody(const double& hraise);
+	void RaiseBody(double hraise);
 
 	/* ------------------------------------ TESTING FUNCTIONS ----------------------------------- */
 

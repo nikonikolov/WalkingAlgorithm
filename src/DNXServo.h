@@ -25,21 +25,21 @@ class DNXServo{
 
 public:
 
-	DNXServo(const PinName tx, const PinName rx, const int& baudIn, const int ReturnLvlIn =1);
+	DNXServo(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn =1);
 
 	virtual ~DNXServo();
 
-    int SetID(const int& ID, const int& newID);
-	int GetValue(const int& ID, const int& address);
+    int SetID(int ID, int newID);
+	int GetValue(int ID, int address);
 
-    virtual int SetBaud	(const int& ID, const int& rate) =0;
-    virtual int SetReturnLevel(const int& ID, const int& lvl) =0;
-    virtual int SetLED(const int& ID, const int& colour) =0; 
-	virtual int SetGoalPosition(const int& ID, const int& angle) =0;
-	virtual int SetGoalPosition(const int& ID, const double& angle) =0;
-	virtual int SetGoalVelocity(const int& ID, const int& velocity) =0;
-	virtual int SetGoalTorque(const int& ID, const int& torque) =0;
-	virtual int SetPunch(const int& ID, const int& punch) =0;
+    virtual int SetBaud	(int ID, int rate) =0;
+    virtual int SetReturnLevel(int ID, int lvl) =0;
+    virtual int SetLED(int ID, int colour) =0; 
+	virtual int SetGoalPosition(int ID, int angle) =0;
+	virtual int SetGoalPosition(int ID, double angle) =0;
+	virtual int SetGoalVelocity(int ID, int velocity) =0;
+	virtual int SetGoalTorque(int ID, int torque) =0;
+	virtual int SetPunch(int ID, int punch) =0;
 
 protected:
 	
@@ -51,19 +51,19 @@ protected:
 	inline uint16_t makeword(const T1& num1, const T2& num2);
 
 	void flush();
-	void write(uint8_t* buf, const int& n);
-	int read(uint8_t* buf, const int& nMax=255);
+	void write(uint8_t* buf, int n);
+	int read(uint8_t* buf, int nMax=255);
 
-	int angleScale(const double& angle);
-	int AddressLength(const int& address, const uint8_t * TWO_BYTE_ADDRESSES);
-	void packetPrint(const int& bytes, uint8_t* buf);
+	int angleScale(double angle);
+	int AddressLength(int address, const uint8_t * TWO_BYTE_ADDRESSES);
+	void packetPrint(int bytes, uint8_t* buf);
 	
-	virtual int statusError(uint8_t* buf, const int& n) =0;
-	virtual int send(const int& ID, const int& bytes, uint8_t* parameters, const uint8_t& ins) =0;
+	virtual int statusError(uint8_t* buf, int n) =0;
+	virtual int send(int ID, int bytes, uint8_t* parameters, uint8_t ins) =0;
 
-	virtual int dataPack(const uint8_t& ins, uint8_t ** parameters, const int& address, const int& value =0) =0;
-	virtual int dataPush(const int& ID, const int& address, const int& value) =0;
-	virtual int dataPull(const int& ID, const int& address) =0;
+	virtual int dataPack(uint8_t ins, uint8_t ** parameters, int address, int value =0) =0;
+	virtual int dataPush(int ID, int address, int value) =0;
+	virtual int dataPull(int ID, int address) =0;
 
 	// REPLY BUFFER - SIZE 256 Overflow should never occur no matter the number of servos - you only communicate with one ID
 	// and others don't respond. ID_Broadcast does not reply as well 

@@ -7,7 +7,7 @@ class Point{
 
 public:
 	Point();
-	Point(const double& x_in, const double& y_in);
+	Point(double x_in, double y_in);
 	Point(const Point& p_in);
 	~Point();
 	
@@ -17,8 +17,8 @@ public:
 	inline double origin_dist() const;
 	//void origin_symmetric();
 
-	inline void translate_y(const double& delta_y);
-	inline void translate_x(const double& delta_x);
+	inline void translate_y(double delta_y);
+	inline void translate_x(double delta_x);
 	inline void translate(const Point& p2);
 	
 	inline double dist(const Point& p_in) const;
@@ -55,11 +55,11 @@ double Point::dist_sq(const Point& p_in) const{
 	return pow((x-p_in.x),2) + pow((y-p_in.y),2);
 }
 
-void Point::translate_y(const double& delta_y){
+void Point::translate_y(double delta_y){
 	y += delta_y;
 }
 
-void Point::translate_x(const double& delta_x){
+void Point::translate_x(double delta_x){
 	x += delta_x;
 }
 

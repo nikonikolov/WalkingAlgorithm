@@ -3,7 +3,7 @@
 /* ===================================================== PUBLIC METHODS ===================================================== */
 
 // Tripod constructor does not write to angles, so Leg constrcutor is only responsible for calculating the proper defaults
-Leg::Leg 	(const int& ID_knee, const int& ID_hip, const int& ID_arm,
+Leg::Leg 	(int ID_knee, int ID_hip, int ID_arm,
 			DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]) :
 	
 	state(height_in, robot_params), 
@@ -43,12 +43,12 @@ void Leg::StandQuad(){
 /* ------------------------------------------------- RAISE AND LOWER ------------------------------------------------- */
 
 // input equals height required for the end effector; Untested for all joints and negative input
-void Leg::LiftUp(const double& height){
+void Leg::LiftUp(double height){
 	state.ServoAngles[KNEE] = wkq::PI - state.ServoAngles[KNEE] + acos(1 - pow(height,2) / state.Params[TIBIA_SQ]); 
 }
 
 // input equals current height of the end effector
-void Leg::LowerDown(const double& height){
+void Leg::LowerDown(double height){
 	state.ServoAngles[KNEE] = wkq::PI - state.ServoAngles[KNEE] - acos(1 - pow(height,2) / state.Params[TIBIA_SQ]); 
 }
 
@@ -68,7 +68,7 @@ void Leg::FinishStep(){
 
 
 // Valid calculations for negative input as well in the current form
-void Leg::IKBodyForward(const double& step_size){
+void Leg::IKBodyForward(double step_size){
 
 	double step_sizeSQ = pow(step_size,2);
 
@@ -88,7 +88,7 @@ void Leg::IKBodyForward(const double& step_size){
 
 
 // Input is the currently used step size
-void Leg::StepForward(const double& step_size){
+void Leg::StepForward(double step_size){
 
 	// Distance from Robot center to end effector for a fully centered robot at this height
 	double ef_center = state.Get(STATE_VAR, EFCENTER);
@@ -130,7 +130,7 @@ void Leg::StepForward(const double& step_size){
 
 
 
-void Leg::IKBodyRotate(const double& angle){
+void Leg::IKBodyRotate(double angle){
 
 	// Sine Rule to find rotation distance
 	double RotDist = 2 * state.Params[DISTCENTER] * sin (fabs(angle)/2);
@@ -157,12 +157,12 @@ void Leg::IKBodyRotate(const double& angle){
 
 
 // Input is the currently used step size
-void Leg::StepRotate(const double& step_size){
+void Leg::StepRotate(double step_size){
 }
 
 
 // input equals height to be raised by; negative values also work
-void Leg::RaiseBody(const double& hraise){
+void Leg::RaiseBody(double hraise){
 
 	state.UpdateVar(HEIGHT, (state.Get(STATE_VAR, HEIGHT) + hraise));			// HIPTOEND, HIP and KNEE automatically get updated
 
@@ -201,14 +201,14 @@ void Leg::WriteAngles(){
 }
 
 // WRITE only a single angle contained in state.ServoAngles[] TO PHYSCIAL SERVO
-void Leg::WriteJoint(const int& idx){
+void Leg::WriteJoint(int idx){
 	Joints[idx].SetGoalPosition(LegRight * state.ServoAngles[idx]);
 }
 
 
 /* ------------------------------------------------- GETTER AND COPY ------------------------------------------------- */
 
-double Leg::Get(const int& param_type, const int& idx) const{
+double Leg::Get(int param_type, int idx) const{
 	if 		(param_type==SERVO_ANGLE) 	return state.ServoAngles[idx];
 	else if (param_type==STATE_VAR) 	return state.Get(STATE_VAR, idx);
 	else if (param_type==DEFAULT_VAR) 	return state.Get(DEFAULT_VAR, idx);

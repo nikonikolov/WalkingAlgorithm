@@ -134,7 +134,7 @@ public:
 
 	/* ---------------------------------------- GETTER AND COPY ---------------------------------------- */
 
-	double Get(const int& param_type, const int& idx) const;
+	double Get(int param_type, int idx) const;
 	void operator=(const State_t& StateIn);
 
 
@@ -148,15 +148,15 @@ public:
 
 	/* ------------------------------------ MAINTAINING LEG STATE ----------------------------------- */
 
-	void UpdateVar(const int& idx, const double& value, const bool& update_state=true);
-	void UpdateVar(const int& idx, const double& value, const double& valueSQ);
+	void UpdateVar(int idx, double value, const bool& update_state=true);
+	void UpdateVar(int idx, double value, double valueSQ);
 
 	void Clear();										// Clears StateVars[] - needed for flight-related actions
 	//void StateVerify();								// Verifies the current leg state is physically possible and accurate
 
-	void CenterAngles(const double& height =0.0); // Compute median HIP, KNEE based on Params[] and HEIGHT/height. Calls ComputeEFVars()
-//	void SetAngles(const double& knee, const double& hip, const double& arm, const double& wing);	// Calls ComputeVars()
-	void SetAngles(const double& knee, const double& hip, const double& arm);	// Calls ComputeVars()
+	void CenterAngles(double height =0.0); // Compute median HIP, KNEE based on Params[] and HEIGHT/height. Calls ComputeEFVars()
+//	void SetAngles(double knee, double hip, double arm, double wing);	// Calls ComputeVars()
+	void SetAngles(double knee, double hip, double arm);	// Calls ComputeVars()
 
 	/* ============================================== PUBLIC MEMBER DATA ============================================== */
 
@@ -170,9 +170,9 @@ private:
 
 	/* ------------------------------------ MAINTAINING LEG STATE ----------------------------------- */
 
-	void Update(const int& idx);				// Auto-invoked when any StateVars[] changes in order to keep leg state consistent
+	void Update(int idx);				// Auto-invoked when any StateVars[] changes in order to keep leg state consistent
 	void UpdateAngles();						// Update KNEE and HIP angles basing on the current HIPTOEND and HEIGHT
-	void ComputeEFVars(const double& height=0.0); // Compute HIPTOEND, ARMGTOEND based on KNEE, HEIGHT/height; called by CenterAngles()
+	void ComputeEFVars(double height=0.0); // Compute HIPTOEND, ARMGTOEND based on KNEE, HEIGHT/height; called by CenterAngles()
 	void ComputeVars();							// Computes valid Vars[] basing on ServoAngles[]
 
 

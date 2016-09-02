@@ -33,32 +33,32 @@ class AX12A : public DNXServo{
  
 public:
  	
-	AX12A(const PinName tx, const PinName rx, const int& baudIn, const int ReturnLvlIn =1);
+	AX12A(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn =1);
 
 	~AX12A();
 
-    int SetBaud(const int& ID, const int& rate);
-    int SetReturnLevel(const int& ID, const int& lvl);
+    int SetBaud(int ID, int rate);
+    int SetReturnLevel(int ID, int lvl);
 
-	int SetGoalPosition(const int& ID, const double& angle); 
-	int SetGoalPosition(const int& ID, const int& angle);
-	int SetGoalVelocity(const int& ID, const int& velocity);
-	int SetGoalTorque(const int& ID, const int& torque);
-	int SetPunch(const int& ID, const int& punch);
+	int SetGoalPosition(int ID, double angle); 
+	int SetGoalPosition(int ID, int angle);
+	int SetGoalVelocity(int ID, int velocity);
+	int SetGoalTorque(int ID, int torque);
+	int SetPunch(int ID, int punch);
 
-    int SetLED(const int& ID, const int& colour);
+    int SetLED(int ID, int colour);
 
 private:
 
 	uint8_t update_crc(uint8_t *data_blk_ptr, const uint16_t& data_blk_size);	
 
-	int AddressLength(const int& address);
-	int statusError(uint8_t* buf, const int& n);
-	int send(const int& ID, const int& packetLength, uint8_t* parameters, const uint8_t& ins);
+	int AddressLength(int address);
+	int statusError(uint8_t* buf, int n);
+	int send(int ID, int packetLength, uint8_t* parameters, uint8_t ins);
 
-	int dataPack(const uint8_t& ins, uint8_t** parameters, const int& address, const int& value =0);
-	int dataPush(const int& ID, const int& address, const int& value);
-	int dataPull(const int& ID, const int& address);
+	int dataPack(uint8_t ins, uint8_t** parameters, int address, int value =0);
+	int dataPush(int ID, int address, int value);
+	int dataPull(int ID, int address);
 	
 	static const uint8_t TWO_BYTE_ADDRESSES[11];
 

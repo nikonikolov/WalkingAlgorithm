@@ -19,11 +19,11 @@ namespace wkq{
 
 	const double PI = 3.14159265358979323846264338327950288419716939937510;
 
-	inline double radians(const double& degrees){	
+	inline double radians(double degrees){	
 		return degrees/180.0*wkq::PI; 
 	}
 
-	inline double degrees(const double& radians){
+	inline double degrees(double radians){
 		return radians/wkq::PI*180.0;
 	}
 
@@ -139,8 +139,8 @@ namespace wkq{
 		inline double origin_dist() const;
 		//void origin_symmetric();
 
-		inline void translate_y(const double& delta_y);
-		inline void translate_x(const double& delta_x);
+		inline void translate_y(double delta_y);
+		inline void translate_x(double delta_x);
 		inline void translate(const Point& p2);
 		
 		inline double dist(const Point& p_in) const;
@@ -189,11 +189,11 @@ namespace wkq{
 		return pow((x-p_in.x),2) + pow((y-p_in.y),2);
 	}
 
-	void Point::translate_y(const double& delta_y){
+	void Point::translate_y(double delta_y){
 		y += delta_y;
 	}
 
-	void Point::translate_x(const double& delta_x){
+	void Point::translate_x(double delta_x){
 		x += delta_x;
 	}
 
