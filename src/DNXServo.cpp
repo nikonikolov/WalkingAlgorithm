@@ -2,7 +2,7 @@
 
 /* ******************************** PUBLIC METHODS ************************************** */
 
-DNXServo::DNXServo(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn /*=1*/):
+DNXServo::DNXServo(PinName tx, PinName rx, int baudIn, int ReturnLvlIn /*=1*/):
 	port(new mbed::Serial(tx, rx)), baud(baudIn), bitPeriod(1000000.0/baudIn), ReturnLvl(ReturnLvlIn){
 	
 	// Set the baud rate of the port
