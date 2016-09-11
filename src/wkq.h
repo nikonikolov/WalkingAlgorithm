@@ -86,36 +86,36 @@ namespace wkq{
 			somehow in Robot::Stand()
 	***/
 	enum RobotState_t{
-		RS_default 				= 0,			// all servos configured to default positions, i.e. centralized for stable stand
-		RS_standing				= 1,			// body height equal to knee height, all knees to 90 degrees, the rest centered
-		RS_centered				= 2,			// body height equal to knee height, all knees to 90 degrees, the rest centered
-		RS_standing_quad 		= 4, 			// Standing with legs configured in Quad mode and configured to stand on the ground
-		RS_standing_flat_quad	= 5, 			// Standing with legs configured in Quad mode and fully flat
-		RS_quad_setup			= 6, 			// Legs set so that pixhawk configuration can be perfromed 
+		RS_DEFAULT 				= 0,			// all servos configured to default positions, i.e. centralized for stable stand
+		RS_STANDING				= 1,			// body height equal to knee height, all knees to 90 degrees, the rest centered
+		RS_CENTERED				= 2,			// body height equal to knee height, all knees to 90 degrees, the rest centered
+		RS_STANDING_QUAD 		= 4, 			// Standing with legs configured in Quad mode and configured to stand on the ground
+		RS_STANDING_FLAT_QUAD	= 5, 			// Standing with legs configured in Quad mode and fully flat
+		RS_QUAD_SETUP			= 6, 			// Legs set so that pixhawk configuration can be perfromed 
 
-		RS_flying_quad 			= 20, 			// Flying with legs configured in Quad mode but not fully flat
-		RS_flying_flat_quad 	= 21, 			// Flying with legs configured in Quad mode and fully flat
+		RS_FLYING_QUAD 			= 20, 			// Flying with legs configured in Quad mode but not fully flat
+		RS_FLYING_FLAT_QUAD 	= 21, 			// Flying with legs configured in Quad mode and fully flat
 		/*
-		RS_idle 		= 0,			// not doing anything
-		RS_in_flight 	= 1,			// flying with legs fully flat
-		RS_walking 		= 2,			// walking
-		RS_landing 		= 3,			// currently landing - knees on 90 degrees for landing
-		RS_error 		= 4,			// not sure what is happening
-		RS_hex			= 6,			// not completely defined yet
-		RS_quad			= 7,			// not completely defined yet
+		RS_IDLE 		= 0,			// not doing anything
+		RS_IN_FLIGHT 	= 1,			// flying with legs fully flat
+		RS_WALKING 		= 2,			// walking
+		RS_LANDING 		= 3,			// currently landing - knees on 90 degrees for landing
+		RS_ERROR 		= 4,			// not sure what is happening
+		RS_HEX			= 6,			// not completely defined yet
+		RS_QUAD			= 7,			// not completely defined yet
 		*/
 	}; 
 
 
 	enum LegStatus_t{
-		LS_knee_max_overflow 	= 0,
-		LS_knee_min_overflow 	= 1,
-		LS_hip_max_overflow 	= 2,
-		LS_hip_min_overflow 	= 3,
-		LS_arm_max_overflow 	= 4,
-		LS_arm_min_overflow 	= 5,
-		LS_wing_max_overflow 	= 6,
-		LS_wing_min_overflow 	= 7,
+		LS_KNEE_MAX_OVERFLOW 	= 0,
+		LS_KNEE_MIN_OVERFLOW 	= 1,
+		LS_HIP_MAX_OVERFLOW 	= 2,
+		LS_HIP_MIN_OVERFLOW 	= 3,
+		LS_ARM_MAX_OVERFLOW 	= 4,
+		LS_ARM_MIN_OVERFLOW 	= 5,
+		LS_WING_MAX_OVERFLOW 	= 6,
+		LS_WING_MIN_OVERFLOW 	= 7,
 
 	}; 
 

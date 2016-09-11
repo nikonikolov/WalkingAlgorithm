@@ -44,7 +44,7 @@ class Robot{
 
 public:
 	Robot(Master* pixhawk_in, DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, 
-		const double robot_params[], wkq::RobotState_t state_in = wkq::RS_default); 
+		const double robot_params[], wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
 	~Robot();
 
 	/* ------------------------------------ STANDING POSITIONS ----------------------------------- */
@@ -53,7 +53,7 @@ public:
 	void Center();					// Reset all Legs to their central positions and keep current height
 	void Stand();					// Set all Legs to a standing state where height = Tibia
 	void StandQuad();				// Same as Stand() but arms configured as quad
-	void FlattenLegs(wkq::RobotState_t state_in = wkq::RS_standing_flat_quad);	// Flatten the knee
+	void FlattenLegs(wkq::RobotState_t state_in = wkq::RS_STANDING_FLAT_QUAD);	// Flatten the knee
 
 	/* ------------------------------------ WALK RELATED FUNCTIONALITY ----------------------------------- */
 	
