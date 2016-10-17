@@ -7,9 +7,9 @@
 #include "src/Tripod.h"
 #include "src/Robot.h"
 
-#include "src/DNXServo.h"
-#include "src/AX12A.h"
-#include "src/XL320.h"
+#include "src/DnxSerialBase.h"
+#include "src/AX12A_Serial.h"
+#include "src/XL320_Serial.h"
 #include "src/include.h"
 
 #include "src/Master.h"
@@ -41,8 +41,8 @@ int main(){
 	pc.print_debug("Pixhawk initialized\n");
 
 	// Instantiate objects for communication with the servo motors 
-	AX12A HipsKnees(p9, p10, baud);
-	XL320 ArmsWings(p13, p14, baud);
+	AX12A_Serial HipsKnees(p9, p10, baud);
+	XL320_Serial Arms(p13, p14, baud);
 
 	pc.print_debug("Communication ready\n");
 	
@@ -50,10 +50,10 @@ int main(){
 	// Instantiate Robot
 	Robot* WkQuad;
 	try{
-		WkQuad = new Robot(pixhawk, &HipsKnees, &ArmsWings, init_height, robot_params, wkq::RS_standing_flat_quad);		// initialize to a ready for flight position
-	//	WkQuad = new Robot(pixhawk, &HipsKnees, &ArmsWings, init_height, robot_params, wkq::RS_standing);				// initialize to a standing position
-	//	WkQuad = new Robot(pixhawk, &HipsKnees, &ArmsWings, init_height, robot_params, wkq::RS_standing_quad);			
-	//	WkQuad = new Robot(pixhawk, &HipsKnees, &ArmsWings, init_height, robot_params, wkq::RS_default);
+		WkQuad = new Robot(pixhawk, &HipsKnees, &Arms, init_height, robot_params, wkq::RS_STRAIGHT_QUAD);		// initialize to a ready for flight position
+	//	WkQuad = new Robot(pixhawk, &HipsKnees, &Arms, init_height, robot_params, wkq::RS_STANDING);				// initialize to a standing position
+	//	WkQuad = new Robot(pixhawk, &HipsKnees, &Arms, init_height, robot_params, wkq::RS_STANDING_QUAD);			
+	//	WkQuad = new Robot(pixhawk, &HipsKnees, &Arms, init_height, robot_params, wkq::RS_DEFAULT);
 
 	}
 	catch(const string& msg){

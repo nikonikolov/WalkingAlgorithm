@@ -1,25 +1,25 @@
-#include "DNXServo.h"
+#include "DnxSerialBase.h"
 
 /* ******************************** PUBLIC METHODS ************************************** */
 
-DNXServo::DNXServo(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn /*=1*/):
+DnxSerialBase::DnxSerialBase(PinName tx, PinName rx, int baudIn, int ReturnLvlIn /*=1*/):
 	port(new mbed::Serial(tx, rx)), baud(baudIn), bitPeriod(1000000.0/baudIn), ReturnLvl(ReturnLvlIn){
 	
 	// Set the baud rate of the port
 	port->baud(baud);
 }
 
-DNXServo::~DNXServo(){
+DnxSerialBase::~DnxSerialBase(){
 	delete port;
 }
 
 // SetID
-int DNXServo::SetID(int ID, int newID){
-    return dataPush(ID, DNXSERVO_ID, newID);
+int DnxSerialBase::SetID(int ID, int newID){
+    return dataPush(ID, DnxSerialBase_ID, newID);
 };
 
 // Read Value from Control Table
-int DNXServo::GetValue(int ID, int address){
+int DnxSerialBase::GetValue(int ID, int address){
 	return dataPull(ID, address);
 }
 
@@ -32,7 +32,7 @@ int DNXServo::GetValue(int ID, int address){
 
 
 // Clear input buffer
-void DNXServo::flush() {	
+void DnxSerialBase::flush() {	
 	while (port->readable()) {
 		port->getc();
 	}
@@ -40,7 +40,7 @@ void DNXServo::flush() {
 
 
 // Write buffer to servo 
-void DNXServo::write(uint8_t* buf, int n) {
+void DnxSerialBase::write(uint8_t* buf, int n) {
 	for (int i=0; i < n; i++) {
 		port->putc(buf[i]);
 	}
@@ -79,7 +79,7 @@ void DNXServo::write(uint8_t* buf, int n) {
 
 
 // Read reply returns payload length, 0 if error.
-int DNXServo::read(uint8_t* buf, int nMax /* =255 */) {			//check readBytesUntil()
+int DnxSerialBase::read(uint8_t* buf, int nMax /* =255 */) {			//check readBytesUntil()
 	int n = 0; 		 	// Bytes read
 	int timeout = 0; 	// Timeout
 
@@ -100,7 +100,7 @@ int DNXServo::read(uint8_t* buf, int nMax /* =255 */) {			//check readBytesUntil
 
 
 // CW - positive input, CCW - negative input
-int DNXServo::angleScale(double angle){
+int DnxSerialBase::angleScale(double angle){
 	
 	// 2.61799387799 rad = 150 degrees
 	int result = 512 - ((angle/2.61799387799)*512);
@@ -121,7 +121,7 @@ int DNXServo::angleScale(double angle){
 
 
 // Length of address
-int DNXServo::AddressLength(int address, const uint8_t * TWO_BYTE_ADDRESSES) {
+int DnxSerialBase::AddressLength(int address, const uint8_t * TWO_BYTE_ADDRESSES) {
 	bool found=false;
 	
 	for(int i=0; i<11 && !found; i++){
@@ -134,7 +134,7 @@ int DNXServo::AddressLength(int address, const uint8_t * TWO_BYTE_ADDRESSES) {
 
 
 // packetPrint
-void DNXServo::packetPrint(int bytes, uint8_t* buf) {
+void DnxSerialBase::packetPrint(int bytes, uint8_t* buf) {
 	if(!pc.get_debug()) return;
 	pc.print_debug("PACKET {");
 	for (int i=0; i < bytes; i++) {

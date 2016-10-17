@@ -148,7 +148,7 @@ public:
 
 	/* ------------------------------------ MAINTAINING LEG STATE ----------------------------------- */
 
-	void UpdateVar(int idx, double value, const bool& update_state=true);
+	void UpdateVar(int idx, double value, bool update_state=true);
 	void UpdateVar(int idx, double value, double valueSQ);
 
 	void Clear();										// Clears StateVars[] - needed for flight-related actions

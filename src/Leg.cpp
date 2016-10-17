@@ -4,13 +4,13 @@
 
 // Tripod constructor does not write to angles, so Leg constrcutor is only responsible for calculating the proper defaults
 Leg::Leg 	(int ID_knee, int ID_hip, int ID_arm,
-			DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]) :
+			DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, const double robot_params[]) :
 	
 	state(height_in, robot_params), 
 	// Instantiate Joints
 	Joints	{ 	ServoJoint(ID_knee, HipsKnees), 
 				ServoJoint(ID_hip, HipsKnees), 
-				ServoJoint(ID_arm, ArmsWings), 
+				ServoJoint(ID_arm, Arms), 
 			} {
 	// Check if RIGHT or LEFT
 	if(ID_knee>wkq::knee_left_back) 	LegRight=-1.0;

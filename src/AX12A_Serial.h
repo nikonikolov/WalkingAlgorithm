@@ -24,18 +24,18 @@ FRAMEWORK:
 */
 
 
-#ifndef AX12A_H
-#define AX12A_H
+#ifndef AX12A_SERIAL_H
+#define AX12A_SERIAL_H
 
-#include "DNXServo.h"
+#include "DnxSerialBase.h"
 
-class AX12A : public DNXServo{
+class AX12A_Serial : public DnxSerialBase{
  
 public:
  	
-	AX12A(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn =1);
+	AX12A_Serial(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn =1);
 
-	~AX12A();
+	~AX12A_Serial();
 
     int SetBaud(int ID, int rate);
     int SetReturnLevel(int ID, int lvl);
@@ -111,4 +111,4 @@ const uint8_t AX_INS_Action = 0x05;       // Go command for Reg Write
 const uint8_t AX_INS_Factory = 0x06;      // Reset All data to factory default settings
 const uint8_t AX_INS_SyncWrite = 0x83;    // Write data from the same location and same size for multiple devices simultaneously
 
-#endif  // AX12A_H
+#endif  // AX12A_SERIAL_H

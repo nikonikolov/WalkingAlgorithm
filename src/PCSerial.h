@@ -29,7 +29,7 @@ class PCSerial{
 
 public:
 
-	PCSerial(const bool& debug_in = false);
+	PCSerial(bool debug_in = false);
 	~PCSerial();
 
 	char read();

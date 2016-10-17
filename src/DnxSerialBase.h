@@ -13,21 +13,21 @@ FUNCTIONALITY:
 
 */
 
-#ifndef DNXSERVO_H
-#define DNXSERVO_H
+#ifndef DNXSERIALBASE_H
+#define DNXSERIALBASE_H
 
 #include "include.h"
 #include <math.h>
 #include <cstdint>
 
 
-class DNXServo{
+class DnxSerialBase{
 
 public:
 
-	DNXServo(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn =1);
+	DnxSerialBase(PinName tx, PinName rx, int baudIn, int ReturnLvlIn =1);
 
-	virtual ~DNXServo();
+	virtual ~DnxSerialBase();
 
     int SetID(int ID, int newID);
 	int GetValue(int ID, int address);
@@ -44,11 +44,11 @@ public:
 protected:
 	
 	template<class Type>
-	inline uint8_t lobyte(const Type& num);
+	inline uint8_t lobyte(Type num);
 	template<class Type>
-	inline uint8_t hibyte(const Type& num);
+	inline uint8_t hibyte(Type num);
 	template<class T1, class T2>
-	inline uint16_t makeword(const T1& num1, const T2& num2);
+	inline uint16_t makeword(T1 num1, T2 num2);
 
 	void flush();
 	void write(uint8_t* buf, int n);
@@ -77,23 +77,23 @@ protected:
 };
 
 // Control table: Only matching addresses are included
-#define DNXSERVO_ID 						3
-#define DNXSERVO_BAUD 						4
+#define DnxSerialBase_ID 						3
+#define DnxSerialBase_BAUD 						4
 
 const uint8_t ID_Broadcast = 0xFE; // 254(0xFE) ID writes to all servos on the line
 
 template<class Type>
-inline uint8_t DNXServo::lobyte(const Type& num){
+inline uint8_t DnxSerialBase::lobyte(Type num){
 	return (uint8_t)num;
 }
 
 template<class Type>
-inline uint8_t DNXServo::hibyte(const Type& num){
+inline uint8_t DnxSerialBase::hibyte(Type num){
 	return (uint8_t) (((uint16_t)num)>>8);
 }
 
 template<class T1, class T2>
-inline uint16_t DNXServo::makeword(const T1& num1, const T2& num2){
+inline uint16_t DnxSerialBase::makeword(T1 num1, T2 num2){
 	return ( ((uint16_t)num1 & 0x00ff) | ( ((uint16_t)(num2) & 0x00ff) << 8 ) );
 }
 

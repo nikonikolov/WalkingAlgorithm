@@ -2,7 +2,7 @@
 
 #ifndef SIMULATION
 
-ServoJoint::ServoJoint(int ID_in, DNXServo* SerialObjPtrIn) : ID(ID_in), SerialObjPtr(SerialObjPtrIn) {
+ServoJoint::ServoJoint(int ID_in, DnxSerialBase* SerialObjPtrIn) : ID(ID_in), SerialObjPtr(SerialObjPtrIn) {
 	SetReturnLevel(1);	
 	//SetPunch(512);	
 }
@@ -63,7 +63,7 @@ void ServoJoint::operator=(const ServoJoint& obj_in){
 #else
 
 
-ServoJoint::ServoJoint(int ID_in, DNXServo* robot_view_in) : ID(ID_in)/*, robot_view(robot_view_in)*/{
+ServoJoint::ServoJoint(int ID_in, DnxSerialBase* robot_view_in) : ID(ID_in)/*, robot_view(robot_view_in)*/{
 	switch(ID){
 		case wkq::knee_left_front	:
 			servo_name = "knee_left_front";

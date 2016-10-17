@@ -2,11 +2,11 @@
 
 //const double Robot::wait_time = 0.5;
 
-Robot::Robot(Master* pixhawk_in, DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, 
-		const double robot_params[], wkq::RobotState_t state_in /*= wkq::RS_default*/) :
+Robot::Robot(Master* pixhawk_in, DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, 
+		const double robot_params[], wkq::RobotState_t state_in /*= wkq::RS_DEFAULT*/) :
 	Tripods{
-		Tripod(wkq::knee_left_front, wkq::knee_right_middle, wkq::knee_left_back, HipsKnees, ArmsWings, height_in, robot_params),
-		Tripod(wkq::knee_right_front, wkq::knee_left_middle, wkq::knee_right_back, HipsKnees, ArmsWings, height_in, robot_params)
+		Tripod(wkq::knee_left_front, wkq::knee_right_middle, wkq::knee_left_back, HipsKnees, Arms, height_in, robot_params),
+		Tripod(wkq::knee_right_front, wkq::knee_left_middle, wkq::knee_right_back, HipsKnees, Arms, height_in, robot_params)
 	}, 
 	pixhawk(pixhawk_in), state(state_in){
 	
@@ -18,12 +18,12 @@ Robot::Robot(Master* pixhawk_in, DNXServo* HipsKnees, DNXServo* ArmsWings, doubl
 	
 	pc.print_debug("Robot calculating state\n");
 
-	state = wkq::RS_standing_flat_quad;
+	state = wkq::RS_STRAIGHT_QUAD;
 	// Initialize servos according to state
-	if 		(state_in == wkq::RS_default) 				Default();
-	else if (state_in == wkq::RS_standing) 				Stand();
-	else if (state_in == wkq::RS_standing_quad) 		StandQuad();
-	else if (state_in == wkq::RS_standing_flat_quad) 	{ StandQuad(); FlattenLegs(); }
+	if 		(state_in == wkq::RS_DEFAULT) 				Default();
+	else if (state_in == wkq::RS_STANDING) 				Stand();
+	else if (state_in == wkq::RS_STANDING_QUAD) 		StandQuad();
+	else if (state_in == wkq::RS_STRAIGHT_QUAD) 	{ StandQuad(); FlattenLegs(); }
 
 	pc.print_debug("Robot done\n");
 }
@@ -41,14 +41,14 @@ void Robot::Default(){
 	Tripods[TRIPOD_LEFT].Default();
 	wait(wait_time);
 	Tripods[TRIPOD_RIGHT].Default();
-	state = wkq::RS_default;
+	state = wkq::RS_DEFAULT;
 }
 
 void Robot::Center(){
 	for(int i=0; i<TRIPOD_COUNT; i++){
 		Tripods[i].Center();
 	}
-	state = wkq::RS_centered;
+	state = wkq::RS_CENTERED;
 }
 
 void Robot::Stand(){
@@ -63,7 +63,7 @@ void Robot::Stand(){
 	/*for(int i=0; i<TRIPOD_COUNT; i++){
 		Tripods[i].Stand(meaningless_state);
 	}*/
-	state = wkq::RS_standing;
+	state = wkq::RS_STANDING;
 }
 
 void Robot::StandQuad(){
@@ -75,11 +75,11 @@ void Robot::StandQuad(){
 	for(int i=0; i<TRIPOD_COUNT; i++){
 		Tripods[i].StandQuad(meaningless_state);
 	}
-	state = wkq::RS_standing_quad;
+	state = wkq::RS_STANDING_QUAD;
 }
 
 // input specifies the overall state of the quad - otherwise we only know the legs are flat
-void Robot::FlattenLegs(wkq::RobotState_t state_in /*= wkq::RS_standing_flat_quad*/){
+void Robot::FlattenLegs(wkq::RobotState_t state_in /*= wkq::RS_STRAIGHT_QUAD*/){
 	for(int i=0; i<TRIPOD_COUNT; i++){
 		Tripods[i].FlattenLegs();
 	}
@@ -195,15 +195,15 @@ void Robot::QuadSetup(){
 	wait(wait_time);
 	Tripods[TRIPOD_RIGHT].QuadSetup();
 
-	state = wkq::RS_quad_setup;
+	state = wkq::RS_QUAD_SETUP;
 }			
 
 
 /* ================================================= PRIVATE METHODS ================================================= */
 
 bool Robot::no_state(){
-	if(state==wkq::RS_standing_flat_quad) return true;
-	if(state==wkq::RS_quad_setup) return true;
+	if(state==wkq::RS_STRAIGHT_QUAD) return true;
+	if(state==wkq::RS_QUAD_SETUP) return true;
 	return false;
 }
 

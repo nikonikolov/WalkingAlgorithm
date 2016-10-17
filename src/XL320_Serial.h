@@ -24,19 +24,19 @@ FRAMEWORK:
 */
 
 
-#ifndef XL320_H
-#define XL320_H
+#ifndef XL320_SERIAL_H
+#define XL320_SERIAL_H
 
-#include "DNXServo.h"
+#include "DnxSerialBase.h"
 
 
-class XL320 : public DNXServo {
+class XL320_Serial : public DnxSerialBase {
  
 public:
  	
-	XL320(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn =1);
+	XL320_Serial(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn =1);
 
-    ~XL320();
+    ~XL320_Serial();
     
     int SetBaud(int ID, int rate);
     int SetReturnLevel(int ID, int lvl);
@@ -128,4 +128,4 @@ const uint8_t XL_INS_SyncWrite = 0x83;    // Write data from the same location a
 const uint8_t XL_INS_BulkRead = 0x92;     // Read data from the different locations and different sizes for multiple devices simultaneously
 const uint8_t XL_INS_BulkWrite = 0x93;    // Write data from the different locations and different sizes for multiple devices simultaneously
 
-#endif  // XL320_H
+#endif  // XL320_Serial_H

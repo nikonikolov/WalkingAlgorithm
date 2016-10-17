@@ -125,7 +125,7 @@ void State_t::LegFlatten(){
 /* ================================================= MAINTAINING LEG STATE ================================================= */
 
 
-void State_t::UpdateVar(int idx, double value, const bool& update_state /*=true*/){
+void State_t::UpdateVar(int idx, double value, bool update_state /*=true*/){
 	
 	Vars[idx] = value;
 

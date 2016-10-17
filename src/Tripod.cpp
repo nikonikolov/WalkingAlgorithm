@@ -3,10 +3,10 @@
 const double Tripod::leg_lift = 5.0; 
 
 Tripod::Tripod (int ID_front_knee, int ID_middle_knee, int ID_back_knee,
-				DNXServo* HipsKnees, DNXServo* ArmsWings, double height_in, const double robot_params[]) :
-	Legs{	Leg(ID_front_knee, 	ID_front_knee+6, 	ID_front_knee+18, 	HipsKnees, ArmsWings, height_in, robot_params),
-			Leg(ID_middle_knee, ID_middle_knee+6, 	ID_middle_knee+18, 	HipsKnees, ArmsWings, height_in, robot_params),
-			Leg(ID_back_knee, 	ID_back_knee+6, 	ID_back_knee+18, 	HipsKnees, ArmsWings, height_in, robot_params)
+				DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, const double robot_params[]) :
+	Legs{	Leg(ID_front_knee, 	ID_front_knee+6, 	ID_front_knee+18, 	HipsKnees, Arms, height_in, robot_params),
+			Leg(ID_middle_knee, ID_middle_knee+6, 	ID_middle_knee+18, 	HipsKnees, Arms, height_in, robot_params),
+			Leg(ID_back_knee, 	ID_back_knee+6, 	ID_back_knee+18, 	HipsKnees, Arms, height_in, robot_params)
 		} {}
 Tripod::~Tripod(){}
 

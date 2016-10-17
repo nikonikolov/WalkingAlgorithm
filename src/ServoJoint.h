@@ -3,7 +3,7 @@
 
 #ifndef SIMULATION
 
-#include "DNXServo.h"
+#include "DnxSerialBase.h"
 
 
 
@@ -11,7 +11,7 @@ class ServoJoint{
 
 public:
 
-	ServoJoint(int ID_in, DNXServo* SerialObjPtrIn);
+	ServoJoint(int ID_in, DnxSerialBase* SerialObjPtrIn);
 
 	int GetID() const;
 
@@ -31,7 +31,7 @@ public:
 private:
 
 	int ID;
-	DNXServo* SerialObjPtr;		// Pointer to the object (Knees/Hips/Arms/Wings) associated with the right serial port
+	DnxSerialBase* SerialObjPtr;		// Pointer to the object (Knees/Hips/Arms/Wings) associated with the right serial port
 };
 
 #else
@@ -43,8 +43,8 @@ class ServoJoint{
 
 public:
 
-	// remember typedef GeomView DNXServo - defined so that same interface is kept between simulation and reality
-	ServoJoint(int ID_in, DNXServo* robot_view_in);
+	// remember typedef GeomView DnxSerialBase - defined so that same interface is kept between simulation and reality
+	ServoJoint(int ID_in, DnxSerialBase* robot_view_in);
 
 	int GetID() const;
 

@@ -2,7 +2,7 @@
 
 #ifndef SIMULATION
 
-PCSerial::PCSerial(const bool& debug_in /*= false*/) : pc_usb(USBTX, USBRX), debug(debug_in) {}
+PCSerial::PCSerial(bool debug_in /*= false*/) : pc_usb(USBTX, USBRX), debug(debug_in) {}
 
 PCSerial::~PCSerial(){}
 

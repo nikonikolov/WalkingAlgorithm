@@ -1,29 +1,29 @@
-#include "XL320.h"
+#include "XL320_Serial.h"
 
 
 /* ******************************** PUBLIC METHODS ************************************** */
 
-XL320::XL320(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn /*=1*/) :
-	DNXServo(tx, rx, baudIn, ReturnLvlIn){
-	pc.print_debug("XL320 object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + dtos(bitPeriod) + " us\n");
+XL320_Serial::XL320_Serial(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn /*=1*/) :
+	DnxSerialBase(tx, rx, baudIn, ReturnLvlIn){
+	pc.print_debug("XL320_Serial object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + dtos(bitPeriod) + " us\n");
 }
 
 
-XL320::~XL320(){}
+XL320_Serial::~XL320_Serial(){}
 
 
 
 // 0: 9600, 1:57600, 2:115200, 3:1Mbps
-int XL320::SetBaud(int ID, int rate) {
+int XL320_Serial::SetBaud(int ID, int rate) {
 	if ((rate > 3) || rate < 0) {
-		pc.print_debug("XL320: Incorrect baud rate\n");
+		pc.print_debug("XL320_Serial: Incorrect baud rate\n");
 		return 1;
 	}
 	return dataPush(ID, XL_BAUD_RATE, rate);
 }
 
 // Set which commands return status; 0: None, 1: Read, 2: All.
-int XL320::SetReturnLevel(int ID, int lvl) {
+int XL320_Serial::SetReturnLevel(int ID, int lvl) {
 	ReturnLvl=lvl;
 	return dataPush(ID, XL_RETURN_LEVEL, ReturnLvl);
 }
@@ -31,44 +31,44 @@ int XL320::SetReturnLevel(int ID, int lvl) {
 
 
 // 1024 = -150 degrees CCW, 512 = 0 degrees (ORIGIN), 0 = +150 degrees CW
-int XL320::SetGoalPosition(int ID, int angle){
+int XL320_Serial::SetGoalPosition(int ID, int angle){
 	return dataPush(ID, XL_GOAL_POSITION_L, angle);
 }
 
-int XL320::SetGoalPosition(int ID, double angle){
+int XL320_Serial::SetGoalPosition(int ID, double angle){
 	return dataPush(ID, XL_GOAL_POSITION_L, angleScale(angle));
 }
 
-int XL320::SetGoalVelocity(int ID, int velocity){
+int XL320_Serial::SetGoalVelocity(int ID, int velocity){
 	return dataPush(ID, XL_GOAL_SPEED_L, velocity);
 }
 
-int XL320::SetGoalTorque(int ID, int torque){
+int XL320_Serial::SetGoalTorque(int ID, int torque){
 	return dataPush(ID, XL_GOAL_TORQUE, torque);
 }
 
-int XL320::SetPunch(int ID, int punch){
+int XL320_Serial::SetPunch(int ID, int punch){
 	return dataPush(ID, XL_PUNCH, punch);
 }
 
 
 
-int XL320::SetP(int ID, int value){
+int XL320_Serial::SetP(int ID, int value){
 	return dataPush(ID, XL_P_GAIN, value);
 }
 
-int XL320::SetI(int ID, int value){
+int XL320_Serial::SetI(int ID, int value){
 	return dataPush(ID, XL_I_GAIN, value);
 }
 
-int XL320::SetD(int ID, int value){
+int XL320_Serial::SetD(int ID, int value){
 	return dataPush(ID, XL_D_GAIN, value);
 }
 
 
 
 // Ping
-int XL320::Ping(int ID /*=1*/){
+int XL320_Serial::Ping(int ID /*=1*/){
 
 	int ec = send(ID, 0, NULL, XL_INS_Ping);
 	pc.print_debug(" - ec " + itos(ec));
@@ -84,12 +84,12 @@ int XL320::Ping(int ID /*=1*/){
 }
 
 // Sets motor led colours. r = 1, g = 2, y = 3, b = 4, p = 5, c = 6, w = 7, o = 0
-int XL320::SetLED(int ID, int colour){
+int XL320_Serial::SetLED(int ID, int colour){
 	return dataPush(ID, XL_LED, colour);
 }
 
 // Rainbow
-int XL320::Rainbow(int ID){
+int XL320_Serial::Rainbow(int ID){
 	for (int i = 1; i < 8; ++i)
 	{
 		int status = SetLED(ID, i);
@@ -108,7 +108,7 @@ int XL320::Rainbow(int ID){
 
 
 // Dynamixel Communication 2.0 Checksum
-uint16_t XL320::update_crc(uint16_t crc_accum, uint8_t *data_blk_ptr, const uint16_t& data_blk_size) {
+uint16_t XL320_Serial::update_crc(uint16_t crc_accum, uint8_t *data_blk_ptr, const uint16_t& data_blk_size) {
     uint16_t i, j;
     uint16_t crc_table[256] = {
         0x0000, 0x8005, 0x800F, 0x000A, 0x801B, 0x001E, 0x0014, 0x8011,
@@ -154,7 +154,7 @@ uint16_t XL320::update_crc(uint16_t crc_accum, uint8_t *data_blk_ptr, const uint
 
 
 // Returns Length of Packet
-int XL320::PacketLength(uint8_t* buf) {
+int XL320_Serial::PacketLength(uint8_t* buf) {
 	// Header(3) + Reserved(1) + ID(1) +  Packet Length(?) + CRC(2)
 	int Length = makeword(buf[5], buf[6]) + 7;
 	return Length;
@@ -162,12 +162,12 @@ int XL320::PacketLength(uint8_t* buf) {
 
 
 // Returns Length of Address
-int XL320::AddressLength(int address) {
-	return DNXServo::AddressLength(address, TWO_BYTE_ADDRESSES);
+int XL320_Serial::AddressLength(int address) {
+	return DnxSerialBase::AddressLength(address, TWO_BYTE_ADDRESSES);
 }
 
 
-int XL320::statusError(uint8_t* buf, int n) {
+int XL320_Serial::statusError(uint8_t* buf, int n) {
 
 	// Minimum return length
 	if (n < 11) {
@@ -218,7 +218,7 @@ int XL320::statusError(uint8_t* buf, int n) {
 
 // Packs data and sends it to the servo
 // Dynamixel Communication 2.0 Protocol: Header, Reserved, ID, Packet Length, Instruction, Parameter, 16bit CRC
-int XL320::send(int ID, int packetLenght, uint8_t* parameters, uint8_t ins) {
+int XL320_Serial::send(int ID, int packetLenght, uint8_t* parameters, uint8_t ins) {
 	uint8_t buf[255]; // Packet
 
 	// Header
@@ -275,7 +275,7 @@ int XL320::send(int ID, int packetLenght, uint8_t* parameters, uint8_t ins) {
 
 
 // dataPack sets the parameters in char array and returns length.
-int XL320::dataPack(uint8_t ins, uint8_t ** parameters, int address, int value /*=0*/){
+int XL320_Serial::dataPack(uint8_t ins, uint8_t ** parameters, int address, int value /*=0*/){
 
 	uint8_t* data; 
 	
@@ -308,7 +308,7 @@ int XL320::dataPack(uint8_t ins, uint8_t ** parameters, int address, int value /
 }
 
 // dataPush is a generic wrapper for single value SET instructions for public methods
-int XL320::dataPush(int ID, int address, int value){
+int XL320_Serial::dataPush(int ID, int address, int value){
 	flush(); // Flush reply	for safety
 	
 	uint8_t* parameters;
@@ -323,7 +323,7 @@ int XL320::dataPush(int ID, int address, int value){
 
 
 // dataPull is a generic wrapper for single value GET instructions for public methods
-int XL320::dataPull(int ID, int address){
+int XL320_Serial::dataPull(int ID, int address){
 	flush(); // Flush reply	for safety
 	
 	uint8_t* parameters;
@@ -353,7 +353,7 @@ int XL320::dataPull(int ID, int address){
 }
 
 
-const uint8_t XL320::TWO_BYTE_ADDRESSES[11] = { 0, 6, 8, 15, 30, 32, 35, 37, 39, 41, 51 };
+const uint8_t XL320_Serial::TWO_BYTE_ADDRESSES[11] = { 0, 6, 8, 15, 30, 32, 35, 37, 39, 41, 51 };
 
 
 /* ******************************** PRIVATE METHODS END ************************************** */

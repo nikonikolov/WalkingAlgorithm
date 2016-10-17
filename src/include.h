@@ -19,7 +19,7 @@
 #include "mbed.h"
 
 #else
-typedef int DNXServo;
+typedef int DnxSerialBase;
 
 using std::cout;
 using std::endl;
