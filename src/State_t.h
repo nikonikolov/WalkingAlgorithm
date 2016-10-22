@@ -138,7 +138,7 @@ public:
 	void operator=(const State_t& StateIn);
 
 
-	/* ------------------------------------ LEG standING POSITIONS ----------------------------------- */
+	/* ------------------------------------ LEG STATIC POSITIONS ----------------------------------- */
 
 	void legDefaultPos();					// Reset all Leg variables to their defaultPos values
 	void legCenter();					// Reset all Legs to their central positions and keep current height

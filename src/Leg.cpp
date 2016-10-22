@@ -24,7 +24,7 @@ Leg::Leg 	(int ID_knee, int ID_hip, int ID_arm,
 
 Leg::~Leg(){}
 
-/* ------------------------------------------------- standING POSITIONS ------------------------------------------------- */
+/* ------------------------------------------------- STATIC POSITIONS ------------------------------------------------- */
 
 void Leg::standQuad(){
 	state.legStand();
@@ -38,6 +38,17 @@ void Leg::standQuad(){
 }
 
 
+void Leg::flatQuad(){
+	if(almost_equals(AngleOffset, wkq::PI/2)) return;
+
+	double MotorAngle = 
+			asin( state.Params[DISTcenter] * sin(wkq::PI/12)/(state.Params[COXA]+state.Params[FEMUR]-state.Params[KNEEMOTORDIST]) );
+	// MotorAngle valid for a LEFT LEG servo facing downwards
+	if 		(almost_equals(AngleOffset, wkq::PI/6)) state.ServoAngles[ARM] = MotorAngle + (wkq::PI/12);
+	else 											state.ServoAngles[ARM] = -(MotorAngle + (wkq::PI/12));
+
+	state.legFlatten();
+}
 
 
 /* ------------------------------------------------- RAISE AND LOWER ------------------------------------------------- */

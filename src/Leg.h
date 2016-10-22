@@ -69,14 +69,14 @@ public:
 	double get(int param_type, int idx) const;
 	void copyState(const Leg& LegIn);								// Copy the state of input Leg
 
-	/* ---------------------------------------- standING POSITIONS ---------------------------------------- */
+	/* ---------------------------------------- STATIC POSITIONS ---------------------------------------- */
 
 	inline void defaultPos();				// Reset all Leg parameters to their defaultPos values
 	inline void center();					// Reset all Legs to their central positions and keep current height
 	inline void stand();					// Centralize all Legs for a standing state where height = Tibia
 	inline void flatten();					// flatten the knee
 	void standQuad();						// Same as stand() but arms configured as quad
-
+	void flatQuad(); 						// Configuration for flying as as a quad
 
 	/* ---------------------------------------- RAISE AND LOWER ---------------------------------------- */
 

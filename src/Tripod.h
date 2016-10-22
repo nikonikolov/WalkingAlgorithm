@@ -49,24 +49,17 @@ public:
 
 	void copyState(const Tripod& tripod_in);
 
-	/* ------------------------------------ STANDING POSITIONS ----------------------------------- */
+	/* ------------------------------------ STATIC POSITIONS ----------------------------------- */
 
 	void defaultPos();					// Reset all Leg parameters to their defaultPos values
 	void center();						// Reset all Legs to their central positions and keep current height
-	void stand(bool meaningless_state = false);		// Set all Legs to a standing state where height = Tibia
-	void standQuad(bool meaningless_state = false);	// Same as stand() but arms configured as quad
-	void flattenLegs();					// flatten the knee
+	void stand();						// Set all Legs to a standing state where height = Tibia
+	void standQuad();					// Same as stand() but arms configured as quad
 	void flatQuad();					// Straighten legs to fly as a quad
 
-	double standing();				// Determines if standing, and if not returns by how much should be lifted
+	double standing();					// Determines if standing, and if not returns by how much should be lifted
 
-	/* ------------------------------------ RAISE AND LOWER ----------------------------------- */
-
-	void liftUp(double height_up);
-	void lowerDown(double height_down);
-	void finishStep();
-
-	/* ------------------------------------ WALKING ALGORITHMS ----------------------------------- */
+	/* ------------------------------------ WALKING MOVEMENTS ----------------------------------- */
 	
 	void bodyForward(double step_size);
 	void stepForward(double step_size);
@@ -74,6 +67,10 @@ public:
 	void bodyRotate(double angle);
 	void stepRotate(double angle);
 	
+	void liftUp(double height_up);
+	void lowerDown(double height_down);
+	void finishStep();
+
 	void raiseBody(double hraise);
 
 	/* ------------------------------------ TESTING FUNCTIONS ----------------------------------- */
@@ -81,6 +78,9 @@ public:
 	void quadSetup();
 
 private:
+	void makeMovement(void (Leg::*leg_action)(double), double arg); 		// Wrapper for calling a function from Leg that makes any moevement
+	void setPosition(void (Leg::*leg_action)()); 							// Wrapper for calling a function from Leg that sets a static leg position
+
 	void writeAngles();
 	void writeHipKneeAngles();
 

@@ -10,66 +10,77 @@ Tripod::Tripod (int ID_front_knee, int ID_middle_knee, int ID_back_knee,
 		} {}
 Tripod::~Tripod(){}
 
-/* ================================================= standING POSITIONS ================================================= */
+
+/* ================================================= STATIC POSITIONS ================================================= */
 
 void Tripod::defaultPos(){
-	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].defaultPos();
-	}
-	writeAngles();
+	setPosition(&Leg::defaultPos);
 }
 
 void Tripod::center(){
 	liftUp(leg_lift);
 	for(int i=0; i<LEG_COUNT; i++){
 		if(i==0) Legs[i].center();
-		// All Legs have same defaultPoss so save some computations
+		// All Legs have same center positions so save computations by copying states
 		else Legs[i].copyState(Legs[0]);
 		Legs[i].writeAngles();
 	}
 }
 
-// input specifies whether current state has any standing meaning - if not, we should not keep backwards consistency as 
-// invalid positions for the servos will be calculated on lifting the legs
-void Tripod::stand(bool meaningless_state /*= false*/){
-	// Robot already has made sure that body was lifted if necessary. Do it leg by leg to ensure you don't overload servos
-	for(int i=0; i<LEG_COUNT; i++){
-		if(!meaningless_state){
-			Legs[i].liftUp(leg_lift);
-			Legs[i].writeAngles();
-		} 
-		Legs[i].stand();
-		Legs[i].writeAngles();
-	}
+void Tripod::stand(){
+	setPosition(&Leg::stand);
 }
 
-void Tripod::standQuad(bool meaningless_state /*= false*/){
-	// Robot already has made sure that body was lifted if necessary. Do it leg by leg to ensure you don't overload servos
-	for(int i=0; i<LEG_COUNT; i++){
-		if(!meaningless_state){
-			Legs[i].liftUp(leg_lift);
-			Legs[i].writeAngles();
-		} 
-		Legs[i].standQuad();
-		Legs[i].writeAngles();
-	}
-}
-
-void Tripod::flattenLegs(){
-	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].flatten();
-	}
-	writeHipKneeAngles();
+void Tripod::standQuad(){
+	setPosition(&Leg::standQuad);
 }
 
 void Tripod::flatQuad(){
-	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].standQuad();
-		Legs[i].flatten();
-	}
-	writeAngles();
+	setPosition(&Leg::flatQuad);
 }
 
+
+/* ================================================= WALKING MOVEMENTS ================================================= */
+
+void Tripod::bodyForward (double step_size){
+	makeMovement(&Leg::IKBodyForward, step_size);
+}
+
+void Tripod::stepForward (double step_size){
+	makeMovement(&Leg::stepForward, step_size);
+}
+
+void Tripod::bodyRotate(double angle){
+	makeMovement(&Leg::IKBodyRotate, angle);
+}
+
+void Tripod::stepRotate(double angle){
+	makeMovement(&Leg::stepRotate, angle);
+}
+
+void Tripod::liftUp(double height_up){
+	makeMovement(&Leg::liftUp, height_up);
+}
+
+void Tripod::lowerDown(double height_down){
+	makeMovement(&Leg::lowerDown, height_down);
+}
+
+void Tripod::finishStep(){
+	setPosition(&Leg::finishStep);
+}
+
+
+/* ================================================= RAISE AND LOWER ================================================= */
+
+void Tripod::raiseBody(double hraise){
+	center();
+	for(int i=0; i<LEG_COUNT; i++){
+		if(i==0) 	Legs[i].raiseBody(hraise);
+		else 		Legs[i].copyState(Legs[0]);
+	}
+	writeHipKneeAngles();
+}
 
 double Tripod::standing(){
 	double height = Legs[0].get(STATE_VAR, HEIGHT);
@@ -86,72 +97,6 @@ void Tripod::copyState(const Tripod& tripod_in){
 }
 
 
-/* ================================================= WALKING ALGORITHMS ================================================= */
-
-void Tripod::bodyForward (double step_size){
-	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].IKBodyForward(step_size);
-	}
-	writeAngles();
-}
-
-void Tripod::stepForward (double step_size){
-	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].stepForward(step_size);
-	}
-	writeAngles();
-}
-
-
-void Tripod::bodyRotate(double angle){
-	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].IKBodyRotate(angle);
-	}
-	writeAngles();
-}
-
-void Tripod::stepRotate(double angle){
-	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].stepRotate(angle);
-	}
-	writeAngles();
-}
-
-
-void Tripod::raiseBody(double hraise){
-	center();
-	for(int i=0; i<LEG_COUNT; i++){
-		if(i==0) 	Legs[i].raiseBody(hraise);
-		else 		Legs[i].copyState(Legs[0]);
-	}
-	writeHipKneeAngles();
-}
-
-
-/* ================================================= RAISE AND LOWER ================================================= */
-
-
-void Tripod::liftUp(double height_up){
-	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].liftUp(height_up);
-	}
-	writeAngles();
-}
-
-void Tripod::lowerDown(double height_down){
-	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].lowerDown(height_down);
-	}
-	writeAngles();
-}
-
-void Tripod::finishStep(){
-	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].finishStep();
-	}
-	writeAngles();
-}
-
 /* ================================================= TESTING FUNCTIONS ================================================= */
 
 void Tripod::quadSetup(){
@@ -163,6 +108,21 @@ void Tripod::quadSetup(){
 
 
 /* ================================================= PRIVATE FUNCTIONALITY ================================================= */
+
+
+void Tripod::makeMovement(void (Leg::*leg_action)(double), double arg){
+	for(int i=0; i<LEG_COUNT; i++){
+		(Legs[i].*leg_action)(arg);
+	}
+	writeAngles();
+}
+
+void Tripod::setPosition(void (Leg::*leg_action)()){
+	for(int i=0; i<LEG_COUNT; i++){
+		(Legs[i].*leg_action)();
+	}
+	writeAngles();
+}
 
 void Tripod::writeHipKneeAngles(){
 	for(int i=0; i<LEG_COUNT; i++){
@@ -176,3 +136,5 @@ void Tripod::writeAngles(){
 		Legs[i].writeAngles();
 	}
 }
+
+

@@ -50,7 +50,7 @@ public:
 	Robot(Master* pixhawk_in, int baud_in, double height_in, const double robot_params[], wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
 	~Robot();
 
-	/* ------------------------------------ STANDING POSITIONS ----------------------------------- */
+	/* ------------------------------------ STATIC POSITIONS ----------------------------------- */
 
 	void defaultPos();				// Reset all Leg parameters to their defaultPos values
 	void center();					// Reset all Legs to their central positions and keep current height
@@ -74,7 +74,7 @@ public:
 	void quadSetup();			// set the legs so that Pixhawk calibration can be performed 
 
 private:
-	void changeState(wkq::RobotState_t state_in, void (Tripod::*tripod_action)(), bool wait_call=false/*, bool check_state*/);
+	void changeState(wkq::RobotState_t state_in, void (Tripod::*tripod_action)(), bool wait_call=false);
 
 	double calcMaxStepSize();
 	double calcMaxRotationAngle();
@@ -98,6 +98,7 @@ private:
 
 	wkq::RobotState_t state;
 
+	/*
 	enum RPC_Fn_t{
 		RPC_DEFAULT_POS 	= 1,
 		RPC_CENTER 			= 2,
@@ -105,6 +106,7 @@ private:
 		RPC_STAND_QUAD 		= 4,
 		RPC_STRAIGHT_QUAD	= 5
 	};
+	*/
 };
 
 #endif //ROBOT_H

@@ -36,80 +36,33 @@ Robot::Robot(Master* pixhawk_in, int baud_in, double height_in, const double rob
 Robot::~Robot(){}
 
 
-/* ================================================= standING POSITIONS ================================================= */
+/* ================================================= STATIC POSITIONS ================================================= */
 
 void Robot::defaultPos(){
-	changeState(wkq::RS_DEFAULT, &Tripod::defaultPos);
-
-	//for(int i=0; i<TRIPOD_COUNT; i++){
-	//	Tripods[i].defaultPos();
-	//}
-	Tripods[TRIPOD_LEFT].defaultPos();
-	wait(wait_time);
-	Tripods[TRIPOD_RIGHT].defaultPos();
-	state = wkq::RS_DEFAULT;
+	changeState(wkq::RS_DEFAULT, &Tripod::defaultPos, true);
 }
 
 void Robot::center(){
-	for(int i=0; i<TRIPOD_COUNT; i++){
-		Tripods[i].center();
-	}
-	state = wkq::RS_CENTERED;
+	changeState(wkq::RS_CENTERED, &Tripod::center, true);
 }
 
 void Robot::stand(){
-	bool meaningless_state = true;
-	if(noState()){
-		raiseBody(Tripods[0].standing());
-		meaningless_state = false;
-	}
-	Tripods[TRIPOD_LEFT].stand(meaningless_state);
-	wait(wait_time);
-	Tripods[TRIPOD_RIGHT].stand(meaningless_state);
-	/*for(int i=0; i<TRIPOD_COUNT; i++){
-		Tripods[i].stand(meaningless_state);
-	}*/
-	state = wkq::RS_STANDING;
+	changeState(wkq::RS_STANDING, &Tripod::stand, true);
 }
 
 void Robot::standQuad(){
-	bool meaningless_state = true;
-	if(noState()){
-		raiseBody(Tripods[0].standing());
-		meaningless_state = false;
-	}
-	for(int i=0; i<TRIPOD_COUNT; i++){
-		Tripods[i].standQuad(meaningless_state);
-	}
-	state = wkq::RS_STANDING_QUAD;
+	changeState(wkq::RS_STANDING_QUAD, &Tripod::standQuad, true);
 }
 
-/*
-// input specifies the overall state of the quad - otherwise we only know the legs are flat
-void Robot::flattenLegs(wkq::RobotState_t state_in /*= wkq::RS_FLAT_QUAD*){
-	for(int i=0; i<TRIPOD_COUNT; i++){
-		Tripods[i].flattenLegs();
-	}
-	state = state_in;
-}
-*/
-
-// input specifies the overall state of the quad - otherwise we only know the legs are flat
 void Robot::flatQuad(){
-	/*for(int i=0; i<TRIPOD_COUNT; i++){
-		Tripods[i].flattenLegs();
-	}
-	state = wkq::RS_FLAT_QUAD;
-	*/
+	changeState(wkq::RS_FLAT_QUAD, &Tripod::flatQuad, true);
 }
 
-
-void Robot::changeState(wkq::RobotState_t state_in, void (Tripod::*tripod_action)(), bool wait_call/*=false, bool check_state*/){
+void Robot::changeState(wkq::RobotState_t state_in, void (Tripod::*tripod_action)(), bool wait_call/*=false*/){
 	for(int i=0; i<TRIPOD_COUNT; i++){
 		(Tripods[i].*tripod_action)();
 		if(wait_call) wait(wait_time);
 	}
-
 	state = state_in;
 }
 
@@ -177,7 +130,6 @@ void Robot::raiseBody(double hraise){
 
 
 /*
-
 void Robot::writeAngles(){
 	for(int i=0; i<TRIPOD_COUNT; i++){
 		Tripods[i].writeAngles(distance);
@@ -226,6 +178,7 @@ void Robot::quadSetup(){
 
 
 /* ================================================= ROS COMMUNICATION ================================================= */
+
 /*
 void Robot::decodeInstruction(wkq_msgs::RPC::Request &req, wkq_msgs::RPC::Request &res){
 

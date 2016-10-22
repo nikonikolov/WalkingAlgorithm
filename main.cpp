@@ -26,7 +26,6 @@
 
 int main(int argc, char **argv){
 
-	// Set the debug level so that debug messages are printed on the USB serial connection
 	pc.set_debug();
 
 	// PARAM_STEP defined in State_t.h. Meaning of each value defined in the same header
@@ -51,12 +50,8 @@ int main(int argc, char **argv){
 	// Instantiate Robot
 	Robot* wk_quad;
 	try{
-	//	wk_quad = new Robot(pixhawk, &HipsKnees, &Arms, init_height, robot_params, wkq::RS_STRAIGHT_QUAD);		// initialize to a ready for flight position
-		wk_quad = new Robot(pixhawk, baud, init_height, robot_params, wkq::RS_FLAT_QUAD);					// initialize to a ready for flight position
-	//	wk_quad = new Robot(pixhawk, &HipsKnees, &Arms, init_height, robot_params, wkq::RS_STANDING);				// initialize to a standing position
-	//	wk_quad = new Robot(pixhawk, &HipsKnees, &Arms, init_height, robot_params, wkq::RS_STANDING_QUAD);			
-	//	wk_quad = new Robot(pixhawk, &HipsKnees, &Arms, init_height, robot_params, wkq::RS_DEFAULT);
-
+	//	wk_quad = new Robot(pixhawk, &HipsKnees, &Arms, init_height, robot_params, wkq::RS_STRAIGHT_QUAD);		
+		wk_quad = new Robot(pixhawk, baud, init_height, robot_params, wkq::RS_FLAT_QUAD);					
 	}
 	catch(const string& msg){
 		pc.print_debug(msg);

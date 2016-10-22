@@ -91,7 +91,7 @@ void State_t::operator=(const State_t& StateIn){
 }
 
 
-/* -------------------------------------------- standING POSITIONS -------------------------------------------- */
+/* -------------------------------------------- STATIC POSITIONS -------------------------------------------- */
 
 void State_t::legDefaultPos(){	
 	// Change State Variables
