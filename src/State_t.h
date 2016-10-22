@@ -6,7 +6,7 @@ so that a proper protocol is followed when the state of the leg is updated
 
 Stores information about the parameters of the leg such as:
 
-DISTCENTER 		Distance from robot's center to the center of ARM servo
+DISTcenter 		Distance from robot's center to the center of ARM servo
 COXA 			Distance from the center of ARM servo to the center of HIP servo
 FEMUR 			Distance from the center of HIP servo to the center of KNEE servo
 TIBIA 			Distance from the center of KNEE servo to END EFFECTOR
@@ -33,22 +33,22 @@ FUNCTIONALITY:
 FRAMEWORK:
 	1. Algorithms work only for LEFT LEG. Values for RIGHT LEG are computed at the time of writing as opposite to Left Leg
 
-	2. StateVars[]		-	Use UpdateVar(). Function automatically updates square value for the variable
+	2. StateVars[]		-	Use updateVar(). Function automatically updates square value for the variable
 							and the rest of the variables by calling StateUpdate()
-	3. UpdateVar() 		- 	When you use this to update HIPTOEND it is assumed the change is in ENDEFFECTOR
+	3. updateVar() 		- 	When you use this to update HIPTOEND it is assumed the change is in ENDEFFECTOR
 							rather than in the HEIGHT of the robot. If change is in the HEIGHT, the StateVars[HEIGHT]
 							will not be updates
-	4. UpdateAngles()	-	Function automatically called when UpdateVar() is called. Basing on StateVars[]
+	4. updateAngles()	-	Function automatically called when updateVar() is called. Basing on StateVars[]
 							function computes new angles for Hip and Knee
-	5. Center()			-	Assumes Leg is already lifted up, otherwise robot will probably fall down
-	6. ComputeVars() 	- 	Used when state changes and new Vars[] need to be computed. Computes all Vars[] based on the current 
-							ServoAngles[] does not use Update(), but computes variables manually to ensure no call to UpdateAngles()
-	7. ComputeEFVars() 	- 	Called only by CenterAngles(). Computes HIPTOEND, ARMGTOEND and EFCENTER (if needed) basing on 
+	5. center()			-	Assumes Leg is already lifted up, otherwise robot will probably fall down
+	6. computeVars() 	- 	Used when state changes and new Vars[] need to be computed. Computes all Vars[] based on the current 
+							ServoAngles[] does not use Update(), but computes variables manually to ensure no call to updateAngles()
+	7. computeEFVars() 	- 	Called only by centerAngles(). Computes HIPTOEND, ARMGTOEND and EFcenter (if needed) basing on 
 							Params[] and KNEE
-	8. CenterAngles() 	- 	Computed median HIP and KNEE basing on Params[] and current HEIGHT or the input HEIGHT if provided.
-							Calls ComputeEFVars automatically in order to keep state consistent
-	9. SetAngles() 		- 	Should be called only on complete state change because automatically calls ComputeVars() and this
-							updates all vars, including EFCENTER
+	8. centerAngles() 	- 	Computed median HIP and KNEE basing on Params[] and current HEIGHT or the input HEIGHT if provided.
+							Calls computeEFVars automatically in order to keep state consistent
+	9. setAngles() 		- 	Should be called only on complete state change because automatically calls computeVars() and this
+							updates all vars, including EFcenter
 
 -------------------------------------------------------------------------------------------
 
@@ -84,13 +84,13 @@ FRAMEWORK:
 #define PARAM_STEP 			6						// Help-macro to get indices in the array with parameters
 #define PARAM_COUNT			(2*PARAM_STEP)			// Size of the array holding the parameters
 
-#define DISTCENTER 			0						// Distance from Robot's Center to Coxa (Arm Mount Point)
+#define DISTcenter 			0						// Distance from Robot's center to Coxa (Arm Mount Point)
 #define COXA 				1
 #define FEMUR 				2
 #define TIBIA 				3
 #define HIPKNEEMAXHDIST 	4
 #define KNEEMOTORDIST 		5
-#define DISTCENTER_SQ 		(DISTCENTER+PARAM_STEP)
+#define DISTcenter_SQ 		(DISTcenter+PARAM_STEP)
 #define COXA_SQ 			(COXA+PARAM_STEP)
 #define FEMUR_SQ 			(FEMUR+PARAM_STEP)
 #define TIBIA_SQ 			(TIBIA+PARAM_STEP)
@@ -98,25 +98,25 @@ FRAMEWORK:
 #define KNEEMOTORDIST_SQ 	(KNEEMOTORDIST+PARAM_STEP)
 
 
-/* ====================================== Indices for StateVars and DefaultVar array ====================================== */
+/* ====================================== Indices for StateVars and defaultPosVar array ====================================== */
 #define VAR_STEP 		4						// Help-macro to get indices in the array with state variables
 #define VAR_COUNT		(2*VAR_STEP)			// Size of the array holding the state variables
 
 #define HIPTOEND		0						// Direct distance from hip mount point to the point where the end effector touches ground
 #define HEIGHT 			1						// Vertical distance from hip mount point to ground
 #define ARMGTOEND		2						// Distance from arm ground projection to end effector
-#define EFCENTER		3						// Distance from End Effector to robot center for centered HIP and KNEE
+#define EFcenter		3						// Distance from End Effector to robot center for centered HIP and KNEE
 #define HIPTOEND_SQ		(HIPTOEND+VAR_STEP)		
 #define HEIGHT_SQ 		(HEIGHT+VAR_STEP)
 #define ARMGTOEND_SQ	(ARMGTOEND+VAR_STEP)
-#define EFCENTER_SQ		(EFCENTER+VAR_STEP)
+#define EFcenter_SQ		(EFcenter+VAR_STEP)
 
 
 /* ====================================== Indices for Getter Decoding ====================================== */
 #define SERVO_ANGLE		0						
 #define STATE_VAR		1						
-#define DEFAULT_VAR		2						
-#define DEFAULT_ANGLE	3						
+#define defaultPos_VAR		2						
+#define defaultPos_ANGLE	3						
 #define PARAM			4						
 #define ANGLE_LIMIT		5						
 
@@ -134,29 +134,29 @@ public:
 
 	/* ---------------------------------------- GETTER AND COPY ---------------------------------------- */
 
-	double Get(int param_type, int idx) const;
+	double get(int param_type, int idx) const;
 	void operator=(const State_t& StateIn);
 
 
-	/* ------------------------------------ LEG STANDING POSITIONS ----------------------------------- */
+	/* ------------------------------------ LEG standING POSITIONS ----------------------------------- */
 
-	void LegDefault();					// Reset all Leg variables to their default values
-	void LegCenter();					// Reset all Legs to their central positions and keep current height
-	void LegStand();					// Centralize all Legs for a standing state where height = Tibia
-	void LegFlatten();					// Flatten the knee
+	void legDefaultPos();					// Reset all Leg variables to their defaultPos values
+	void legCenter();					// Reset all Legs to their central positions and keep current height
+	void legStand();					// Centralize all Legs for a standing state where height = Tibia
+	void legFlatten();					// flatten the knee
 
 
 	/* ------------------------------------ MAINTAINING LEG STATE ----------------------------------- */
 
-	void UpdateVar(int idx, double value, bool update_state=true);
-	void UpdateVar(int idx, double value, double valueSQ);
+	void updateVar(int idx, double value, bool update_state=true);
+	void updateVar(int idx, double value, double valueSQ);
 
-	void Clear();										// Clears StateVars[] - needed for flight-related actions
+	void clear();										// Clears StateVars[] - needed for flight-related actions
 	//void StateVerify();								// Verifies the current leg state is physically possible and accurate
 
-	void CenterAngles(double height =0.0); // Compute median HIP, KNEE based on Params[] and HEIGHT/height. Calls ComputeEFVars()
-//	void SetAngles(double knee, double hip, double arm, double wing);	// Calls ComputeVars()
-	void SetAngles(double knee, double hip, double arm);	// Calls ComputeVars()
+	void centerAngles(double height =0.0); // Compute median HIP, KNEE based on Params[] and HEIGHT/height. Calls computeEFVars()
+//	void setAngles(double knee, double hip, double arm, double wing);	// Calls computeVars()
+	void setAngles(double knee, double hip, double arm);	// Calls computeVars()
 
 	/* ============================================== PUBLIC MEMBER DATA ============================================== */
 
@@ -170,20 +170,20 @@ private:
 
 	/* ------------------------------------ MAINTAINING LEG STATE ----------------------------------- */
 
-	void Update(int idx);				// Auto-invoked when any StateVars[] changes in order to keep leg state consistent
-	void UpdateAngles();						// Update KNEE and HIP angles basing on the current HIPTOEND and HEIGHT
-	void ComputeEFVars(double height=0.0); // Compute HIPTOEND, ARMGTOEND based on KNEE, HEIGHT/height; called by CenterAngles()
-	void ComputeVars();							// Computes valid Vars[] basing on ServoAngles[]
+	void update(int idx);				// Auto-invoked when any StateVars[] changes in order to keep leg state consistent
+	void updateAngles();						// Update KNEE and HIP angles basing on the current HIPTOEND and HEIGHT
+	void computeEFVars(double height=0.0); // Compute HIPTOEND, ARMGTOEND based on KNEE, HEIGHT/height; called by centerAngles()
+	void computeVars();							// Computes valid Vars[] basing on ServoAngles[]
 
 
 	/* ============================================== PRIVATE MEMBER DATA ============================================== */
 	
 	double Vars[VAR_COUNT];							// Store current values of variables that determine state of the robot
 
-	static double DefaultVars[VAR_COUNT];			// Store default values for StateVars[VAR_COUNT]
-	static double DefaultAngles[JOINT_COUNT]; 		// Store default values for ServoAngles[VAR_COUNT]
+	static double defaultPosVars[VAR_COUNT];			// Store defaultPos values for StateVars[VAR_COUNT]
+	static double defaultPosAngles[JOINT_COUNT]; 		// Store defaultPos values for ServoAngles[VAR_COUNT]
 
-	static bool defaults_calculated;				// Needed to know whether to calculate defaults
+	static bool defaultPoss_calculated;				// Needed to know whether to calculate defaultPoss
 };
 
 

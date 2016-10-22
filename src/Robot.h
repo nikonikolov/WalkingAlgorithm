@@ -16,7 +16,7 @@ FUNCTIONALITY:
 FRAMEWORK:
 	1. ALWAYS THINK ABOUT THE ORDER THE FUNCTIONS NEED TO BE CALLED. ASK YOURSELF - IS THIS A TRIPOD-ONLY MOVEMENT
 		OR IT IS RELATED TO THE OTHER TRIPOD AND TO THE ROBOT ITSELF
-	2. Reset() 		- 	NOTE: function does not care about current state and just writes default values to all servos
+	2. Reset() 		- 	NOTE: function does not care about current state and just writes defaultPos values to all servos
 						without accounting for stability - i.e. the robot will most probably fall down !!!
 						Supposed to be used in extreme cases only
 
@@ -30,6 +30,8 @@ FRAMEWORK:
 
 #include "wkq.h"
 #include "Tripod.h"
+#include "AX12A_Serial.h"
+#include "XL320_Serial.h"
 #include "include.h"
 #include "Master.h"
 
@@ -43,42 +45,50 @@ using wkq::RobotState_t;
 class Robot{
 
 public:
-	Robot(Master* pixhawk_in, DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, 
-		const double robot_params[], wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
+
+	Robot(Master* pixhawk_in, DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, const double robot_params[], wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
+	Robot(Master* pixhawk_in, int baud_in, double height_in, const double robot_params[], wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
 	~Robot();
 
 	/* ------------------------------------ STANDING POSITIONS ----------------------------------- */
 
-	void Default();					// Reset all Leg parameters to their default values
-	void Center();					// Reset all Legs to their central positions and keep current height
-	void Stand();					// Set all Legs to a standing state where height = Tibia
-	void StandQuad();				// Same as Stand() but arms configured as quad
-	void FlattenLegs(wkq::RobotState_t state_in = wkq::RS_STRAIGHT_QUAD);	// Flatten the knee
+	void defaultPos();				// Reset all Leg parameters to their defaultPos values
+	void center();					// Reset all Legs to their central positions and keep current height
+	void stand();					// Set all Legs to a standing state where height = Tibia
+	void standQuad();				// Same as stand() but arms configured as quad
+	void flatQuad(); 				// flatten legs so you can fly as a quad
+
+	//void flattenLegs(wkq::RobotState_t state_in = wkq::RS_FLAT_QUAD);	// flatten the knee
 
 	/* ------------------------------------ WALK RELATED FUNCTIONALITY ----------------------------------- */
 	
-	void WalkForward(double coeff);
-	void Rotate(double angle);
+	void walkForward(double coeff);
+	void rotate(double angle);
 
-	void RaiseBody(double hraise);
+	void raiseBody(double hraise);
 
 	/* ------------------------------------ TESTING FUNCTIONS ----------------------------------- */
 
-	void Test();
-	void SingleStepForwardTest(double coeff);
-	void QuadSetup();			// set the legs so that Pixhawk calibration can be performed 
+	void test();
+	void singleStepForwardTest(double coeff);
+	void quadSetup();			// set the legs so that Pixhawk calibration can be performed 
 
 private:
-	double CalcMaxStepSize();
-	double CalcMaxRotationAngle();
+	void changeState(wkq::RobotState_t state_in, void (Tripod::*tripod_action)(), bool wait_call=false/*, bool check_state*/);
 
-	bool no_state();		// check if the current state is meaningless for the walking configuration
+	double calcMaxStepSize();
+	double calcMaxRotationAngle();
+
+	bool noState();				// check if the current state is meaningless for the walking configuration
 
 
 	/* ------------------------------------ MEMBER DATA ----------------------------------- */
 
 	Tripod Tripods[TRIPOD_COUNT];
 	
+	//DnxSerialBase* Arms;
+	//DnxSerialBase* HipsKnees;
+
 	Master* pixhawk;
 	// Both MAXes always positive; Negative limit same number
 	double max_rotation_angle;
@@ -87,6 +97,14 @@ private:
 	const double wait_time = 0.5; 	// wait time between writing angles for the two tripods
 
 	wkq::RobotState_t state;
+
+	enum RPC_Fn_t{
+		RPC_DEFAULT_POS 	= 1,
+		RPC_CENTER 			= 2,
+		RPC_STAND 			= 3,
+		RPC_STAND_QUAD 		= 4,
+		RPC_STRAIGHT_QUAD	= 5
+	};
 };
 
 #endif //ROBOT_H

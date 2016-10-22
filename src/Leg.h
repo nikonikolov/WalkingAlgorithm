@@ -5,7 +5,7 @@ Leg Abstraction Class: Corresponds to a physical leg. Constructed from 4 ServoJo
 
 Stores information about the parameters of the leg such as:
 
-DISTCENTER 		Distance from robot's center to the center of ARM servo
+DISTcenter 		Distance from robot's center to the center of ARM servo
 COXA 			Distance from the center of ARM servo to the center of HIP servo
 FEMUR 			Distance from the center of HIP servo to the center of KNEE servo
 TIBIA 			Distance from the center of KNEE servo to END EFFECTOR
@@ -31,16 +31,16 @@ FUNCTIONALITY:
 FRAMEWORK:
 	1. Algorithms work only for LEFT LEG. Values for RIGHT LEG are computed at the time of writing as opposite to Left Leg
 
-	2. StateVars[]		-	Use UpdateVar(). Function automatically updates square value for the variable
+	2. StateVars[]		-	Use updateVar(). Function automatically updates square value for the variable
 							and the rest of the variables by calling StateUpdate()
-	3. UpdateVar() 		- 	When you use this to update HIPTOEND it is assumed the change is in ENDEFFECTOR
+	3. updateVar() 		- 	When you use this to update HIPTOEND it is assumed the change is in ENDEFFECTOR
 							rather than in the HEIGHT of the robot. If change is in the HEIGHT, the StateVars[HEIGHT]
 							will not be updates
-	4. UpdateAngles()	-	Function automatically called when UpdateVar() is called. Basing on StateVars[]
+	4. updateAngles()	-	Function automatically called when updateVar() is called. Basing on StateVars[]
 							function computes new angles for Hip and Knee
-	5. Center()			-	Assumes Leg is already lifted up, otherwise robot will probably fall down
-	6. ComputeVars() 	- 	Computes all Vars[] based on the current ServoAngles[] does not use Update(), but computes variables
-							manually to ensure no call to UpdateAngles()
+	5. center()			-	Assumes Leg is already lifted up, otherwise robot will probably fall down
+	6. computeVars() 	- 	Computes all Vars[] based on the current ServoAngles[] does not use Update(), but computes variables
+							manually to ensure no call to updateAngles()
 
 -------------------------------------------------------------------------------------------
 
@@ -66,43 +66,43 @@ public:
 
 	/* ---------------------------------------- GETTER AND COPY ---------------------------------------- */
 
-	double Get(int param_type, int idx) const;
-	void CopyState(const Leg& LegIn);								// Copy the state of input Leg
+	double get(int param_type, int idx) const;
+	void copyState(const Leg& LegIn);								// Copy the state of input Leg
 
-	/* ---------------------------------------- STANDING POSITIONS ---------------------------------------- */
+	/* ---------------------------------------- standING POSITIONS ---------------------------------------- */
 
-	inline void Default();					// Reset all Leg parameters to their default values
-	inline void Center();					// Reset all Legs to their central positions and keep current height
-	inline void Stand();					// Centralize all Legs for a standing state where height = Tibia
-	inline void Flatten();					// Flatten the knee
-	void StandQuad();						// Same as Stand() but arms configured as quad
+	inline void defaultPos();				// Reset all Leg parameters to their defaultPos values
+	inline void center();					// Reset all Legs to their central positions and keep current height
+	inline void stand();					// Centralize all Legs for a standing state where height = Tibia
+	inline void flatten();					// flatten the knee
+	void standQuad();						// Same as stand() but arms configured as quad
 
 
 	/* ---------------------------------------- RAISE AND LOWER ---------------------------------------- */
 
-	void LiftUp(double height);				// Lift End Effector in the air
-	void LowerDown(double height);			// Put End Effector straight down
-	void FinishStep();								// Put End Effector down with ARM, HIP and KNEE centered
+	void liftUp(double height);				// Lift End Effector in the air
+	void lowerDown(double height);			// Put End Effector straight down
+	void finishStep();								// Put End Effector down with ARM, HIP and KNEE centered
 
 
 	/* ---------------------------------------- WALKING ALGORITHMS ---------------------------------------- */
 
 	void IKBodyForward(double step_size);	// Change angles and state of Leg for a step forward
-	void StepForward(double step_size);		// Put End Effector down by making a step forward. Leg must be already lifted
+	void stepForward(double step_size);		// Put End Effector down by making a step forward. Leg must be already lifted
 	
 	void IKBodyRotate(double angle);			// Change angles and state of Leg for a rotation around central axis
-	void StepRotate(double angle);			// Put End Effector down by making a rotation step. Leg must be already lifted
+	void stepRotate(double angle);			// Put End Effector down by making a rotation step. Leg must be already lifted
 	
-	void RaiseBody(double hraise);
+	void raiseBody(double hraise);
 
 	/* ---------------------------------------- TESTING FUNCTIONS ---------------------------------------- */
 
-	void QuadSetup();
+	void quadSetup();
 	
 	/* ---------------------------------------- WRITE TO SERVOS ---------------------------------------- */
 
-	void WriteAngles();							// Write ServoAngles[] to physcial servos in order ARM, HIP, KNEE
-	void WriteJoint(int idx);			// Write only a single angle contained in ServoAngles[] to physcial servo
+	void writeAngles();							// Write ServoAngles[] to physcial servos in order ARM, HIP, KNEE
+	void writeJoint(int idx);			// Write only a single angle contained in ServoAngles[] to physcial servo
 
 
 private:
@@ -117,19 +117,19 @@ private:
 };
 
 
-inline void Leg::Default(){
-	state.LegDefault();
+inline void Leg::defaultPos(){
+	state.legDefaultPos();
 }
 
-inline void Leg::Center(){
-	state.LegCenter();
+inline void Leg::center(){
+	state.legCenter();
 }
 
-inline void Leg::Stand(){
-	state.LegStand();
+inline void Leg::stand(){
+	state.legStand();
 }
-inline void Leg::Flatten(){	
-	state.LegFlatten();
+inline void Leg::flatten(){	
+	state.legFlatten();
 }
 
 

@@ -14,15 +14,17 @@
 
 #include "src/Master.h"
 
+// ROS Functionality
+//#include <ros.h>
+//#include "wkq_msgs/RPC.h"
+
+
 /*  
- * main() that runs on the mbed. To compile run $ make
- *
- *
  *	Global vars defined in other header files:
  *	PC pc - specifies connected pc for debugging purposes - initialized in include.h and include.cpp
  */
 
-int main(){
+int main(int argc, char **argv){
 
 	// Set the debug level so that debug messages are printed on the USB serial connection
 	pc.set_debug();
@@ -32,28 +34,28 @@ int main(){
 	
 	pc.print_debug("MAIN started\n");
 
-	int baud = 1000000; 		// No resistor between Rx and Tx
-//	int baud = 115200; 			// resistor between Rx and Tx - can possibly work without one
-	double init_height = 10.0;	// initial height for the robot
+	int baud = 1000000; 		
+	double init_height = 10.0;	
 
 	Master* pixhawk = new Master();
 
 	pc.print_debug("Pixhawk initialized\n");
 
 	// Instantiate objects for communication with the servo motors 
-	AX12A_Serial HipsKnees(p9, p10, baud);
-	XL320_Serial Arms(p13, p14, baud);
+	//AX12A_Serial HipsKnees(p9, p10, baud);
+	//XL320_Serial Arms(p13, p14, baud);
 
 	pc.print_debug("Communication ready\n");
 	
 
 	// Instantiate Robot
-	Robot* WkQuad;
+	Robot* wk_quad;
 	try{
-		WkQuad = new Robot(pixhawk, &HipsKnees, &Arms, init_height, robot_params, wkq::RS_STRAIGHT_QUAD);		// initialize to a ready for flight position
-	//	WkQuad = new Robot(pixhawk, &HipsKnees, &Arms, init_height, robot_params, wkq::RS_STANDING);				// initialize to a standing position
-	//	WkQuad = new Robot(pixhawk, &HipsKnees, &Arms, init_height, robot_params, wkq::RS_STANDING_QUAD);			
-	//	WkQuad = new Robot(pixhawk, &HipsKnees, &Arms, init_height, robot_params, wkq::RS_DEFAULT);
+	//	wk_quad = new Robot(pixhawk, &HipsKnees, &Arms, init_height, robot_params, wkq::RS_STRAIGHT_QUAD);		// initialize to a ready for flight position
+		wk_quad = new Robot(pixhawk, baud, init_height, robot_params, wkq::RS_FLAT_QUAD);					// initialize to a ready for flight position
+	//	wk_quad = new Robot(pixhawk, &HipsKnees, &Arms, init_height, robot_params, wkq::RS_STANDING);				// initialize to a standing position
+	//	wk_quad = new Robot(pixhawk, &HipsKnees, &Arms, init_height, robot_params, wkq::RS_STANDING_QUAD);			
+	//	wk_quad = new Robot(pixhawk, &HipsKnees, &Arms, init_height, robot_params, wkq::RS_DEFAULT);
 
 	}
 	catch(const string& msg){
@@ -63,12 +65,25 @@ int main(){
 
 	pc.print_debug("Robot Initialized\n");
 
+/*
+	// INIT ROS
+  	ros::init(argc, argv, "walking_server");
+  	ros::NodeHandle this_node;      // defaults to USBTX and USBRX
+
+  	ros::ServiceServer service_default  		= this_node.advertiseService("add_two_ints", wk_quad.Default);
+  	ros::ServiceServer service_stand_quad 		= this_node.advertiseService("add_two_ints", wk_quad.standQuad);
+  	ros::ServiceServer service_stand 			= this_node.advertiseService("add_two_ints", wk_quad.stand);
+  	ros::ServiceServer service_straight_quad 	= this_node.advertiseService("add_two_ints", wk_quad.straightQuad);
+ 
+  	ROS_INFO("Ready to add two ints.");
+  	ros::spin();
+
 	// Make the robot do something. Examples shown below. Check Robot.h for possible functions
-	//WkQuad->Stand();							// make the robot stand on its legs
+	//wk_quad->Stand();							// make the robot stand on its legs
 	//pc.print_debug("Robot Standing\n");		// make the robot walk
-	//WkQuad->WalkForward(0.5);
+	//wk_quad->WalkForward(0.5);
 
-
+*/
 	pc.print_debug("End of Program\n");
 	return 0;
 }

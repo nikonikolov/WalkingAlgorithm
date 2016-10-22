@@ -83,17 +83,17 @@ namespace wkq{
 	
 	/* *** NOTE: Be very careful when introducing new states - if the new state is meaningless in terms of leg configuration
 			on the ground, i.e. backwards consistency with current position does no need to be kept, you need to signify that
-			somehow in Robot::Stand()
+			somehow in Robot::stand()
 	***/
 	enum RobotState_t{
 		RS_DEFAULT 				= 0,			// all servos configured to default positions, i.e. centralized for stable stand
 		RS_STANDING				= 1,			// body height equal to knee height, all knees to 90 degrees, the rest centered
 		RS_CENTERED				= 2,			// body height equal to knee height, all knees to 90 degrees, the rest centered
-		RS_STANDING_QUAD 		= 4, 			// Standing with legs configured in Quad mode and configured to stand on the ground
-		RS_STRAIGHT_QUAD	= 5, 			// Standing with legs configured in Quad mode and fully flat
+		RS_STANDING_QUAD 		= 4, 			// standing with legs configured in Quad mode and configured to stand on the ground
+		RS_FLAT_QUAD			= 5,			// standing with legs configured in Quad mode and fully flat
 		RS_QUAD_SETUP			= 6, 			// Legs set so that pixhawk configuration can be perfromed 
 
-		RS_FLY_STANDING_QUAD 			= 20, 			// Flying with legs configured in Quad mode but not fully flat
+		RS_FLY_STANDING_QUAD 	= 20, 			// Flying with legs configured in Quad mode but not fully flat
 		RS_FLY_STRAIGHT_QUAD 	= 21, 			// Flying with legs configured in Quad mode and fully flat
 		/*
 		RS_idle 		= 0,			// not doing anything

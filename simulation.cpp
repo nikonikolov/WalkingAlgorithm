@@ -47,9 +47,9 @@ int main(){
 
 	WkQuad->Stand();
 	pc.print_debug("Robot Standing\n");
-	WkQuad->StandQuad();
+	WkQuad->standQuad();
 	pc.print_debug("Robot Standing as Quad\n");
-	WkQuad->FlattenLegs();
+	WkQuad->flattenLegs();
 	pc.print_debug("Legs Flattened\n");
 	WkQuad->Default();
 	pc.print_debug("Legs in Default position\n");

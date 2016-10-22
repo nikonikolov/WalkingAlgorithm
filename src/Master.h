@@ -26,7 +26,7 @@ public:
 #endif
 	Master(){}
 
-	bool InputWalkForward();
+	bool inputWalkForward();
 
 private:
 

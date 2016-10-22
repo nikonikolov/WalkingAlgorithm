@@ -137,7 +137,7 @@ ServoJoint::ServoJoint(int ID_in, DnxSerialBase* robot_view_in) : ID(ID_in)/*, r
 		case wkq::arm_right_back	:
 			servo_name = "arm_right_back";
 			break;
-		default:
+		defaultPos:
 			servo_name = "error in servo ID";
 	}		
 }

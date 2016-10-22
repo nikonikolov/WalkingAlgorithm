@@ -9,7 +9,7 @@ FUNCTIONALITY:
 	3. RESPONSIBLE for invoking the Leg class functionality that write the calculated values to the motors - usually
 		performed in each function after all Legs have calculated their new positions
 	4. Does not currently store any data - no need for that so far
-	5. RESPONSIBLE for determining whether an algorithmic function or CopyState() must be called for more efficient
+	5. RESPONSIBLE for determining whether an algorithmic function or copyState() must be called for more efficient
 		operation
 
 
@@ -19,7 +19,7 @@ FRAMEWORK:
 	1. ALWAYS THINK ABOUT THE ORDER THE FUNCTIONS NEED TO BE CALLED. ASK YOURSELF - IS THIS A TRIPOD-ONLY MOVEMENT
 		OR IT IS RELATED TO THE OTHER TRIPOD AND TO THE ROBOT ITSELF
 	2. ALWAYS THINK ABOUT WHAT COMPUTATIONS DOES THE CALLED FUNCTION PERFORM - IF THE RESULTING STATE OF EACH LEG
-		IS THE SAME, DO COMPUTATIONS FOR FIRST LEG AND USE CopyState()
+		IS THE SAME, DO COMPUTATIONS FOR FIRST LEG AND USE copyState()
 
 -------------------------------------------------------------------------------------------
 
@@ -47,41 +47,42 @@ public:
 
 	/* ------------------------------------ COPYING STATE ----------------------------------- */
 
-	void CopyState(const Tripod& tripod_in);
+	void copyState(const Tripod& tripod_in);
 
 	/* ------------------------------------ STANDING POSITIONS ----------------------------------- */
 
-	void Default();					// Reset all Leg parameters to their default values
-	void Center();					// Reset all Legs to their central positions and keep current height
-	void Stand(bool meaningless_state = false);		// Set all Legs to a standing state where height = Tibia
-	void StandQuad(bool meaningless_state = false);	// Same as Stand() but arms configured as quad
-	void FlattenLegs();				// Flatten the knee
+	void defaultPos();					// Reset all Leg parameters to their defaultPos values
+	void center();						// Reset all Legs to their central positions and keep current height
+	void stand(bool meaningless_state = false);		// Set all Legs to a standing state where height = Tibia
+	void standQuad(bool meaningless_state = false);	// Same as stand() but arms configured as quad
+	void flattenLegs();					// flatten the knee
+	void flatQuad();					// Straighten legs to fly as a quad
 
-	double Standing();				// Determines if standing, and if not returns by how much should be lifted
+	double standing();				// Determines if standing, and if not returns by how much should be lifted
 
 	/* ------------------------------------ RAISE AND LOWER ----------------------------------- */
 
-	void LiftUp(double height_up);
-	void LowerDown(double height_down);
-	void FinishStep();
+	void liftUp(double height_up);
+	void lowerDown(double height_down);
+	void finishStep();
 
 	/* ------------------------------------ WALKING ALGORITHMS ----------------------------------- */
 	
-	void BodyForward(double step_size);
-	void StepForward(double step_size);
+	void bodyForward(double step_size);
+	void stepForward(double step_size);
 
-	void BodyRotate(double angle);
-	void StepRotate(double angle);
+	void bodyRotate(double angle);
+	void stepRotate(double angle);
 	
-	void RaiseBody(double hraise);
+	void raiseBody(double hraise);
 
 	/* ------------------------------------ TESTING FUNCTIONS ----------------------------------- */
 
-	void QuadSetup();
+	void quadSetup();
 
 private:
-	void WriteAngles();
-	void WriteHipKneeAngles();
+	void writeAngles();
+	void writeHipKneeAngles();
 
 	Leg Legs[LEG_COUNT];
 

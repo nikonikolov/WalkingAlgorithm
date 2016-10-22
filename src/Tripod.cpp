@@ -10,160 +10,169 @@ Tripod::Tripod (int ID_front_knee, int ID_middle_knee, int ID_back_knee,
 		} {}
 Tripod::~Tripod(){}
 
-/* ================================================= STANDING POSITIONS ================================================= */
+/* ================================================= standING POSITIONS ================================================= */
 
-void Tripod::Default(){
+void Tripod::defaultPos(){
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].Default();
+		Legs[i].defaultPos();
 	}
-	WriteAngles();
+	writeAngles();
 }
 
-void Tripod::Center(){
-	LiftUp(leg_lift);
+void Tripod::center(){
+	liftUp(leg_lift);
 	for(int i=0; i<LEG_COUNT; i++){
-		if(i==0) Legs[i].Center();
-		// All Legs have same defaults so save some computations
-		else Legs[i].CopyState(Legs[0]);
-		Legs[i].WriteAngles();
+		if(i==0) Legs[i].center();
+		// All Legs have same defaultPoss so save some computations
+		else Legs[i].copyState(Legs[0]);
+		Legs[i].writeAngles();
 	}
 }
 
 // input specifies whether current state has any standing meaning - if not, we should not keep backwards consistency as 
 // invalid positions for the servos will be calculated on lifting the legs
-void Tripod::Stand(bool meaningless_state /*= false*/){
+void Tripod::stand(bool meaningless_state /*= false*/){
 	// Robot already has made sure that body was lifted if necessary. Do it leg by leg to ensure you don't overload servos
 	for(int i=0; i<LEG_COUNT; i++){
 		if(!meaningless_state){
-			Legs[i].LiftUp(leg_lift);
-			Legs[i].WriteAngles();
+			Legs[i].liftUp(leg_lift);
+			Legs[i].writeAngles();
 		} 
-		Legs[i].Stand();
-		Legs[i].WriteAngles();
+		Legs[i].stand();
+		Legs[i].writeAngles();
 	}
 }
 
-void Tripod::StandQuad(bool meaningless_state /*= false*/){
+void Tripod::standQuad(bool meaningless_state /*= false*/){
 	// Robot already has made sure that body was lifted if necessary. Do it leg by leg to ensure you don't overload servos
 	for(int i=0; i<LEG_COUNT; i++){
 		if(!meaningless_state){
-			Legs[i].LiftUp(leg_lift);
-			Legs[i].WriteAngles();
+			Legs[i].liftUp(leg_lift);
+			Legs[i].writeAngles();
 		} 
-		Legs[i].StandQuad();
-		Legs[i].WriteAngles();
+		Legs[i].standQuad();
+		Legs[i].writeAngles();
 	}
 }
 
-void Tripod::FlattenLegs(){
+void Tripod::flattenLegs(){
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].Flatten();
+		Legs[i].flatten();
 	}
-	WriteHipKneeAngles();
+	writeHipKneeAngles();
 }
 
-double Tripod::Standing(){
-	double height = Legs[0].Get(STATE_VAR, HEIGHT);
-	double height_stand = Legs[0].Get(PARAM, TIBIA);
+void Tripod::flatQuad(){
+	for(int i=0; i<LEG_COUNT; i++){
+		Legs[i].standQuad();
+		Legs[i].flatten();
+	}
+	writeAngles();
+}
+
+
+double Tripod::standing(){
+	double height = Legs[0].get(STATE_VAR, HEIGHT);
+	double height_stand = Legs[0].get(PARAM, TIBIA);
 	if(!almost_equals(height, height_stand)) return 0.0;
 	else return height_stand - height;
 }
 
-void Tripod::CopyState(const Tripod& tripod_in){
+void Tripod::copyState(const Tripod& tripod_in){
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].CopyState(tripod_in.Legs[i]);
+		Legs[i].copyState(tripod_in.Legs[i]);
 	}
-	WriteAngles();
+	writeAngles();
 }
 
 
 /* ================================================= WALKING ALGORITHMS ================================================= */
 
-void Tripod::BodyForward (double step_size){
+void Tripod::bodyForward (double step_size){
 	for(int i=0; i<LEG_COUNT; i++){
 		Legs[i].IKBodyForward(step_size);
 	}
-	WriteAngles();
+	writeAngles();
 }
 
-void Tripod::StepForward (double step_size){
+void Tripod::stepForward (double step_size){
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].StepForward(step_size);
+		Legs[i].stepForward(step_size);
 	}
-	WriteAngles();
+	writeAngles();
 }
 
 
-void Tripod::BodyRotate(double angle){
+void Tripod::bodyRotate(double angle){
 	for(int i=0; i<LEG_COUNT; i++){
 		Legs[i].IKBodyRotate(angle);
 	}
-	WriteAngles();
+	writeAngles();
 }
 
-void Tripod::StepRotate(double angle){
+void Tripod::stepRotate(double angle){
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].StepRotate(angle);
+		Legs[i].stepRotate(angle);
 	}
-	WriteAngles();
+	writeAngles();
 }
 
 
-void Tripod::RaiseBody(double hraise){
-	Center();
+void Tripod::raiseBody(double hraise){
+	center();
 	for(int i=0; i<LEG_COUNT; i++){
-		if(i==0) 	Legs[i].RaiseBody(hraise);
-		else 		Legs[i].CopyState(Legs[0]);
+		if(i==0) 	Legs[i].raiseBody(hraise);
+		else 		Legs[i].copyState(Legs[0]);
 	}
-	WriteHipKneeAngles();
+	writeHipKneeAngles();
 }
 
 
 /* ================================================= RAISE AND LOWER ================================================= */
 
 
-void Tripod::LiftUp(double height_up){
+void Tripod::liftUp(double height_up){
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].LiftUp(height_up);
+		Legs[i].liftUp(height_up);
 	}
-	WriteAngles();
+	writeAngles();
 }
 
-void Tripod::LowerDown(double height_down){
+void Tripod::lowerDown(double height_down){
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].LowerDown(height_down);
+		Legs[i].lowerDown(height_down);
 	}
-	WriteAngles();
+	writeAngles();
 }
 
-void Tripod::FinishStep(){
+void Tripod::finishStep(){
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].FinishStep();
+		Legs[i].finishStep();
 	}
-	WriteAngles();
+	writeAngles();
 }
 
 /* ================================================= TESTING FUNCTIONS ================================================= */
 
-void Tripod::QuadSetup(){
-	Legs[0].StandQuad();
-	Legs[1].QuadSetup();
-	Legs[2].StandQuad();
-	WriteAngles();
+void Tripod::quadSetup(){
+	Legs[0].standQuad();
+	Legs[1].quadSetup();
+	Legs[2].standQuad();
+	writeAngles();
 }
 
 
 /* ================================================= PRIVATE FUNCTIONALITY ================================================= */
 
-void Tripod::WriteHipKneeAngles(){
+void Tripod::writeHipKneeAngles(){
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].WriteJoint(HIP);
-		Legs[i].WriteJoint(KNEE);
+		Legs[i].writeJoint(HIP);
+		Legs[i].writeJoint(KNEE);
 	}
 }
 
-void Tripod::WriteAngles(){
+void Tripod::writeAngles(){
 	for(int i=0; i<LEG_COUNT; i++){
-		Legs[i].WriteAngles();
+		Legs[i].writeAngles();
 	}
 }
