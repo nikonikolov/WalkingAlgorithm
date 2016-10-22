@@ -24,39 +24,38 @@ int main(){
 	// PARAM_STEP defined in State_t.h. Meaning of each value defined in the same header
 	const double robot_params[PARAM_STEP] = { 10.95, 2.65, 17.5, 30.0, 12.0, 2.25};
 	
-	pc.print_debug("MAIN started\n");
+	pc.print_debug("MAIN STARTED\n");
 
 	int baud = 1000000;
 	double init_height = 10.0;
 
 	Master* pixhawk = new Master();
 
-	pc.print_debug("Pixhawk initialized\n");
+	pc.print_debug("PIXHAWK INITIALIZED\n");
 	
-	Robot* WkQuad;
+	Robot* wk_quad;
 	// Instantiate Robot
 	try{
-		WkQuad = new Robot(pixhawk, NULL, NULL, init_height, robot_params, wkq::RS_standing);
+		wk_quad = new Robot(pixhawk, NULL, NULL, init_height, robot_params, wkq::RS_DEFAULT);
 	}
 	catch(const string& msg){
 		pc.print_debug(msg);
 		exit(EXIT_FAILURE);
 	}
 
-	pc.print_debug("Robot Initialized\n");
+	pc.print_debug("ROBOT INITIALIZED\n");
 
-	WkQuad->Stand();
+	/*wk_quad->stand();
 	pc.print_debug("Robot Standing\n");
-	WkQuad->standQuad();
+	wk_quad->standQuad();
 	pc.print_debug("Robot Standing as Quad\n");
-	WkQuad->flattenLegs();
-	pc.print_debug("Legs Flattened\n");
-	WkQuad->Default();
+	wk_quad->defaultPos();
 	pc.print_debug("Legs in Default position\n");
-	WkQuad->Center();
+	wk_quad->center();
 	pc.print_debug("Legs Centered\n");
-	WkQuad->WalkForward(0.7);
-	pc.print_debug("Robot walked\n");
+	*/
+	wk_quad->walkForward(0.7);
+	pc.print_debug("ROBOT WALKED\n");
 
 	// Further tests - lifting body after center to stand
 	// Centering for arbitrary height

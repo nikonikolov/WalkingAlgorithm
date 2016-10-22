@@ -78,8 +78,8 @@ public:
 	void quadSetup();
 
 private:
-	void makeMovement(void (Leg::*leg_action)(double), double arg); 		// Wrapper for calling a function from Leg that makes any moevement
-	void setPosition(void (Leg::*leg_action)()); 							// Wrapper for calling a function from Leg that sets a static leg position
+	void makeMovement(void (Leg::*leg_action)(double), double arg, const string debug_msg=""); 		// Wrapper for calling a function from Leg that makes any moevement
+	void setPosition(void (Leg::*leg_action)(), const string debug_msg=""); 						// Wrapper for calling a function from Leg that sets a static leg position
 
 	void writeAngles();
 	void writeHipKneeAngles();

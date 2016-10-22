@@ -28,10 +28,10 @@ Robot::Robot(Master* pixhawk_in, DnxSerialBase* HipsKnees, DnxSerialBase* Arms, 
 	pc.print_debug("Robot done\n");
 }
 
-
+#ifndef SIMULATION
 Robot::Robot(Master* pixhawk_in, int baud_in, double height_in, const double robot_params[], wkq::RobotState_t state_in/* = wkq::RS_DEFAULT*/) : 
 	Robot(pixhawk_in, new AX12A_Serial(p9, p10, baud_in), new XL320_Serial(p13, p14, baud_in), height_in, robot_params, state_in) {}
-
+#endif
 
 Robot::~Robot(){}
 

@@ -84,7 +84,6 @@ public:
 	void lowerDown(double height);			// Put End Effector straight down
 	void finishStep();								// Put End Effector down with ARM, HIP and KNEE centered
 
-
 	/* ---------------------------------------- WALKING ALGORITHMS ---------------------------------------- */
 
 	void IKBodyForward(double step_size);	// Change angles and state of Leg for a step forward

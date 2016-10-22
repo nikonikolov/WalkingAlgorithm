@@ -236,8 +236,6 @@ void State_t::centerAngles(double height /*=0.0*/){
 	double hip_max=asin(Params[HIPKNEEMAXHDIST]/Params[FEMUR]);
 	ServoAngles[HIP] = ( hip_max + ( wkq::radians(90) - fabs(AngleLimits[HIP_MIN]) ) )/2 - wkq::radians(90);
 	
-	ServoAngles[HIP] = AngleLimits[HIP_MIN];
-
 	// center KNEE
 	double height_hip;
 	if(height==0.0) height_hip = Vars[HEIGHT];

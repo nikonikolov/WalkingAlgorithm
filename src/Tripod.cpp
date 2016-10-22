@@ -43,11 +43,11 @@ void Tripod::flatQuad(){
 /* ================================================= WALKING MOVEMENTS ================================================= */
 
 void Tripod::bodyForward (double step_size){
-	makeMovement(&Leg::IKBodyForward, step_size);
+	makeMovement(&Leg::IKBodyForward, step_size, "MOVING BODY FORWARD\n");
 }
 
 void Tripod::stepForward (double step_size){
-	makeMovement(&Leg::stepForward, step_size);
+	makeMovement(&Leg::stepForward, step_size, "TRIPOD STEPPING FORWARD\n");
 }
 
 void Tripod::bodyRotate(double angle){
@@ -59,15 +59,15 @@ void Tripod::stepRotate(double angle){
 }
 
 void Tripod::liftUp(double height_up){
-	makeMovement(&Leg::liftUp, height_up);
+	makeMovement(&Leg::liftUp, height_up, "LIFTING TRIPOD\n");
 }
 
 void Tripod::lowerDown(double height_down){
-	makeMovement(&Leg::lowerDown, height_down);
+	makeMovement(&Leg::lowerDown, height_down, "LOWERING TRIPOD\n");
 }
 
 void Tripod::finishStep(){
-	setPosition(&Leg::finishStep);
+	setPosition(&Leg::finishStep, "TRIPOD FINISHING STEP\n");
 }
 
 
@@ -110,14 +110,18 @@ void Tripod::quadSetup(){
 /* ================================================= PRIVATE FUNCTIONALITY ================================================= */
 
 
-void Tripod::makeMovement(void (Leg::*leg_action)(double), double arg){
+void Tripod::makeMovement(void (Leg::*leg_action)(double), double arg, const string debug_msg /*=""*/ ){
+	if(debug_msg!="") pc.print_debug(debug_msg);
+	
 	for(int i=0; i<LEG_COUNT; i++){
 		(Legs[i].*leg_action)(arg);
 	}
 	writeAngles();
 }
 
-void Tripod::setPosition(void (Leg::*leg_action)()){
+void Tripod::setPosition(void (Leg::*leg_action)(), const string debug_msg /*=""*/){
+	if(debug_msg!="") pc.print_debug(debug_msg);
+
 	for(int i=0; i<LEG_COUNT; i++){
 		(Legs[i].*leg_action)();
 	}

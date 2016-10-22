@@ -30,12 +30,15 @@ FRAMEWORK:
 
 #include "wkq.h"
 #include "Tripod.h"
-#include "AX12A_Serial.h"
-#include "XL320_Serial.h"
 #include "include.h"
 #include "Master.h"
 
 using wkq::RobotState_t;
+
+#ifndef SIMULATION
+#include "AX12A_Serial.h"
+#include "XL320_Serial.h"
+#endif
 
 #define TRIPOD_COUNT 	2
 #define TRIPOD_LEFT 	0	
@@ -47,7 +50,9 @@ class Robot{
 public:
 
 	Robot(Master* pixhawk_in, DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, const double robot_params[], wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
+#ifndef SIMULATION
 	Robot(Master* pixhawk_in, int baud_in, double height_in, const double robot_params[], wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
+#endif
 	~Robot();
 
 	/* ------------------------------------ STATIC POSITIONS ----------------------------------- */
@@ -98,7 +103,6 @@ private:
 
 	wkq::RobotState_t state;
 
-	/*
 	enum RPC_Fn_t{
 		RPC_DEFAULT_POS 	= 1,
 		RPC_CENTER 			= 2,
@@ -106,7 +110,6 @@ private:
 		RPC_STAND_QUAD 		= 4,
 		RPC_STRAIGHT_QUAD	= 5
 	};
-	*/
 };
 
 #endif //ROBOT_H

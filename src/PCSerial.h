@@ -67,7 +67,7 @@ public:
 	~PCSerial(){}
 
 	inline void print_debug(const std::string& msg){
-		cout<<msg<<endl;
+		cout<<msg;
 	}
 
 private:
