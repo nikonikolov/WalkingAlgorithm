@@ -7,19 +7,46 @@ Leg::Leg 	(int ID_knee, int ID_hip, int ID_arm,
 			DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, const double robot_params[]) :
 	
 	state(height_in, robot_params), 
-	// Instantiate Joints
-	Joints	{ 	ServoJoint(ID_knee, HipsKnees), 
+	// Instantiate joints
+	joints	{ 	ServoJoint(ID_knee, HipsKnees), 
 				ServoJoint(ID_hip, HipsKnees), 
 				ServoJoint(ID_arm, Arms), 
 			} {
-	// Check if RIGHT or LEFT
-	if(ID_knee>wkq::knee_left_back) 	LegRight=-1.0;
-	else 								LegRight=1.0;
 
-	// Calculate AngleOffset
-	if(ID_knee == wkq::knee_left_front 	|| ID_knee == wkq::knee_right_front) 	AngleOffset = wkq::radians(30);
-	if(ID_knee == wkq::knee_left_middle || ID_knee == wkq::knee_right_middle) 	AngleOffset = wkq::radians(30+60);
-	if(ID_knee == wkq::knee_left_back 	|| ID_knee == wkq::knee_right_back) 	AngleOffset = wkq::radians(30+120);
+	switch(ID_knee){
+		case wkq::KNEE_LEFT_FRONT:
+			angle_offset = wkq::radians(30);
+			leg_id = wkq::LEG_LEFT_FRONT;
+			leg_right = false;
+			break;
+		case wkq::KNEE_LEFT_MIDDLE:
+			angle_offset = wkq::radians(30+60);
+			leg_id = wkq::LEG_LEFT_MIDDLE;
+			leg_right = false;
+			break;
+		case wkq::KNEE_LEFT_BACK:
+			angle_offset = wkq::radians(30+120);
+			leg_id = wkq::LEG_LEFT_BACK;
+			leg_right = false;
+			break;
+		case wkq::KNEE_RIGHT_FRONT:
+			angle_offset = wkq::radians(30);
+			leg_id = wkq::LEG_RIGHT_FRONT;
+			leg_right = true;
+			break;
+		case wkq::KNEE_RIGHT_MIDDLE:
+			angle_offset = wkq::radians(30+60);
+			leg_id = wkq::LEG_RIGHT_MIDDLE;
+			leg_right = true;
+			break;
+		case wkq::KNEE_RIGHT_BACK:
+			angle_offset = wkq::radians(30+120);
+			leg_id = wkq::LEG_RIGHT_BACK;
+			leg_right = true;
+			break;
+		default:
+			pc.print_debug("WARNING: Invalid KNEE ID IN LEG CONSTRUCTOR\n");
+	}
 }
 
 Leg::~Leg(){}
@@ -28,39 +55,39 @@ Leg::~Leg(){}
 
 void Leg::standQuad(){
 	state.legStand();
-	if(almost_equals(AngleOffset, wkq::PI/2)) return;
-
-	double MotorAngle = 
-			asin( state.Params[DISTcenter] * sin(wkq::PI/12)/(state.Params[COXA]+state.Params[FEMUR]-state.Params[KNEEMOTORDIST]) );
-	// MotorAngle valid for a LEFT LEG servo facing downwards
-	if 		(almost_equals(AngleOffset, wkq::PI/6)) state.ServoAngles[ARM] = MotorAngle + (wkq::PI/12);
-	else 											state.ServoAngles[ARM] = -(MotorAngle + (wkq::PI/12));
+	confQuadArms();
 }
 
-
 void Leg::flatQuad(){
-	if(almost_equals(AngleOffset, wkq::PI/2)) return;
-
-	double MotorAngle = 
-			asin( state.Params[DISTcenter] * sin(wkq::PI/12)/(state.Params[COXA]+state.Params[FEMUR]-state.Params[KNEEMOTORDIST]) );
-	// MotorAngle valid for a LEFT LEG servo facing downwards
-	if 		(almost_equals(AngleOffset, wkq::PI/6)) state.ServoAngles[ARM] = MotorAngle + (wkq::PI/12);
-	else 											state.ServoAngles[ARM] = -(MotorAngle + (wkq::PI/12));
-
+	confQuadArms();
 	state.legFlatten();
 }
 
+void Leg::confQuadArms(){
+	// MIDDLE LEGS
+	if(leg_id == wkq::LEG_RIGHT_MIDDLE || leg_id == wkq::LEG_LEFT_MIDDLE) state.servo_angles[ARM] = 0.0;
+	
+	else{
+		double arm_offset = 
+			asin( state.params[DISTCENTER] * sin(wkq::PI/12)/(state.params[COXA]+state.params[FEMUR]-state.params[KNEEMOTORDIST]) );
+		
+		// FRONT LEGS
+		if(leg_id == wkq::LEG_RIGHT_FRONT || leg_id == wkq::LEG_LEFT_FRONT) state.servo_angles[ARM] = arm_offset + (wkq::PI/12);
+		// BACK LEGS
+		else if(leg_id == wkq::LEG_RIGHT_BACK || leg_id == wkq::LEG_LEFT_BACK) state.servo_angles[ARM] = - (arm_offset + (wkq::PI/12));
+	}
+}
 
 /* ------------------------------------------------- RAISE AND LOWER ------------------------------------------------- */
 
 // input equals height required for the end effector; Untested for all joints and negative input
 void Leg::liftUp(double height){
-	state.ServoAngles[KNEE] = wkq::PI - state.ServoAngles[KNEE] + acos(1 - pow(height,2) / state.Params[TIBIA_SQ]); 
+	state.servo_angles[KNEE] = wkq::PI - state.servo_angles[KNEE] + acos(1 - pow(height,2) / state.params[TIBIA_SQ]); 
 }
 
 // input equals current height of the end effector
 void Leg::lowerDown(double height){
-	state.ServoAngles[KNEE] = wkq::PI - state.ServoAngles[KNEE] - acos(1 - pow(height,2) / state.Params[TIBIA_SQ]); 
+	state.servo_angles[KNEE] = wkq::PI - state.servo_angles[KNEE] - acos(1 - pow(height,2) / state.params[TIBIA_SQ]); 
 }
 
 /* 	
@@ -68,7 +95,7 @@ void Leg::lowerDown(double height){
 	Note that End Effector is still kept on the same line as HIP and KNEE are centered for this position
 */
 void Leg::finishStep(){
-	state.ServoAngles[ARM] = 0.0;
+	state.servo_angles[ARM] = 0.0;
 	// center HIP and KNEE and Compute new state
 	state.centerAngles();
 }
@@ -85,14 +112,14 @@ void Leg::IKBodyForward(double step_size){
 
 	// Cosine Rule to find new HipToEndSQ
 	double ArmGToEndNewSQ = state.get(STATE_VAR, ARMGTOEND_SQ) + step_sizeSQ - 
-								2 * step_size * state.get(STATE_VAR, ARMGTOEND) * cos( AngleOffset + state.ServoAngles[ARM] ) ;
+								2 * step_size * state.get(STATE_VAR, ARMGTOEND) * cos( angle_offset + state.servo_angles[ARM] ) ;
 
 	double ArmGToEndNew = sqrt(ArmGToEndNewSQ);
 
 	// Cosine Rule to find new Arm Servo Angle
 	double ArmTmp = acos( (step_sizeSQ + ArmGToEndNewSQ - state.get(STATE_VAR, ARMGTOEND_SQ)) / ( 2 * step_size * ArmGToEndNew ) );
 	// Convert to actual angle for the servo
-	state.ServoAngles[ARM] = wkq::PI - AngleOffset - ArmTmp; 			// NB: Valid for a LEFT servo facing down
+	state.servo_angles[ARM] = wkq::PI - angle_offset - ArmTmp; 			// NB: Valid for a LEFT servo facing down
 
 	state.updateVar(ARMGTOEND, ArmGToEndNew, ArmGToEndNewSQ);		// Automatically changes robot state in software
 }
@@ -106,7 +133,7 @@ void Leg::stepForward(double step_size){
 
 	// Create Point representing the new END EFFECTOR position
 	double x_EFNew, y_EFNew;
-	if(almost_equals(AngleOffset, wkq::PI/2)){			// Middle Joint
+	if(leg_id == wkq::LEG_RIGHT_MIDDLE || leg_id == wkq::LEG_LEFT_MIDDLE){			// Middle Joint
 		//x_EFNew = ef_center - step_size/sqrt(3); - change when you have prev and current step size as inputs
 		x_EFNew = ef_center - step_size/sqrt(3);
 		y_EFNew = 0.0;
@@ -115,13 +142,13 @@ void Leg::stepForward(double step_size){
 		x_EFNew = ef_center/2.0 + step_size/sqrt(3);
 		y_EFNew = sqrt(3)*x_EFNew; 						// Front Joint
 
-		if(almost_equals(AngleOffset, wkq::radians(150.0))) 	y_EFNew -= sqrt(3)*ef_center; 			// Back Joint
+		if(leg_id == wkq::LEG_RIGHT_BACK || leg_id == wkq::LEG_LEFT_BACK) 	y_EFNew -= sqrt(3)*ef_center; 			// Back Joint
 	}		
 	wkq::Point EFNew(x_EFNew, y_EFNew);
 
 	// Create Point representing current HIP position
-	double hip_arg = wkq::PI/2 -AngleOffset;
-	wkq::Point Hip(state.Params[DISTcenter]*cos(hip_arg), state.Params[DISTcenter]*sin(hip_arg));
+	double hip_arg = wkq::PI/2 -angle_offset;
+	wkq::Point Hip(state.params[DISTCENTER]*cos(hip_arg), state.params[DISTCENTER]*sin(hip_arg));
 
 	// Create Point representing the new HIP position
 	wkq::Point HipNew(Hip);
@@ -133,8 +160,8 @@ void Leg::stepForward(double step_size){
 	// Cosine Rule to find new ARM angle
 	double ArgTriangle = 
 			acos( (Hip.dist_sq(HipNew) +  Hip.dist_sq(EFNew) - HipNew.dist_sq(EFNew)) / (2*Hip.dist(HipNew)*Hip.dist_sq(EFNew)) );
-	//state.ServoAngles[ARM] = wkq::PI - AngleOffset - ArgTriangle;
-	state.ServoAngles[ARM] = ArgTriangle - AngleOffset ;		// Unconfirmed that valid for all joints
+	//state.servo_angles[ARM] = wkq::PI - angle_offset - ArgTriangle;
+	state.servo_angles[ARM] = ArgTriangle - angle_offset ;		// Unconfirmed that valid for all joints
 
 	state.updateVar(ARMGTOEND_SQ, ArmGToEndNewSQ);				// Automatically changes HIPTOEND, HIP and KNEE	
 }
@@ -144,24 +171,24 @@ void Leg::stepForward(double step_size){
 void Leg::IKBodyRotate(double angle){
 
 	// Sine Rule to find rotation distance
-	double RotDist = 2 * state.Params[DISTcenter] * sin (fabs(angle)/2);
+	double RotDist = 2 * state.params[DISTCENTER] * sin (fabs(angle)/2);
 
 	double RotDistSQ = pow(RotDist, 2);
 
 	// Cosine Rule to find new ArmGToEndSQ
 	double ArmGToEndNewSQ;
 	if (angle>=0.0) ArmGToEndNewSQ = state.get(STATE_VAR, ARMGTOEND_SQ) + RotDistSQ - 
-									2 * RotDist * state.get(STATE_VAR, ARMGTOEND) * cos( wkq::PI/2 + angle/2 - state.ServoAngles[ARM] );
+									2 * RotDist * state.get(STATE_VAR, ARMGTOEND) * cos( wkq::PI/2 + angle/2 - state.servo_angles[ARM] );
 	else ArmGToEndNewSQ = state.get(STATE_VAR, ARMGTOEND_SQ) + RotDistSQ - 
-									2 * RotDist * state.get(STATE_VAR, ARMGTOEND) * cos( wkq::PI/2 - angle/2 + state.ServoAngles[ARM] );	
+									2 * RotDist * state.get(STATE_VAR, ARMGTOEND) * cos( wkq::PI/2 - angle/2 + state.servo_angles[ARM] );	
 
 	double ArmGToEndNew = sqrt(ArmGToEndNewSQ);
 
 	// Cosine Rule to find new Arm Servo Angle
 	double ArmTmp = acos( (RotDistSQ + ArmGToEndNewSQ - state.get(STATE_VAR, ARMGTOEND_SQ)) / ( 2 * RotDist * ArmGToEndNew ) );
 	// Convert to actual angle for the servo - valid for a LEFT LEG servo facing down
-	if (angle>=0.0)	state.ServoAngles[ARM] = wkq::PI/2 - ArmTmp + angle/2;  // - (- wkq::PI/2 + state.ServoAngles[ARM] - angle/2)
-	else 			state.ServoAngles[ARM] = -wkq::PI/2 + ArmTmp + angle/2;	// - (  wkq::PI/2 - state.ServoAngles[ARM] - angle/2)
+	if (angle>=0.0)	state.servo_angles[ARM] = wkq::PI/2 - ArmTmp + angle/2;  // - (- wkq::PI/2 + state.servo_angles[ARM] - angle/2)
+	else 			state.servo_angles[ARM] = -wkq::PI/2 + ArmTmp + angle/2;	// - (  wkq::PI/2 - state.servo_angles[ARM] - angle/2)
 
 	state.updateVar(ARMGTOEND, ArmGToEndNew, ArmGToEndNewSQ);					// Automatically changes robot state in software		
 }
@@ -178,13 +205,13 @@ void Leg::raiseBody(double hraise){
 	state.updateVar(HEIGHT, (state.get(STATE_VAR, HEIGHT) + hraise));			// HIPTOEND, HIP and KNEE automatically get updated
 
 /*
-	if (StateVars[HIPTOEND] > (state.Params[TIBIA] + state.Params[FEMUR]) ){
-		state.updateVar(HIPTOEND, (state.Params[TIBIA] + state.Params[FEMUR]) );
+	if (vars[HIPTOEND] > (state.params[TIBIA] + state.params[FEMUR]) ){
+		state.updateVar(HIPTOEND, (state.params[TIBIA] + state.params[FEMUR]) );
 		UpdateHeight();
 	}
 
-	else if (StateVars[HIPTOEND] < (state.Params[TIBIA] - state.Params[FEMUR]) ){ 
-		state.updateVar(HIPTOEND, 1.5 * (state.Params[TIBIA] - state.Params[FEMUR]) );	 // state.Params[TIBIA] - state.Params[FEMUR] is impossible position
+	else if (vars[HIPTOEND] < (state.params[TIBIA] - state.params[FEMUR]) ){ 
+		state.updateVar(HIPTOEND, 1.5 * (state.params[TIBIA] - state.params[FEMUR]) );	 // state.params[TIBIA] - state.params[FEMUR] is impossible position
 		// Think of better way to calculate minimal position - use Hip limit angle
 		UpdateHeight();
 	}
@@ -195,37 +222,53 @@ void Leg::raiseBody(double hraise){
 
 void Leg::quadSetup(){
 	state.clear();
-	state.ServoAngles[ARM] = 0;
-	state.ServoAngles[HIP] = wkq::radians(50);
-	state.ServoAngles[KNEE] = wkq::PI/2;
+	state.servo_angles[ARM] = 0;
+	state.servo_angles[HIP] = wkq::radians(50);
+	state.servo_angles[KNEE] = wkq::PI/2;
 }
 
 
 /* ------------------------------------------------- WRITING TO SERVOS ------------------------------------------------- */
 
 
-// Write state.ServoAngles[] to physcial servos in order ARM, HIP, KNEE
+// Write state.servo_angles[] to physcial servos in order ARM, HIP, KNEE
 void Leg::writeAngles(){
-	Joints[ARM].SetGoalPosition(LegRight * state.ServoAngles[ARM]);
-	Joints[HIP].SetGoalPosition(LegRight * state.ServoAngles[HIP]);
-	Joints[KNEE].SetGoalPosition(LegRight * state.ServoAngles[KNEE]);
+	if(!leg_right){
+		joints[ARM].SetGoalPosition(state.servo_angles[ARM]);
+		joints[HIP].SetGoalPosition(state.servo_angles[HIP]);
+		joints[KNEE].SetGoalPosition(state.servo_angles[KNEE]);
+	}
+	else{
+		if(state.servo_angles[ARM] != 0)		joints[ARM].SetGoalPosition(-state.servo_angles[ARM]);
+		else								joints[ARM].SetGoalPosition(state.servo_angles[ARM]);
+		if(state.servo_angles[HIP] != 0)		joints[HIP].SetGoalPosition(-state.servo_angles[HIP]);
+		else								joints[HIP].SetGoalPosition(state.servo_angles[HIP]);
+		if(state.servo_angles[KNEE] != 0)	joints[KNEE].SetGoalPosition(-state.servo_angles[KNEE]);
+		else								joints[KNEE].SetGoalPosition(state.servo_angles[KNEE]);
+	}
 }
 
-// WRITE only a single angle contained in state.ServoAngles[] TO PHYSCIAL SERVO
+// WRITE only a single angle contained in state.servo_angles[] TO PHYSCIAL SERVO
 void Leg::writeJoint(int idx){
-	Joints[idx].SetGoalPosition(LegRight * state.ServoAngles[idx]);
+	if(!leg_right){
+		joints[idx].SetGoalPosition(state.servo_angles[idx]);
+	}
+	else{
+		if(state.servo_angles[idx] != 0)		joints[idx].SetGoalPosition(-state.servo_angles[idx]);
+		else								joints[idx].SetGoalPosition(state.servo_angles[idx]);
+	}
 }
 
 
 /* ------------------------------------------------- GETTER AND COPY ------------------------------------------------- */
 
 double Leg::get(int param_type, int idx) const{
-	if 		(param_type==SERVO_ANGLE) 	return state.ServoAngles[idx];
+	if 		(param_type==SERVO_ANGLE) 	return state.servo_angles[idx];
 	else if (param_type==STATE_VAR) 	return state.get(STATE_VAR, idx);
 	else if (param_type==defaultPos_VAR) 	return state.get(defaultPos_VAR, idx);
 	else if (param_type==defaultPos_ANGLE) return state.get(defaultPos_ANGLE, idx);
-	else if (param_type==PARAM) 		return state.Params[idx];
-	else if (param_type==ANGLE_LIMIT) 	return state.AngleLimits[idx];
+	else if (param_type==PARAM) 		return state.params[idx];
+	else if (param_type==ANGLE_LIMIT) 	return state.angle_limits[idx];
 	else return 0.0;
 }
 

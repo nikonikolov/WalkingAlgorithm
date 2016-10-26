@@ -85,7 +85,7 @@ void Tripod::raiseBody(double hraise){
 double Tripod::standing(){
 	double height = Legs[0].get(STATE_VAR, HEIGHT);
 	double height_stand = Legs[0].get(PARAM, TIBIA);
-	if(!almost_equals(height, height_stand)) return 0.0;
+	if(!compare_doubles(height, height_stand)) return 0.0;
 	else return height_stand - height;
 }
 

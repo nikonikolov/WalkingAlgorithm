@@ -1,11 +1,11 @@
 /* 
 
-Leg Abstraction Class: Corresponds to a physical leg. Constructed from 4 ServoJoints. 
+Leg Abstraction Class: Corresponds to a physical leg. Constructed from 4 Servojoints. 
 ===========================================================================================
 
 Stores information about the parameters of the leg such as:
 
-DISTcenter 		Distance from robot's center to the center of ARM servo
+DISTCENTER 		Distance from robot's center to the center of ARM servo
 COXA 			Distance from the center of ARM servo to the center of HIP servo
 FEMUR 			Distance from the center of HIP servo to the center of KNEE servo
 TIBIA 			Distance from the center of KNEE servo to END EFFECTOR
@@ -24,22 +24,22 @@ FUNCTIONALITY:
 	3. Does not write calculated values to the motors: this action is invoked from the Tripod for coordination
 	4. The class does computations for LEFT LEG only. Values for RIGHT LEG are computed at the time of writing as opposite to Left Leg
 	5. ServoAgnles[] stores values to be written to servo. These would usually be different from values you need for computations
-	6. Although ServoAngles[] is HARDLY used for computing state, be careful if you need to use it
+	6. Although servo_angles[] is HARDLY used for computing state, be careful if you need to use it
 
 -------------------------------------------------------------------------------------------
 
 FRAMEWORK:
 	1. Algorithms work only for LEFT LEG. Values for RIGHT LEG are computed at the time of writing as opposite to Left Leg
 
-	2. StateVars[]		-	Use updateVar(). Function automatically updates square value for the variable
+	2. vars[]		-	Use updateVar(). Function automatically updates square value for the variable
 							and the rest of the variables by calling StateUpdate()
 	3. updateVar() 		- 	When you use this to update HIPTOEND it is assumed the change is in ENDEFFECTOR
-							rather than in the HEIGHT of the robot. If change is in the HEIGHT, the StateVars[HEIGHT]
+							rather than in the HEIGHT of the robot. If change is in the HEIGHT, the vars[HEIGHT]
 							will not be updates
-	4. updateAngles()	-	Function automatically called when updateVar() is called. Basing on StateVars[]
+	4. updateAngles()	-	Function automatically called when updateVar() is called. Basing on vars[]
 							function computes new angles for Hip and Knee
 	5. center()			-	Assumes Leg is already lifted up, otherwise robot will probably fall down
-	6. computeVars() 	- 	Computes all Vars[] based on the current ServoAngles[] does not use Update(), but computes variables
+	6. computeVars() 	- 	Computes all vars[] based on the current servo_angles[] does not use Update(), but computes variables
 							manually to ensure no call to updateAngles()
 
 -------------------------------------------------------------------------------------------
@@ -100,19 +100,21 @@ public:
 	
 	/* ---------------------------------------- WRITE TO SERVOS ---------------------------------------- */
 
-	void writeAngles();							// Write ServoAngles[] to physcial servos in order ARM, HIP, KNEE
-	void writeJoint(int idx);			// Write only a single angle contained in ServoAngles[] to physcial servo
+	void writeAngles();							// Write servo_angles[] to physcial servos in order ARM, HIP, KNEE
+	void writeJoint(int idx);			// Write only a single angle contained in servo_angles[] to physcial servo
 
 
 private:
+	void confQuadArms();
+
 	/* ============================================== MEMBER DATA ============================================== */
 
 	State_t state;
-	ServoJoint Joints[JOINT_COUNT];					// Stores servo objects corresponding to the physical servos
+	ServoJoint joints[JOINT_COUNT];					// Stores servo objects corresponding to the physical servos
 
-	double AngleOffset;								// Angle between Y-axis and servo orientation; always positive
-	double LegRight;								// 1.0 - Leg is LEFT, -1.0 - Leg is RIGHT
-
+	double angle_offset;								// Angle between Y-axis and servo orientation; always positive
+	bool leg_right;								// 1.0 - Leg is LEFT, -1.0 - Leg is RIGHT
+	wkq::LegID leg_id; 									// ID of the leg
 };
 
 

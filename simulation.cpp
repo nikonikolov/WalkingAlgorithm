@@ -36,7 +36,7 @@ int main(){
 	Robot* wk_quad;
 	// Instantiate Robot
 	try{
-		wk_quad = new Robot(pixhawk, NULL, NULL, init_height, robot_params, wkq::RS_DEFAULT);
+		wk_quad = new Robot(pixhawk, NULL, NULL, init_height, robot_params, wkq::RS_FLAT_QUAD);
 	}
 	catch(const string& msg){
 		pc.print_debug(msg);
@@ -54,8 +54,9 @@ int main(){
 	wk_quad->center();
 	pc.print_debug("Legs Centered\n");
 	*/
-	wk_quad->walkForward(0.7);
-	pc.print_debug("ROBOT WALKED\n");
+	
+	//wk_quad->walkForward(0.7);
+	//pc.print_debug("ROBOT WALKED\n");
 
 	// Further tests - lifting body after center to stand
 	// Centering for arbitrary height

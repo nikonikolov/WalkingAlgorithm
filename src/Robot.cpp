@@ -5,8 +5,8 @@
 Robot::Robot(Master* pixhawk_in, DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, 
 		const double robot_params[], wkq::RobotState_t state_in /*= wkq::RS_DEFAULT*/) :
 	Tripods{
-		Tripod(wkq::knee_left_front, wkq::knee_right_middle, wkq::knee_left_back, HipsKnees, Arms, height_in, robot_params),
-		Tripod(wkq::knee_right_front, wkq::knee_left_middle, wkq::knee_right_back, HipsKnees, Arms, height_in, robot_params)
+		Tripod(wkq::KNEE_LEFT_FRONT, wkq::KNEE_RIGHT_MIDDLE, wkq::KNEE_LEFT_BACK, HipsKnees, Arms, height_in, robot_params),
+		Tripod(wkq::KNEE_RIGHT_FRONT, wkq::KNEE_LEFT_MIDDLE, wkq::KNEE_RIGHT_BACK, HipsKnees, Arms, height_in, robot_params)
 	}, 
 	pixhawk(pixhawk_in), state(state_in){
 	
@@ -122,7 +122,7 @@ void Robot::rotate(double angle){
 }
 
 void Robot::raiseBody(double hraise){
-	if(almost_equals(0.0, hraise)) return;
+	if(compare_doubles(0.0, hraise)) return;
 	Tripods[TRIPOD_LEFT].raiseBody(hraise);
 	Tripods[TRIPOD_RIGHT].copyState(Tripods[TRIPOD_LEFT]);
 }

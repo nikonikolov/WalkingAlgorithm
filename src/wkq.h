@@ -33,36 +33,36 @@ namespace wkq{
 	 	and you will also have to change the ID of the physical servo */
 
 	// SERIAL TX-9 RX-10 - KNEES
-	const int knee_left_front =			11;				// M7
-	const int knee_left_middle =		12;				// M9
-	const int knee_left_back =			13;				// M1
-	const int knee_right_front =		14; 			// M11
-	const int knee_right_middle =		15;				// M6
-	const int knee_right_back =			16; 			// M5
+	const int KNEE_LEFT_FRONT =			11;				// M7
+	const int KNEE_LEFT_MIDDLE =		12;				// M9
+	const int KNEE_LEFT_BACK =			13;				// M1
+	const int KNEE_RIGHT_FRONT =		14; 			// M11
+	const int KNEE_RIGHT_MIDDLE =		15;				// M6
+	const int KNEE_RIGHT_BACK =			16; 			// M5
 
 	// SERIAL TX-9 RX-10 - HIPS
-	const int hip_left_front =			17; 			// M4
-	const int hip_left_middle =			18; 			// M2
-	const int hip_left_back =			19;				// M10
-	const int hip_right_front =			20; 			// M12
-	const int hip_right_middle =		21; 			// M8
-	const int hip_right_back =			22; 			// M3
+	const int HIP_LEFT_FRONT =			17; 			// M4
+	const int HIP_LEFT_MIDDLE =			18; 			// M2
+	const int HIP_LEFT_BACK =			19;				// M10
+	const int HIP_RIGHT_FRONT =			20; 			// M12
+	const int HIP_RIGHT_MIDDLE =		21; 			// M8
+	const int HIP_RIGHT_BACK =			22; 			// M3
 
 	// SERIAL TX-13 RX-14 - WINGS
-	const int wing_left_front =			23; 			// M18
-	const int wing_left_middle =		24; 			// M13
-	const int wing_left_back =			25; 			// M14
-	const int wing_right_front =		26; 			// M17
-	const int wing_right_middle =		27; 			// M16
-	const int wing_right_back =			28; 			// M15
+	const int WING_LEFT_FRONT =			23; 			// M18
+	const int WING_LEFT_MIDDLE =		24; 			// M13
+	const int WING_LEFT_BACK =			25; 			// M14
+	const int WING_RIGHT_FRONT =		26; 			// M17
+	const int WING_RIGHT_MIDDLE =		27; 			// M16
+	const int WING_RIGHT_BACK =			28; 			// M15
 
 	// SERIAL TX-13 RX-14 - ARMS
-	const int arm_left_front =			29; 			// M18
-	const int arm_left_middle =			30; 			// M13
-	const int arm_left_back =			31; 			// M14
-	const int arm_right_front =			32; 			// M17
-	const int arm_right_middle =		33; 			// M16
-	const int arm_right_back =			34; 			// M15
+	const int ARM_LEFT_FRONT =			29; 			// M18
+	const int ARM_LEFT_MIDDLE =			30; 			// M13
+	const int ARM_LEFT_BACK =			31; 			// M14
+	const int ARM_RIGHT_FRONT =			32; 			// M17
+	const int ARM_RIGHT_MIDDLE =		33; 			// M16
+	const int ARM_RIGHT_BACK =			34; 			// M15
 
 	const int knees_start = 			11;
 	const int hips_start = 				17;
@@ -70,15 +70,24 @@ namespace wkq{
 	const int arms_start = 				29;
 
 	// LIMITS FOR ROTATION ANGLES FOR SERVO
-	const int knee_min =				0;
-	const int knee_max =				1024;
-	const int hip_min =					0;
-	const int hip_max =					1024;
-	const int wing_min =				0;
-	const int wing_max =				1024;	
-	const int arm_min =					0;
-	const int arm_max =					1024;
+	const int KNEE_MIN =				0;
+	const int KNEE_MAX =				1024;
+	const int HIP_MIN =					0;
+	const int HIP_MAX =					1024;
+	const int WING_MIN =				0;
+	const int WING_MAX =				1024;	
+	const int ARM_MIN =					0;
+	const int ARM_MAX =					1024;
 
+
+	enum LegID{
+		LEG_LEFT_FRONT 			= 1,
+		LEG_LEFT_MIDDLE 		= 2,
+		LEG_LEFT_BACK 			= 3,
+		LEG_RIGHT_FRONT 		= 4,
+		LEG_RIGHT_MIDDLE 		= 5,
+		LEG_RIGHT_BACK 			= 6
+	};
 
 	
 	/* *** NOTE: Be very careful when introducing new states - if the new state is meaningless in terms of leg configuration

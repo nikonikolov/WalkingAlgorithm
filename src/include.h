@@ -38,6 +38,6 @@ string to_hex(uint8_t dec);
 string itos(int num);
 string dtos(double num);
 
-bool almost_equals(double a, double b);
+bool compare_doubles(double a, double b, double error = 0.01);
 
 #endif

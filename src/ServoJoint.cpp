@@ -65,76 +65,76 @@ void ServoJoint::operator=(const ServoJoint& obj_in){
 
 ServoJoint::ServoJoint(int ID_in, DnxSerialBase* robot_view_in) : ID(ID_in)/*, robot_view(robot_view_in)*/{
 	switch(ID){
-		case wkq::knee_left_front	:
+		case wkq::KNEE_LEFT_FRONT	:
 			servo_name = "knee_left_front";
 			break;
-		case wkq::knee_left_middle	:
+		case wkq::KNEE_LEFT_MIDDLE	:
 			servo_name = "knee_left_middle";
 			break;
-		case wkq::knee_left_back	:
+		case wkq::KNEE_LEFT_BACK	:
 			servo_name = "knee_left_back";
 			break;
-		case wkq::knee_right_front	:
+		case wkq::KNEE_RIGHT_FRONT	:
 			servo_name = "knee_right_front";
 			break;
-		case wkq::knee_right_middle	:
+		case wkq::KNEE_RIGHT_MIDDLE	:
 			servo_name = "knee_right_middle";
 			break;
-		case wkq::knee_right_back	:
+		case wkq::KNEE_RIGHT_BACK	:
 			servo_name = "knee_right_back";
 			break;
-		case wkq::hip_left_front	:
+		case wkq::HIP_LEFT_FRONT	:
 			servo_name = "hip_left_front";
 			break;
-		case wkq::hip_left_middle	:
+		case wkq::HIP_LEFT_MIDDLE	:
 			servo_name = "hip_left_middle";
 			break;
-		case wkq::hip_left_back	:
+		case wkq::HIP_LEFT_BACK	:
 			servo_name = "hip_left_back";
 			break;
-		case wkq::hip_right_front	:
+		case wkq::HIP_RIGHT_FRONT	:
 			servo_name = "hip_right_front";
 			break;
-		case wkq::hip_right_middle	:
+		case wkq::HIP_RIGHT_MIDDLE	:
 			servo_name = "hip_right_middle";
 			break;
-		case wkq::hip_right_back	:
+		case wkq::HIP_RIGHT_BACK	:
 			servo_name = "hip_right_back";
 			break;
-		case wkq::wing_left_front	:
+		case wkq::WING_LEFT_FRONT	:
 			servo_name = "wing_left_front";
 			break;
-		case wkq::wing_left_middle	:
+		case wkq::WING_LEFT_MIDDLE	:
 			servo_name = "wing_left_middle";
 			break;
-		case wkq::wing_left_back	:
+		case wkq::WING_LEFT_BACK	:
 			servo_name = "wing_left_back";
 			break;
-		case wkq::wing_right_front	:
+		case wkq::WING_RIGHT_FRONT	:
 			servo_name = "wing_right_front";
 			break;
-		case wkq::wing_right_middle	:
+		case wkq::WING_RIGHT_MIDDLE	:
 			servo_name = "wing_right_middle";
 			break;
-		case wkq::wing_right_back	:
+		case wkq::WING_RIGHT_BACK	:
 			servo_name = "wing_right_back";
 			break;
-		case wkq::arm_left_front	:
+		case wkq::ARM_LEFT_FRONT	:
 			servo_name = "arm_left_front";
 			break;
-		case wkq::arm_left_middle	:
+		case wkq::ARM_LEFT_MIDDLE	:
 			servo_name = "arm_left_middle";
 			break;
-		case wkq::arm_left_back	:
+		case wkq::ARM_LEFT_BACK	:
 			servo_name = "arm_left_back";
 			break;
-		case wkq::arm_right_front	:
+		case wkq::ARM_RIGHT_FRONT	:
 			servo_name = "arm_right_front";
 			break;
-		case wkq::arm_right_middle	:
+		case wkq::ARM_RIGHT_MIDDLE	:
 			servo_name = "arm_right_middle";
 			break;
-		case wkq::arm_right_back	:
+		case wkq::ARM_RIGHT_BACK	:
 			servo_name = "arm_right_back";
 			break;
 		defaultPos:

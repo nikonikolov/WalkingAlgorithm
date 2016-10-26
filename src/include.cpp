@@ -22,8 +22,8 @@ string dtos(double num){
 }
 
 
-bool almost_equals(double a, double b){
-	return fabs(a - b) <= 0.01;
+bool compare_doubles(double a, double b, double error/* = 0.01*/){
+	return fabs(a - b) <= error;
 }
 
 #ifdef SIMULATION
