@@ -2,60 +2,60 @@
 
 #ifndef SIMULATION
 
-ServoJoint::ServoJoint(int ID_in, DnxSerialBase* SerialObjPtrIn) : ID(ID_in), SerialObjPtr(SerialObjPtrIn) {
-	SetReturnLevel(1);	
-	//SetPunch(512);	
+ServoJoint::ServoJoint(int ID_in, DnxSerialBase* serial_ptr_in) : ID(ID_in), serial_ptr(serial_ptr_in) {
+	setReturnLevel(1);	
+	//setPunch(512);	
 }
 
 // return ID of the object, not of the physical servo
-int ServoJoint::GetID() const {
+int ServoJoint::getID() const {
 	return ID;
 }
 
-int ServoJoint::SetID(int newID){
-	return SerialObjPtr->SetID(ID, newID);
+int ServoJoint::setID(int newID){
+	return serial_ptr->setID(ID, newID);
 }
 	
-int ServoJoint::GetValue(int address){
-	return SerialObjPtr->GetValue(ID, address);
+int ServoJoint::getValue(int address){
+	return serial_ptr->getValue(ID, address);
 }
     
-int ServoJoint::SetBaud(int rate){
-	return SerialObjPtr->SetBaud(ID, rate);
+int ServoJoint::setBaud(int rate){
+	return serial_ptr->setBaud(ID, rate);
 }
     
-int ServoJoint::SetReturnLevel(int lvl){
-	return SerialObjPtr->SetReturnLevel(ID, lvl);
+int ServoJoint::setReturnLevel(int lvl){
+	return serial_ptr->setReturnLevel(ID, lvl);
 }
 
-int ServoJoint::SetLED(int colour){
-	return SerialObjPtr->SetLED(ID, colour);
+int ServoJoint::setLED(int colour){
+	return serial_ptr->setLED(ID, colour);
 }
 
-int ServoJoint::SetGoalPosition(int angle){
-	return SerialObjPtr->SetGoalPosition(ID, angle);
+int ServoJoint::setGoalPosition(int angle){
+	return serial_ptr->setGoalPosition(ID, angle);
 }
 
-int ServoJoint::SetGoalPosition(double angle){
-	return SerialObjPtr->SetGoalPosition(ID, angle);
+int ServoJoint::setGoalPosition(double angle){
+	return serial_ptr->setGoalPosition(ID, angle);
 }
 
-int ServoJoint::SetGoalVelocity(int velocity){
-	return SerialObjPtr->SetGoalVelocity(ID, velocity);
+int ServoJoint::setGoalVelocity(int velocity){
+	return serial_ptr->setGoalVelocity(ID, velocity);
 }
 
-int ServoJoint::SetGoalTorque(int torque){
-	return SerialObjPtr->SetGoalTorque(ID, torque);
+int ServoJoint::setGoalTorque(int torque){
+	return serial_ptr->setGoalTorque(ID, torque);
 }
 
-int ServoJoint::SetPunch(int punch){
-	return SerialObjPtr->SetPunch(ID, punch);
+int ServoJoint::setPunch(int punch){
+	return serial_ptr->setPunch(ID, punch);
 }
 
 void ServoJoint::operator=(const ServoJoint& obj_in){
 	if(this != &obj_in){
 		ID = obj_in.ID;
-		SerialObjPtr = obj_in.SerialObjPtr;
+		serial_ptr = obj_in.serial_ptr;
 	}
 }
 
@@ -143,50 +143,50 @@ ServoJoint::ServoJoint(int ID_in, DnxSerialBase* robot_view_in) : ID(ID_in)/*, r
 }
 
 // return ID of the object, not of the physical servo
-int ServoJoint::GetID() const {
+int ServoJoint::getID() const {
 	return ID;
 }
 
-int ServoJoint::SetID(int newID){
+int ServoJoint::setID(int newID){
 	ID = newID;
 	return 0;
 }
 	
-int ServoJoint::GetValue(int address){
+int ServoJoint::getValue(int address){
 	return 0;
 }
     
-int ServoJoint::SetBaud(int rate){
+int ServoJoint::setBaud(int rate){
 	return 0;
 }
     
-int ServoJoint::SetReturnLevel(int lvl){
+int ServoJoint::setReturnLevel(int lvl){
 	return 0; 
 }
 
-int ServoJoint::SetLED(int colour){
+int ServoJoint::setLED(int colour){
 	return 0; 
 }
 
-int ServoJoint::SetGoalPosition(int angle_in){
+int ServoJoint::setGoalPosition(int angle_in){
 	return 0;
 }
 
-int ServoJoint::SetGoalPosition(double angle_in){
+int ServoJoint::setGoalPosition(double angle_in){
 	angle=angle_in;
 	pc.print_debug(servo_name + " set to " + dtos(wkq::degrees(angle)) +"\n");
 	return 0;
 }
 
-int ServoJoint::SetGoalVelocity(int velocity){
+int ServoJoint::setGoalVelocity(int velocity){
 	return 0;
 }
 
-int ServoJoint::SetGoalTorque(int torque){
+int ServoJoint::setGoalTorque(int torque){
 	return 0;
 }
 
-int ServoJoint::SetPunch(int punch){
+int ServoJoint::setPunch(int punch){
 	return 0;
 }
 

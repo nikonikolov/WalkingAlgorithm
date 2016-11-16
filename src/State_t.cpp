@@ -161,9 +161,9 @@ void State_t::update(int idx){
 			updateVar(HIPTOEND_SQ, pow((vars[ARMGTOEND]-params[COXA]),2) + vars[HEIGHT_SQ], false);
 			break;
 		case HEIGHT:
-			// Only EFcenter and HIPTOEND affected. ARMGTOEND is not affected by height change
+			// Only EFCENTER and HIPTOEND affected. ARMGTOEND is not affected by height change
 			updateVar(HIPTOEND_SQ, pow((vars[ARMGTOEND]-params[COXA]),2) + vars[HEIGHT_SQ], false);
-			updateVar(EFcenter, vars[ARMGTOEND]+params[DISTCENTER], false);
+			updateVar(EFCENTER, vars[ARMGTOEND]+params[DISTCENTER], false);
 			break;
 		//defaultPos:	// Good idea is to throw exception or signal somehow
 	}
@@ -275,8 +275,8 @@ void State_t::computeVars(){
 	double arm_g_to_end = sqrt(vars[HIPTOEND_SQ]-vars[HEIGHT_SQ]) + params[COXA];
 	updateVar(ARMGTOEND, arm_g_to_end, false); 			// Only updates ARMGTOEND
 
-	// Note that angles are already centered so EFcenter will be fine
-	updateVar(EFcenter, vars[ARMGTOEND]+params[DISTCENTER], false);
+	// Note that angles are already centered so EFCENTER will be fine
+	updateVar(EFCENTER, vars[ARMGTOEND]+params[DISTCENTER], false);
 }
 
 
@@ -289,6 +289,6 @@ void State_t::computeEFVars(double height /*=0.0*/){
 	double arm_g_to_end = sqrt(vars[HIPTOEND_SQ]-vars[HEIGHT_SQ]) + params[COXA];
 	updateVar(ARMGTOEND, arm_g_to_end, false); 			// Only updates ARMGTOEND
 
-	// Note that angles are already centered so EFcenter will be fine
-	if(height!=0.0) updateVar(EFcenter, vars[ARMGTOEND]+params[DISTCENTER], false);
+	// Note that angles are already centered so EFCENTER will be fine
+	if(height!=0.0) updateVar(EFCENTER, vars[ARMGTOEND]+params[DISTCENTER], false);
 }

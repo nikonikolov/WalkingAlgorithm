@@ -15,7 +15,7 @@ AX12A_Serial::~AX12A_Serial(){}
 
 
 // 1: 1Mbps, 3: 500 000, 4: 400 000, 7: 250 000, 9: 200 000, 16: 115200, 34: 57600, 103: 19200, 207: 9600
-int AX12A_Serial::SetBaud(int ID, int rate) {
+int AX12A_Serial::setBaud(int ID, int rate) {
 	if ( rate != 1 && rate != 3 && rate != 4 && rate != 7 && rate != 9 && rate != 16  && rate != 34 && rate != 103 && rate != 207 ) {
 		pc.print_debug("Incorrect baud rate\n");
 		return 1;
@@ -25,7 +25,7 @@ int AX12A_Serial::SetBaud(int ID, int rate) {
 }
 
 // Set which commands return status; 0: None, 1: Read, 2: All.
-int AX12A_Serial::SetReturnLevel(int ID, int lvl) {
+int AX12A_Serial::setReturnLevel(int ID, int lvl) {
 	ReturnLvl=lvl;
 	return dataPush(ID, AX_RETURN_LEVEL, ReturnLvl);
 }
@@ -33,28 +33,28 @@ int AX12A_Serial::SetReturnLevel(int ID, int lvl) {
 
 
 // 1024 = -150 degrees CCW, 512 = 0 degrees (ORIGIN), 0 = +150 degrees CW
-int AX12A_Serial::SetGoalPosition(int ID, int angle){
+int AX12A_Serial::setGoalPosition(int ID, int angle){
 	return dataPush(ID, AX_GOAL_POSITION, angle);
 }
 
-int AX12A_Serial::SetGoalPosition(int ID, double angle){
+int AX12A_Serial::setGoalPosition(int ID, double angle){
 	return dataPush(ID, AX_GOAL_POSITION, angleScale(angle));
 }
 
-int AX12A_Serial::SetGoalVelocity(int ID, int velocity){
+int AX12A_Serial::setGoalVelocity(int ID, int velocity){
 	return dataPush(ID, AX_GOAL_VELOCITY, velocity);
 }
 
-int AX12A_Serial::SetGoalTorque(int ID, int torque){
+int AX12A_Serial::setGoalTorque(int ID, int torque){
 	return dataPush(ID, AX_MAX_TORQUE, torque);
 }
 
-int AX12A_Serial::SetPunch(int ID, int punch){
+int AX12A_Serial::setPunch(int ID, int punch){
 	return dataPush(ID, AX_PUNCH, punch);
 }
 
 // Turn LED on (0x01) and off (0x00)
-int AX12A_Serial::SetLED(int ID, int value){
+int AX12A_Serial::setLED(int ID, int value){
 	return dataPush(ID, AX_LED, value);
 }
 

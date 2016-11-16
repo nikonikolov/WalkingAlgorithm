@@ -29,17 +29,17 @@ public:
 
 	virtual ~DnxSerialBase();
 
-    int SetID(int ID, int newID);
-	int GetValue(int ID, int address);
+    int setID(int ID, int newID);
+	int getValue(int ID, int address);
 
-    virtual int SetBaud	(int ID, int rate) =0;
-    virtual int SetReturnLevel(int ID, int lvl) =0;
-    virtual int SetLED(int ID, int colour) =0; 
-	virtual int SetGoalPosition(int ID, int angle) =0;
-	virtual int SetGoalPosition(int ID, double angle) =0;
-	virtual int SetGoalVelocity(int ID, int velocity) =0;
-	virtual int SetGoalTorque(int ID, int torque) =0;
-	virtual int SetPunch(int ID, int punch) =0;
+    virtual int setBaud(int ID, int rate) =0;
+    virtual int setReturnLevel(int ID, int lvl) =0;
+    virtual int setLED(int ID, int colour) =0; 
+	virtual int setGoalPosition(int ID, int angle) =0;
+	virtual int setGoalPosition(int ID, double angle) =0;
+	virtual int setGoalVelocity(int ID, int velocity) =0;
+	virtual int setGoalTorque(int ID, int torque) =0;
+	virtual int setPunch(int ID, int punch) =0;
 
 protected:
 	

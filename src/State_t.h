@@ -43,12 +43,12 @@ FRAMEWORK:
 	5. center()			-	Assumes Leg is already lifted up, otherwise robot will probably fall down
 	6. computeVars() 	- 	Used when state changes and new vars[] need to be computed. Computes all vars[] based on the current 
 							servo_angles[] does not use Update(), but computes variables manually to ensure no call to updateAngles()
-	7. computeEFVars() 	- 	Called only by centerAngles(). Computes HIPTOEND, ARMGTOEND and EFcenter (if needed) basing on 
+	7. computeEFVars() 	- 	Called only by centerAngles(). Computes HIPTOEND, ARMGTOEND and EFCENTER (if needed) basing on 
 							params[] and KNEE
 	8. centerAngles() 	- 	Computed median HIP and KNEE basing on params[] and current HEIGHT or the input HEIGHT if provided.
 							Calls computeEFVars automatically in order to keep state consistent
 	9. setAngles() 		- 	Should be called only on complete state change because automatically calls computeVars() and this
-							updates all vars, including EFcenter
+							updates all vars, including EFCENTER
 
 -------------------------------------------------------------------------------------------
 
@@ -60,6 +60,7 @@ FRAMEWORK:
 #include "wkq.h"
 #include "include.h"
 #include <cmath>
+//#include "robot_types.h"
 
 
 /* ====================================== Indices for joints and ServoAngle arrays ====================================== */
@@ -90,7 +91,7 @@ FRAMEWORK:
 #define TIBIA 				3
 #define HIPKNEEMAXHDIST 	4
 #define KNEEMOTORDIST 		5
-#define DISTcenter_SQ 		(DISTCENTER+PARAM_STEP)
+#define DISTCENTER_SQ 		(DISTCENTER+PARAM_STEP)
 #define COXA_SQ 			(COXA+PARAM_STEP)
 #define FEMUR_SQ 			(FEMUR+PARAM_STEP)
 #define TIBIA_SQ 			(TIBIA+PARAM_STEP)
@@ -105,11 +106,11 @@ FRAMEWORK:
 #define HIPTOEND		0						// Direct distance from hip mount point to the point where the end effector touches ground
 #define HEIGHT 			1						// Vertical distance from hip mount point to ground
 #define ARMGTOEND		2						// Distance from arm ground projection to end effector
-#define EFcenter		3						// Distance from End Effector to robot center for centered HIP and KNEE
+#define EFCENTER		3						// Distance from End Effector to robot center for centered HIP and KNEE
 #define HIPTOEND_SQ		(HIPTOEND+VAR_STEP)		
 #define HEIGHT_SQ 		(HEIGHT+VAR_STEP)
 #define ARMGTOEND_SQ	(ARMGTOEND+VAR_STEP)
-#define EFcenter_SQ		(EFcenter+VAR_STEP)
+#define EFCENTER_SQ		(EFCENTER+VAR_STEP)
 
 
 /* ====================================== Indices for Getter Decoding ====================================== */
@@ -123,6 +124,7 @@ FRAMEWORK:
 
 /* ====================================== Additional Macros ====================================== */
 #define SQUARE 			2
+
 
 class State_t{
 
@@ -165,6 +167,9 @@ public:
 	static double params[PARAM_COUNT];						// Store const parameters of the robot
 	static const double angle_limits[JOINT_COUNT*2];			// Store angle limits of the robot
 
+	//static JointLimits limit;
+	//static BodyParams params;
+	//LegJoints servo_angles;
 
 private:
 
@@ -178,12 +183,20 @@ private:
 
 	/* ============================================== PRIVATE MEMBER DATA ============================================== */
 	
-	double vars[VAR_COUNT];							// Store current values of variables that determine state of the robot
+	double vars[VAR_COUNT];								// Store current values of variables that determine state of the robot
 
 	static double default_pos_vars[VAR_COUNT];			// Store defaultPos values for vars[VAR_COUNT]
 	static double default_pos_angles[JOINT_COUNT]; 		// Store defaultPos values for servo_angles[VAR_COUNT]
 
+
+	//DynamicVars vars;
+
+	//static LegJoints 	default_pos_angles;
+	//static DynamicVars	default_pos_vars;
+
+
 	static bool default_pos_calculated;				// Needed to know whether to calculate defaultPoss
+
 };
 
 

@@ -38,22 +38,22 @@ public:
 
     ~XL320_Serial();
     
-    int SetBaud(int ID, int rate);
-    int SetReturnLevel(int ID, int lvl);
+    int setBaud(int ID, int rate);
+    int setReturnLevel(int ID, int lvl);
 
-	int SetGoalPosition(int ID, double angle);
-	int SetGoalPosition(int ID, int angle);
-	int SetGoalVelocity(int ID, int velocity);
-	int SetGoalTorque(int ID, int torque);
-	int SetPunch(int ID, int punch);			// Sets the current to drive the motors
+	int setGoalPosition(int ID, double angle);
+	int setGoalPosition(int ID, int angle);
+	int setGoalVelocity(int ID, int velocity);
+	int setGoalTorque(int ID, int torque);
+	int setPunch(int ID, int punch);			// Sets the current to drive the motors
     
-    int SetP(int ID, int value);
-	int SetI(int ID, int value);
-	int SetD(int ID, int value);
+    int setP(int ID, int value);
+	int setI(int ID, int value);
+	int setD(int ID, int value);
 
 	//int Test(int ID);
     int Ping(int ID=1);
-    int SetLED(int ID, int colour); 
+    int setLED(int ID, int colour); 
     int Rainbow(int ID);
 
 private:

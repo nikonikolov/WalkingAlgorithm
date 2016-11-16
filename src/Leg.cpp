@@ -129,7 +129,7 @@ void Leg::IKBodyForward(double step_size){
 void Leg::stepForward(double step_size){
 
 	// Distance from Robot center to end effector for a fully centered robot at this height
-	double ef_center = state.get(STATE_VAR, EFcenter);
+	double ef_center = state.get(STATE_VAR, EFCENTER);
 
 	// Create Point representing the new END EFFECTOR position
 	double x_EFNew, y_EFNew;
@@ -234,28 +234,28 @@ void Leg::quadSetup(){
 // Write state.servo_angles[] to physcial servos in order ARM, HIP, KNEE
 void Leg::writeAngles(){
 	if(!leg_right){
-		joints[ARM].SetGoalPosition(state.servo_angles[ARM]);
-		joints[HIP].SetGoalPosition(state.servo_angles[HIP]);
-		joints[KNEE].SetGoalPosition(state.servo_angles[KNEE]);
+		joints[ARM].setGoalPosition(state.servo_angles[ARM]);
+		joints[HIP].setGoalPosition(state.servo_angles[HIP]);
+		joints[KNEE].setGoalPosition(state.servo_angles[KNEE]);
 	}
 	else{
-		if(state.servo_angles[ARM] != 0)		joints[ARM].SetGoalPosition(-state.servo_angles[ARM]);
-		else								joints[ARM].SetGoalPosition(state.servo_angles[ARM]);
-		if(state.servo_angles[HIP] != 0)		joints[HIP].SetGoalPosition(-state.servo_angles[HIP]);
-		else								joints[HIP].SetGoalPosition(state.servo_angles[HIP]);
-		if(state.servo_angles[KNEE] != 0)	joints[KNEE].SetGoalPosition(-state.servo_angles[KNEE]);
-		else								joints[KNEE].SetGoalPosition(state.servo_angles[KNEE]);
+		if(state.servo_angles[ARM] != 0)		joints[ARM].setGoalPosition(-state.servo_angles[ARM]);
+		else								joints[ARM].setGoalPosition(state.servo_angles[ARM]);
+		if(state.servo_angles[HIP] != 0)		joints[HIP].setGoalPosition(-state.servo_angles[HIP]);
+		else								joints[HIP].setGoalPosition(state.servo_angles[HIP]);
+		if(state.servo_angles[KNEE] != 0)	joints[KNEE].setGoalPosition(-state.servo_angles[KNEE]);
+		else								joints[KNEE].setGoalPosition(state.servo_angles[KNEE]);
 	}
 }
 
 // WRITE only a single angle contained in state.servo_angles[] TO PHYSCIAL SERVO
 void Leg::writeJoint(int idx){
 	if(!leg_right){
-		joints[idx].SetGoalPosition(state.servo_angles[idx]);
+		joints[idx].setGoalPosition(state.servo_angles[idx]);
 	}
 	else{
-		if(state.servo_angles[idx] != 0)		joints[idx].SetGoalPosition(-state.servo_angles[idx]);
-		else								joints[idx].SetGoalPosition(state.servo_angles[idx]);
+		if(state.servo_angles[idx] != 0)		joints[idx].setGoalPosition(-state.servo_angles[idx]);
+		else								joints[idx].setGoalPosition(state.servo_angles[idx]);
 	}
 }
 

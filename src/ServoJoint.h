@@ -11,27 +11,27 @@ class ServoJoint{
 
 public:
 
-	ServoJoint(int ID_in, DnxSerialBase* SerialObjPtrIn);
+	ServoJoint(int ID_in, DnxSerialBase* serial_ptr_in);
 
-	int GetID() const;
+	int getID() const;
 
-    int SetID(int newID);
-	int GetValue(int address);
-    int SetBaud(int rate);
-    int SetReturnLevel(int lvl);
-    int SetLED(int colour); 
-	int SetGoalPosition(int angle);
-	int SetGoalPosition(double angle);
-	int SetGoalVelocity(int velocity);
-	int SetGoalTorque(int torque);
-	int SetPunch(int punch);
+    int setID(int newID);
+	int getValue(int address);
+    int setBaud(int rate);
+    int setReturnLevel(int lvl);
+    int setLED(int colour); 
+	int setGoalPosition(int angle);
+	int setGoalPosition(double angle);
+	int setGoalVelocity(int velocity);
+	int setGoalTorque(int torque);
+	int setPunch(int punch);
 
 	void operator=(const ServoJoint& obj_in);
 
 private:
 
 	int ID;
-	DnxSerialBase* SerialObjPtr;		// Pointer to the object (Knees/Hips/Arms/Wings) associated with the right serial port
+	DnxSerialBase* serial_ptr;		// Pointer to the object (Knees/Hips/Arms/Wings) associated with the right serial port
 };
 
 #else
@@ -46,18 +46,18 @@ public:
 	// remember typedef GeomView DnxSerialBase - defined so that same interface is kept between simulation and reality
 	ServoJoint(int ID_in, DnxSerialBase* robot_view_in);
 
-	int GetID() const;
+	int getID() const;
 
-    int SetID(int newID);
-	int GetValue(int address);
-    int SetBaud(int rate);
-    int SetReturnLevel(int lvl);
-    int SetLED(int colour); 
-	int SetGoalPosition(int angle_in);
-	int SetGoalPosition(double angle_in);
-	int SetGoalVelocity(int velocity);
-	int SetGoalTorque(int torque);
-	int SetPunch(int punch);
+    int setID(int newID);
+	int getValue(int address);
+    int setBaud(int rate);
+    int setReturnLevel(int lvl);
+    int setLED(int colour); 
+	int setGoalPosition(int angle_in);
+	int setGoalPosition(double angle_in);
+	int setGoalVelocity(int velocity);
+	int setGoalTorque(int torque);
+	int setPunch(int punch);
 
 	void operator=(const ServoJoint& obj_in);
 

@@ -14,7 +14,7 @@ XL320_Serial::~XL320_Serial(){}
 
 
 // 0: 9600, 1:57600, 2:115200, 3:1Mbps
-int XL320_Serial::SetBaud(int ID, int rate) {
+int XL320_Serial::setBaud(int ID, int rate) {
 	if ((rate > 3) || rate < 0) {
 		pc.print_debug("XL320_Serial: Incorrect baud rate\n");
 		return 1;
@@ -23,7 +23,7 @@ int XL320_Serial::SetBaud(int ID, int rate) {
 }
 
 // Set which commands return status; 0: None, 1: Read, 2: All.
-int XL320_Serial::SetReturnLevel(int ID, int lvl) {
+int XL320_Serial::setReturnLevel(int ID, int lvl) {
 	ReturnLvl=lvl;
 	return dataPush(ID, XL_RETURN_LEVEL, ReturnLvl);
 }
@@ -31,37 +31,37 @@ int XL320_Serial::SetReturnLevel(int ID, int lvl) {
 
 
 // 1024 = -150 degrees CCW, 512 = 0 degrees (ORIGIN), 0 = +150 degrees CW
-int XL320_Serial::SetGoalPosition(int ID, int angle){
+int XL320_Serial::setGoalPosition(int ID, int angle){
 	return dataPush(ID, XL_GOAL_POSITION_L, angle);
 }
 
-int XL320_Serial::SetGoalPosition(int ID, double angle){
+int XL320_Serial::setGoalPosition(int ID, double angle){
 	return dataPush(ID, XL_GOAL_POSITION_L, angleScale(angle));
 }
 
-int XL320_Serial::SetGoalVelocity(int ID, int velocity){
+int XL320_Serial::setGoalVelocity(int ID, int velocity){
 	return dataPush(ID, XL_GOAL_SPEED_L, velocity);
 }
 
-int XL320_Serial::SetGoalTorque(int ID, int torque){
+int XL320_Serial::setGoalTorque(int ID, int torque){
 	return dataPush(ID, XL_GOAL_TORQUE, torque);
 }
 
-int XL320_Serial::SetPunch(int ID, int punch){
+int XL320_Serial::setPunch(int ID, int punch){
 	return dataPush(ID, XL_PUNCH, punch);
 }
 
 
 
-int XL320_Serial::SetP(int ID, int value){
+int XL320_Serial::setP(int ID, int value){
 	return dataPush(ID, XL_P_GAIN, value);
 }
 
-int XL320_Serial::SetI(int ID, int value){
+int XL320_Serial::setI(int ID, int value){
 	return dataPush(ID, XL_I_GAIN, value);
 }
 
-int XL320_Serial::SetD(int ID, int value){
+int XL320_Serial::setD(int ID, int value){
 	return dataPush(ID, XL_D_GAIN, value);
 }
 
@@ -84,7 +84,7 @@ int XL320_Serial::Ping(int ID /*=1*/){
 }
 
 // Sets motor led colours. r = 1, g = 2, y = 3, b = 4, p = 5, c = 6, w = 7, o = 0
-int XL320_Serial::SetLED(int ID, int colour){
+int XL320_Serial::setLED(int ID, int colour){
 	return dataPush(ID, XL_LED, colour);
 }
 
@@ -92,13 +92,13 @@ int XL320_Serial::SetLED(int ID, int colour){
 int XL320_Serial::Rainbow(int ID){
 	for (int i = 1; i < 8; ++i)
 	{
-		int status = SetLED(ID, i);
+		int status = setLED(ID, i);
 		if (status != 0) {
 			return status;
 		}
 		wait(1);
 	}
-	return SetLED(ID, 0);
+	return setLED(ID, 0);
 }
 
 /* ******************************** PUBLIC METHODS END************************************** */

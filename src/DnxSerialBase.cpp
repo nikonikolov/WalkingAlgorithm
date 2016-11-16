@@ -14,12 +14,12 @@ DnxSerialBase::~DnxSerialBase(){
 }
 
 // SetID
-int DnxSerialBase::SetID(int ID, int newID){
+int DnxSerialBase::setID(int ID, int newID){
     return dataPush(ID, DnxSerialBase_ID, newID);
 };
 
 // Read Value from Control Table
-int DnxSerialBase::GetValue(int ID, int address){
+int DnxSerialBase::getValue(int ID, int address){
 	return dataPull(ID, address);
 }
 

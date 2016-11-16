@@ -21,9 +21,19 @@
 
 int main(){
 
+	const double P_DISTCENTER = 10.95;
+	//const double P_COXA = 2.65;
+	//const double P_FEMUR = 17.5;
+	const double P_COXA = 2.65-1.6;
+	const double P_FEMUR = 17.5-0.6;
+	const double P_TIBIA = 30;
+	const double P_HIPKNEEMAXHDIST = 12.0;
+	const double P_KNEEMOTORDIST = 2.25;
+
 	// PARAM_STEP defined in State_t.h. Meaning of each value defined in the same header
-	const double robot_params[PARAM_STEP] = { 10.95, 2.65, 17.5, 30.0, 12.0, 2.25};
-	
+	//const double robot_params[PARAM_STEP] = { 10.95, 2.65, 17.5, 30.0, 12.0, 2.25};
+	const double robot_params[PARAM_STEP] = { P_DISTCENTER, P_COXA, P_FEMUR, P_TIBIA, P_HIPKNEEMAXHDIST, P_KNEEMOTORDIST};
+
 	pc.print_debug("MAIN STARTED\n");
 
 	int baud = 1000000;
