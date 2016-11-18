@@ -5,7 +5,7 @@
 
 XL320_Serial::XL320_Serial(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn /*=1*/) :
 	DnxSerialBase(tx, rx, baudIn, ReturnLvlIn){
-	pc.print_debug("XL320_Serial object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + dtos(bitPeriod) + " us\n");
+	pc.print_debug("XL320_Serial object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + dtos(bitPeriod) + " us\n\r");
 }
 
 
@@ -16,7 +16,7 @@ XL320_Serial::~XL320_Serial(){}
 // 0: 9600, 1:57600, 2:115200, 3:1Mbps
 int XL320_Serial::setBaud(int ID, int rate) {
 	if ((rate > 3) || rate < 0) {
-		pc.print_debug("XL320_Serial: Incorrect baud rate\n");
+		pc.print_debug("XL320_Serial: Incorrect baud rate\n\r");
 		return 1;
 	}
 	return dataPush(ID, XL_BAUD_RATE, rate);
@@ -77,7 +77,7 @@ int XL320_Serial::Ping(int ID /*=1*/){
 		for (int i = 0; i < 15; ++i){
 			pc.print_debug(to_hex(reply_buf[i]) + " ");
 		}
-		pc.print_debug("}\n");
+		pc.print_debug("}\n\r");
 	}
 
 	return ec;
@@ -172,13 +172,13 @@ int XL320_Serial::statusError(uint8_t* buf, int n) {
 	// Minimum return length
 	if (n < 11) {
 		flush();
-		pc.print_debug("READING CORRUPTION\n");
+		pc.print_debug("READING CORRUPTION\n\r");
 		return -1; 
 	}
 
 	if ((buf[0]!=0xFF)||(buf[1]!=0xFF)||(buf[2]!=0xFD)||(buf[3]!=0x00)) {
 		flush();
-		pc.print_debug("WRONG RETURN HEADER\n");
+		pc.print_debug("WRONG RETURN HEADER\n\r");
 		packetPrint(n, buf);	
 		return -1; 
 	}
@@ -186,7 +186,7 @@ int XL320_Serial::statusError(uint8_t* buf, int n) {
 	int l = PacketLength(buf);
 	if (l != n) {
 		flush();
-		pc.print_debug("WRONG RETURN LENGTH\n");
+		pc.print_debug("WRONG RETURN LENGTH\n\r");
 		packetPrint(n, buf);	
 		return -1;
 	}
@@ -195,20 +195,20 @@ int XL320_Serial::statusError(uint8_t* buf, int n) {
 	uint16_t checksum = makeword(buf[n-2],buf[n-1]);
 	if (CRC != checksum){ 
 		flush();
-		pc.print_debug("WRONG CHECKSUM\n");
+		pc.print_debug("WRONG CHECKSUM\n\r");
 		return -1;
 	}
 
 
 	if(buf[8]!=0 ){
-		pc.print_debug("STATUS ERROR \n");
-		if 		(buf[8] == 0x01) pc.print_debug("FAILED PROCESS OF INSTRUCTION\n");	
-		else if (buf[8] == 0x02) pc.print_debug("UNDEFINED INSTRUCTION OR ACTION WITHOUT REG WRITE\n");
-		else if (buf[8] == 0x03) pc.print_debug("CORRUPTED PACKAGE SENT - CRC DOES NOT MATCH\n");
-		else if (buf[8] == 0x04) pc.print_debug("VALUE TO WRITE OUT OF RANGE\n");
-		else if (buf[8] == 0x05) pc.print_debug("RECEIVED VALUE LENGTH SHORTER IN BYTES THAN REQUIRED FOR THIS ADDRESS\n");
-		else if (buf[8] == 0x06) pc.print_debug("RECEIVED VALUE LENGTH LONGER IN BYTES THAN REQUIRED FOR THIS ADDRESS\n");
-		else if (buf[8] == 0x07) pc.print_debug("READ_ONLY OR WRITE_ONLY ADDRESS\n");
+		pc.print_debug("STATUS ERROR \n\r");
+		if 		(buf[8] == 0x01) pc.print_debug("FAILED PROCESS OF INSTRUCTION\n\r");	
+		else if (buf[8] == 0x02) pc.print_debug("UNDEFINED INSTRUCTION OR ACTION WITHOUT REG WRITE\n\r");
+		else if (buf[8] == 0x03) pc.print_debug("CORRUPTED PACKAGE SENT - CRC DOES NOT MATCH\n\r");
+		else if (buf[8] == 0x04) pc.print_debug("VALUE TO WRITE OUT OF RANGE\n\r");
+		else if (buf[8] == 0x05) pc.print_debug("RECEIVED VALUE LENGTH SHORTER IN BYTES THAN REQUIRED FOR THIS ADDRESS\n\r");
+		else if (buf[8] == 0x06) pc.print_debug("RECEIVED VALUE LENGTH LONGER IN BYTES THAN REQUIRED FOR THIS ADDRESS\n\r");
+		else if (buf[8] == 0x07) pc.print_debug("READ_ONLY OR WRITE_ONLY ADDRESS\n\r");
 		return -1;
 	}
 
@@ -258,15 +258,15 @@ int XL320_Serial::send(int ID, int packetLenght, uint8_t* parameters, uint8_t in
 	}
 
 	// Read reply
-	pc.print_debug("Reading reply\n");
+	pc.print_debug("Reading reply\n\r");
 	
 	int n = read(reply_buf);
 	if (n == 0) {
-		pc.print_debug("Could not read status packet\n");
+		pc.print_debug("Could not read status packet\n\r");
 		return 0;
 	}
 
-	pc.print_debug("- Read" + itos(n) + " bytes\n");
+	pc.print_debug("- Read" + itos(n) + " bytes\n\r");
 
 	return statusError(reply_buf, n); // Return Error code
 }
@@ -347,7 +347,7 @@ int XL320_Serial::dataPull(int ID, int address){
    	}
 
    	else{
-   		pc.print_debug("WRONG ID REPLIED\n");
+   		pc.print_debug("WRONG ID REPLIED\n\r");
    		return -1;
    	}
 }

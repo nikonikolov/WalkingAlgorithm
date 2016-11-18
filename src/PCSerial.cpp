@@ -8,7 +8,7 @@ PCSerial::~PCSerial(){}
 
 void PCSerial::set_debug(){
 	debug=true;
-	pc_usb.printf("Debug enabled \n");
+	pc_usb.printf("Debug enabled \n\r");
 }
 
 bool PCSerial::get_debug(){

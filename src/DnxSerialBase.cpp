@@ -47,7 +47,7 @@ void DnxSerialBase::write(uint8_t* buf, int n) {
 
 	int i=0;
 
-//	pc.print_debug("about to clear buf\n");
+//	pc.print_debug("about to clear buf\n\r");
 	while(i<n){
 		if (port->readable()){	
 			int inf = port->getc();		//empty buffer because tx has written to rx	(only in case of tx and rx connected)																
@@ -55,12 +55,12 @@ void DnxSerialBase::write(uint8_t* buf, int n) {
 		}
 	}
 
-//	pc.print_debug("buf cleared\n");
+//	pc.print_debug("buf cleared\n\r");
 
 /*
 	int i=0;
 	int timeout = 0; 	// Timeout
-	//pc.print_debug("about to clear buf\n");
+	//pc.print_debug("about to clear buf\n\r");
 
 	while ((timeout < 2*n) && (i<n)) {
 		if (port->readable()) {
@@ -73,7 +73,7 @@ void DnxSerialBase::write(uint8_t* buf, int n) {
 			timeout++;		
 		}															
 	}
-	//pc.print_debug("buf cleared\n");
+	//pc.print_debug("buf cleared\n\r");
 */
 }
 
@@ -107,12 +107,12 @@ int DnxSerialBase::angleScale(double angle){
 	// 0 is end CW and 1024 is end CCW
 
 	if (result>1024){
-		pc.print_debug("CCW out of range\n");
+		pc.print_debug("CCW out of range\n\r");
 		return 1024;	
 	} 
 
 	else if (result<0){
-		pc.print_debug("CW out of range\n");
+		pc.print_debug("CW out of range\n\r");
 		return 0;	
 	}  
 	
@@ -140,7 +140,7 @@ void DnxSerialBase::packetPrint(int bytes, uint8_t* buf) {
 	for (int i=0; i < bytes; i++) {
 		pc.print_debug(to_hex(buf[i])+" ");
 	}
-	pc.print_debug(" } \n");
+	pc.print_debug(" } \n\r");
 }
 
 

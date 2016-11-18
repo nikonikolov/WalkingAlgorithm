@@ -5,16 +5,16 @@ Leg Abstraction Class: Corresponds to a physical leg. Constructed from 4 Servojo
 
 Stores information about the parameters of the leg such as:
 
-DISTCENTER 		Distance from robot's center to the center of ARM servo
+DIST_CENTER 		Distance from robot's center to the center of ARM servo
 COXA 			Distance from the center of ARM servo to the center of HIP servo
 FEMUR 			Distance from the center of HIP servo to the center of KNEE servo
 TIBIA 			Distance from the center of KNEE servo to END EFFECTOR
-HIPTOEND		Direct distance from hip mount point to the point where the end effector touches ground
+hip_to_end		Direct distance from hip mount point to the point where the end effector touches ground
 HEIGHT 			Vertical distance from HIP mount point to ground
-ARMGTOEND		Horizontal distance from the center of ARM servo's ground point projection to the END EFFECTOR
+arm_ground_to_ef		Horizontal distance from the center of ARM servo's ground point projection to the END EFFECTOR
 ANGLEOFFSET 	Angle between Y-axis(Robot orientation) and servo orientation; always a positive quantity
 HIPKNEEMAXHDIST Maximum horizontal distance between center of HIP and center of KNEE so that torque on KNEE servo is in range
-KNEEMOTORDIST 	Horizontal distance between center of KNEE and center of MOTOR - needed for calculating Quadcopter ARM angle
+KNEE_TO_MOTOR_DIST 	Horizontal distance between center of KNEE and center of MOTOR - needed for calculating Quadcopter ARM angle
 
 -------------------------------------------------------------------------------------------
 
@@ -33,8 +33,8 @@ FRAMEWORK:
 
 	2. vars[]		-	Use updateVar(). Function automatically updates square value for the variable
 							and the rest of the variables by calling StateUpdate()
-	3. updateVar() 		- 	When you use this to update HIPTOEND it is assumed the change is in ENDEFFECTOR
-							rather than in the HEIGHT of the robot. If change is in the HEIGHT, the vars[HEIGHT]
+	3. updateVar() 		- 	When you use this to update hip_to_end it is assumed the change is in ENDEFFECTOR
+							rather than in the HEIGHT of the robot. If change is in the HEIGHT, the vars.height
 							will not be updates
 	4. updateAngles()	-	Function automatically called when updateVar() is called. Basing on vars[]
 							function computes new angles for Hip and Knee
@@ -61,7 +61,7 @@ class Leg{
 
 public:
 	
-	Leg(int ID_knee, int ID_hip, int ID_arm, DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, const double robot_params[]);
+	Leg(int ID_knee, int ID_hip, int ID_arm, DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, BodyParams robot_params);
 	~Leg();
 
 	/* ---------------------------------------- GETTER AND COPY ---------------------------------------- */
@@ -110,11 +110,11 @@ private:
 	/* ============================================== MEMBER DATA ============================================== */
 
 	State_t state;
-	ServoJoint joints[JOINT_COUNT];					// Stores servo objects corresponding to the physical servos
+	LegJoints joints;							// Stores servo objects corresponding to the physical servos
 
-	double angle_offset;								// Angle between Y-axis and servo orientation; always positive
+	double angle_offset;						// Angle between Y-axis and servo orientation; always positive
 	bool leg_right;								// 1.0 - Leg is LEFT, -1.0 - Leg is RIGHT
-	wkq::LegID leg_id; 									// ID of the leg
+	wkq::LegID leg_id; 							// ID of the leg
 };
 
 

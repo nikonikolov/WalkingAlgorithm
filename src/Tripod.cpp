@@ -3,7 +3,7 @@
 const double Tripod::leg_lift = 5.0; 
 
 Tripod::Tripod (int ID_front_knee, int ID_middle_knee, int ID_back_knee,
-				DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, const double robot_params[]) :
+				DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, BodyParams robot_params) :
 	Legs{	Leg(ID_front_knee, 	ID_front_knee+6, 	ID_front_knee+18, 	HipsKnees, Arms, height_in, robot_params),
 			Leg(ID_middle_knee, ID_middle_knee+6, 	ID_middle_knee+18, 	HipsKnees, Arms, height_in, robot_params),
 			Leg(ID_back_knee, 	ID_back_knee+6, 	ID_back_knee+18, 	HipsKnees, Arms, height_in, robot_params)
@@ -43,11 +43,11 @@ void Tripod::flatQuad(){
 /* ================================================= WALKING MOVEMENTS ================================================= */
 
 void Tripod::bodyForward (double step_size){
-	makeMovement(&Leg::IKBodyForward, step_size, "MOVING BODY FORWARD\n");
+	makeMovement(&Leg::IKBodyForward, step_size, "MOVING BODY FORWARD\n\r");
 }
 
 void Tripod::stepForward (double step_size){
-	makeMovement(&Leg::stepForward, step_size, "TRIPOD STEPPING FORWARD\n");
+	makeMovement(&Leg::stepForward, step_size, "TRIPOD STEPPING FORWARD\n\r");
 }
 
 void Tripod::bodyRotate(double angle){
@@ -59,15 +59,15 @@ void Tripod::stepRotate(double angle){
 }
 
 void Tripod::liftUp(double height_up){
-	makeMovement(&Leg::liftUp, height_up, "LIFTING TRIPOD\n");
+	makeMovement(&Leg::liftUp, height_up, "LIFTING TRIPOD\n\r");
 }
 
 void Tripod::lowerDown(double height_down){
-	makeMovement(&Leg::lowerDown, height_down, "LOWERING TRIPOD\n");
+	makeMovement(&Leg::lowerDown, height_down, "LOWERING TRIPOD\n\r");
 }
 
 void Tripod::finishStep(){
-	setPosition(&Leg::finishStep, "TRIPOD FINISHING STEP\n");
+	setPosition(&Leg::finishStep, "TRIPOD FINISHING STEP\n\r");
 }
 
 

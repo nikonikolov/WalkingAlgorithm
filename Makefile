@@ -5,10 +5,10 @@ GCC_BIN =
 PROJECT = bin/wkquad
 OBJECTS = ./main.o $(HARDWARE_OBJS) $(SOFTWARE_OBJS)
 HARDWARE_OBJS = ./src/include.o ./src/DnxSerialBase.o ./src/AX12A_Serial.o ./src/XL320_Serial.o ./src/PCSerial.o 
-SOFTWARE_OBJS = ./src/ServoJoint.o ./src/State_t.o ./src/Leg.o ./src/Tripod.o ./src/Robot.o ./src/wkq.o ./src/Master.o
+SOFTWARE_OBJS = ./src/ServoJoint.o ./src/robot_types.o ./src/State_t.o ./src/Leg.o ./src/Tripod.o ./src/Robot.o ./src/wkq.o ./src/Master.o
 
-SOFTWARE_SRCS = ./src/ServoJoint.cpp ./src/State_t.cpp ./src/Leg.cpp ./src/Tripod.cpp ./src/Robot.cpp ./src/wkq.cpp ./src/Master.cpp
-SOFTWARE_HDRS = ./src/ServoJoint.h ./src/State_t.h ./src/Leg.h ./src/Tripod.h ./src/Robot.h ./src/wkq.h ./src/Master.h
+SOFTWARE_SRCS = ./src/ServoJoint.cpp ./src/robot_types.cpp ./src/State_t.cpp ./src/Leg.cpp ./src/Tripod.cpp ./src/Robot.cpp ./src/wkq.cpp ./src/Master.cpp
+SOFTWARE_HDRS = ./src/ServoJoint.h ./src/robot_types.cpp ./src/State_t.h ./src/Leg.h ./src/Tripod.h ./src/Robot.h ./src/wkq.h ./src/Master.h
 
 SYS_OBJECTS = ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/board.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/cmsis_nvic.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/retarget.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/startup_LPC17xx.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/system_LPC17xx.o 
 INCLUDE_PATHS = -I. -I./mbed -I./mbed/TARGET_LPC1768 -I./mbed/TARGET_LPC1768/TARGET_NXP -I./mbed/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X -I./mbed/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X/TARGET_MBED_LPC1768 -I./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM 

@@ -49,9 +49,9 @@ class Robot{
 
 public:
 
-	Robot(Master* pixhawk_in, DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, const double robot_params[], wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
+	Robot(Master* pixhawk_in, DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, BodyParams robot_params, wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
 #ifndef SIMULATION
-	Robot(Master* pixhawk_in, int baud_in, double height_in, const double robot_params[], wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
+	Robot(Master* pixhawk_in, int baud_in, double height_in, BodyParams robot_params, wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
 #endif
 	~Robot();
 

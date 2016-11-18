@@ -3,20 +3,20 @@
 //const double Robot::wait_time = 0.5;
 
 Robot::Robot(Master* pixhawk_in, DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, 
-		const double robot_params[], wkq::RobotState_t state_in /*= wkq::RS_DEFAULT*/) :
+		BodyParams robot_params, wkq::RobotState_t state_in /*= wkq::RS_DEFAULT*/) :
 	Tripods{
 		Tripod(wkq::KNEE_LEFT_FRONT, wkq::KNEE_RIGHT_MIDDLE, wkq::KNEE_LEFT_BACK, HipsKnees, Arms, height_in, robot_params),
 		Tripod(wkq::KNEE_RIGHT_FRONT, wkq::KNEE_LEFT_MIDDLE, wkq::KNEE_RIGHT_BACK, HipsKnees, Arms, height_in, robot_params)
 	}, 
 	pixhawk(pixhawk_in), state(state_in){
 	
-	pc.print_debug("Robot start\n");
+	pc.print_debug("Robot start\n\r");
 	
 	// Calculate max size for movements
 	max_step_size = 		calcMaxStepSize();
 	max_rotation_angle = 	calcMaxRotationAngle();
 	
-	pc.print_debug("Robot calculating state\n");
+	pc.print_debug("Robot calculating state\n\r");
 
 	state = wkq::RS_FLAT_QUAD;
 	// Initialize servos according to state
@@ -25,11 +25,11 @@ Robot::Robot(Master* pixhawk_in, DnxSerialBase* HipsKnees, DnxSerialBase* Arms, 
 	else if (state_in == wkq::RS_STANDING_QUAD) 		standQuad();
 	else if (state_in == wkq::RS_FLAT_QUAD) 			flatQuad();
 
-	pc.print_debug("Robot done\n");
+	pc.print_debug("Robot done\n\r");
 }
 
 #ifndef SIMULATION
-Robot::Robot(Master* pixhawk_in, int baud_in, double height_in, const double robot_params[], wkq::RobotState_t state_in/* = wkq::RS_DEFAULT*/) : 
+Robot::Robot(Master* pixhawk_in, int baud_in, double height_in, BodyParams robot_params, wkq::RobotState_t state_in/* = wkq::RS_DEFAULT*/) : 
 	Robot(pixhawk_in, new AX12A_Serial(p9, p10, baud_in), new XL320_Serial(p13, p14, baud_in), height_in, robot_params, state_in) {}
 #endif
 
@@ -79,14 +79,14 @@ void Robot::walkForward(double coeff){
 	bool continue_movement = true;
 	int tripod_up = TRIPOD_LEFT, tripod_down = TRIPOD_RIGHT;
 
-	//pc.print_debug("Movement forward starts\n");
+	//pc.print_debug("Movement forward starts\n\r");
 	
 	// repeat until walkForward signal stops
 	while(continue_movement){
 		Tripods[tripod_up].liftUp(ef_raise);
-		//pc.print_debug("First tripod lifted\n");
+		//pc.print_debug("First tripod lifted\n\r");
 		Tripods[tripod_down].bodyForward(step_size);
-		//pc.print_debug("Second tripod moved body forward\n");
+		//pc.print_debug("Second tripod moved body forward\n\r");
 
 		// Read Input and find out whether movement should go on
 		continue_movement = pixhawk->inputWalkForward();
@@ -94,18 +94,18 @@ void Robot::walkForward(double coeff){
 		// Movement goes on
 		if(continue_movement){
 			Tripods[tripod_up].stepForward(step_size);
-			//pc.print_debug("First tripod put down legs for another step forward\n");
+			//pc.print_debug("First tripod put down legs for another step forward\n\r");
 			std::swap(tripod_up, tripod_down);			// swap the roles of the Tripods
 		}
 		
 		// Movement stops
 		else{
 			Tripods[tripod_up].finishStep();
-			//pc.print_debug("First tripod finished step\n");
+			//pc.print_debug("First tripod finished step\n\r");
 			Tripods[tripod_down].liftUp(ef_raise);
-			//pc.print_debug("Second tripod lifted\n");
+			//pc.print_debug("Second tripod lifted\n\r");
 			Tripods[tripod_down].finishStep();
-			//pc.print_debug("Second tripod finished step\n");
+			//pc.print_debug("Second tripod finished step\n\r");
 		}
 	}
 }
@@ -157,13 +157,13 @@ void Robot::singleStepForwardTest(double coeff){
 	wait(wait_time);
 	Tripods[tripod_up].liftUp(ef_raise);
 	wait(wait_time);
-	pc.print_debug("First tripod lifted\n");
+	pc.print_debug("First tripod lifted\n\r");
 	Tripods[tripod_down].bodyForward(step_size);
 	wait(wait_time);
-	pc.print_debug("Second tripod moved body forward\n");
+	pc.print_debug("Second tripod moved body forward\n\r");
 
 	Tripods[tripod_up].stepForward(step_size);
-	pc.print_debug("First tripod put down legs for another step forward\n");
+	pc.print_debug("First tripod put down legs for another step forward\n\r");
 }
 
 

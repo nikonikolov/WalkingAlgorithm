@@ -174,7 +174,7 @@ int ServoJoint::setGoalPosition(int angle_in){
 
 int ServoJoint::setGoalPosition(double angle_in){
 	angle=angle_in;
-	pc.print_debug(servo_name + " set to " + dtos(wkq::degrees(angle)) +"\n");
+	pc.print_debug(servo_name + " set to " + dtos(wkq::degrees(angle)) +"\n\r");
 	return 0;
 }
 

@@ -5,7 +5,7 @@
 
 AX12A_Serial::AX12A_Serial(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn /*=1*/) :
 	DnxSerialBase(tx, rx, baudIn, ReturnLvlIn){
-	pc.print_debug("AX12A_Serial object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + dtos(bitPeriod) + " us\n");
+	pc.print_debug("AX12A_Serial object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + dtos(bitPeriod) + " us\n\r");
 }
 
 
@@ -17,7 +17,7 @@ AX12A_Serial::~AX12A_Serial(){}
 // 1: 1Mbps, 3: 500 000, 4: 400 000, 7: 250 000, 9: 200 000, 16: 115200, 34: 57600, 103: 19200, 207: 9600
 int AX12A_Serial::setBaud(int ID, int rate) {
 	if ( rate != 1 && rate != 3 && rate != 4 && rate != 7 && rate != 9 && rate != 16  && rate != 34 && rate != 103 && rate != 207 ) {
-		pc.print_debug("Incorrect baud rate\n");
+		pc.print_debug("Incorrect baud rate\n\r");
 		return 1;
 	}
 
@@ -88,13 +88,13 @@ int AX12A_Serial::statusError(uint8_t* buf, int n) {
 	// Minimum return length
 	if (n < 6) {
 		flush();
-		pc.print_debug("READING CORRUPTION\n");
+		pc.print_debug("READING CORRUPTION\n\r");
 		return -1; 
 	}
 
 	if ((buf[0]!=0xFF)||(buf[1]!=0xFF)) {
 		flush();
-		pc.print_debug("WRONG RETURN HEADER\n");
+		pc.print_debug("WRONG RETURN HEADER\n\r");
 		packetPrint(n, buf);
 		return -1; 
 	}
@@ -103,37 +103,37 @@ int AX12A_Serial::statusError(uint8_t* buf, int n) {
 	// The last byte does not get included in the checksum
 	if(checksum != buf[n-1]){
 		flush();
-			pc.print_debug("WRONG RETURN CHECKSUM\n");
+			pc.print_debug("WRONG RETURN CHECKSUM\n\r");
 			packetPrint(n, buf);
-			pc.print_debug("CHECKSUM READ IS " + to_hex(checksum)+"\n");
+			pc.print_debug("CHECKSUM READ IS " + to_hex(checksum)+"\n\r");
 		return -1;
 	}
 
 	if ( (buf[3]+4) != n ) {
 		flush();
-		pc.print_debug("WRONG RETURN LENGHT\n");
+		pc.print_debug("WRONG RETURN LENGHT\n\r");
 		packetPrint(n, buf);
 		return -1;
 	}
 
 	if(buf[4]!=0 ){
-		pc.print_debug("STATUS ERROR \n");
+		pc.print_debug("STATUS ERROR \n\r");
 		// bit 0
-		 if ( !(buf[4] & 0x01) ) pc.print_debug("VOLTAGE OUT OF RANGE\n");	
+		 if ( !(buf[4] & 0x01) ) pc.print_debug("VOLTAGE OUT OF RANGE\n\r");	
 		// bit 1
-		else if ( !(buf[4] & 0x02) ) pc.print_debug("REQUIRED POSITION OUT OF RANGE\n");
+		else if ( !(buf[4] & 0x02) ) pc.print_debug("REQUIRED POSITION OUT OF RANGE\n\r");
 		// bit 2
-		else if ( !(buf[4] & 0x04) ) pc.print_debug("TEMPERATURE OUT OF RANGE\n");
+		else if ( !(buf[4] & 0x04) ) pc.print_debug("TEMPERATURE OUT OF RANGE\n\r");
 		// bit 3
-		else if ( !(buf[4] & 0x08) ) pc.print_debug("COMMAND OUT OF RANGE\n");
+		else if ( !(buf[4] & 0x08) ) pc.print_debug("COMMAND OUT OF RANGE\n\r");
 		// bit 4
-		else if ( !(buf[4] & 0x10) ) pc.print_debug("CORRUPTED PACKAGE SENT - CRC DOES NOT MATCH\n");
+		else if ( !(buf[4] & 0x10) ) pc.print_debug("CORRUPTED PACKAGE SENT - CRC DOES NOT MATCH\n\r");
 		// bit 5
-		else if ( !(buf[4] & 0x20) ) pc.print_debug("LOAD OUT OF RANGE\n");
+		else if ( !(buf[4] & 0x20) ) pc.print_debug("LOAD OUT OF RANGE\n\r");
 		// bit 6
-		else if ( !(buf[4] & 0x40) ) pc.print_debug("UNDEFINED OR MISSING COMMAND\n");
+		else if ( !(buf[4] & 0x40) ) pc.print_debug("UNDEFINED OR MISSING COMMAND\n\r");
 		// bit 7
-		else if ( !(buf[4] & 0x80) ) pc.print_debug("GLITCH\n");
+		else if ( !(buf[4] & 0x80) ) pc.print_debug("GLITCH\n\r");
 		return -1;
 	}
 
@@ -179,15 +179,15 @@ int AX12A_Serial::send(int ID, int packetLength, uint8_t* parameters, uint8_t in
 
 	
 	// Read reply
-	pc.print_debug("Reading reply\n");	
+	pc.print_debug("Reading reply\n\r");	
 
 	int n = read(reply_buf);
 	if (n == 0) {
-		pc.print_debug("Could not read status packet\n");
+		pc.print_debug("Could not read status packet\n\r");
 		return 0;
 	}
 
-	pc.print_debug("- Read " + itos(n) + " bytes\n");
+	pc.print_debug("- Read " + itos(n) + " bytes\n\r");
 
 	return statusError(reply_buf, n); // Return Error code
 }
@@ -263,7 +263,7 @@ int AX12A_Serial::dataPull(int ID, int address){
    	}
 
    	else{
-   		pc.print_debug("WRONG ID " + to_hex(reply_buf[2]) + " REPLIED\n");
+   		pc.print_debug("WRONG ID " + to_hex(reply_buf[2]) + " REPLIED\n\r");
    		return -1;
    	}
 }
