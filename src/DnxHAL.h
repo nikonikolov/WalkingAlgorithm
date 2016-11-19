@@ -16,8 +16,6 @@ FUNCTIONALITY:
 #ifndef DNXHAL_H
 #define DNXHAL_H
 
-//#define _USE_MATH_DEFINES
-//#include <math.h>
 #include <cstdint>
 #include <string>
 using std::string;
@@ -37,7 +35,6 @@ public:
     };
 
 	DnxHAL(const DnxHAL::Port_t& port_in, int baud_in, int return_lvl_in =1);
-
 	virtual ~DnxHAL();
 
     int setID(int ID, int newID);

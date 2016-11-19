@@ -2,11 +2,11 @@
 
 //const double Robot::wait_time = 0.5;
 
-Robot::Robot(Master* pixhawk_in, DnxHAL* HipsKnees, DnxHAL* Arms, double height_in, 
+Robot::Robot(Master* pixhawk_in, DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, 
 		const BodyParams& robot_params, wkq::RobotState_t state_in /*= wkq::RS_DEFAULT*/) :
 	Tripods{
-		Tripod(wkq::KNEE_LEFT_FRONT, wkq::KNEE_RIGHT_MIDDLE, wkq::KNEE_LEFT_BACK, HipsKnees, Arms, height_in, robot_params),
-		Tripod(wkq::KNEE_RIGHT_FRONT, wkq::KNEE_LEFT_MIDDLE, wkq::KNEE_RIGHT_BACK, HipsKnees, Arms, height_in, robot_params)
+		Tripod(wkq::KNEE_LEFT_FRONT, wkq::KNEE_RIGHT_MIDDLE, wkq::KNEE_LEFT_BACK, dnx_hips_knees, dnx_arms, height_in, robot_params),
+		Tripod(wkq::KNEE_RIGHT_FRONT, wkq::KNEE_LEFT_MIDDLE, wkq::KNEE_RIGHT_BACK, dnx_hips_knees, dnx_arms, height_in, robot_params)
 	}, 
 	pixhawk(pixhawk_in), state(state_in){
 	

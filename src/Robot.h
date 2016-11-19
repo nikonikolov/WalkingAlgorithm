@@ -48,7 +48,7 @@ class Robot{
 
 public:
 
-	Robot(Master* pixhawk_in, DnxHAL* HipsKnees, DnxHAL* Arms, double height_in, const BodyParams& robot_params, wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
+	Robot(Master* pixhawk_in, DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, const BodyParams& robot_params, wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
 #ifndef SIMULATION
 	Robot(Master* pixhawk_in, int baud_in, double height_in, const BodyParams& robot_params, wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
 #endif
@@ -91,7 +91,7 @@ private:
 	Tripod Tripods[TRIPOD_COUNT];
 	
 	//DnxHAL* Arms;
-	//DnxHAL* HipsKnees;
+	//DnxHAL* dnx_hips_knees;
 
 	Master* pixhawk;
 	// Both MAXes always positive; Negative limit same number

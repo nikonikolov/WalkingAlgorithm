@@ -18,7 +18,7 @@ bool State_t::default_pos_calculated = false;
     Tripod and Leg constructors do not write to servo_angles, so State constrcutor is only responsible for initializing to meaningless
     state and calculating the defaultPos if not calculated already
 */
-State_t::State_t(double height_in, const BodyParams& robot_params) : servo_angles { 0.0 }, vars{ 0.0 }, params(robot_params) {
+State_t::State_t(double height_in, const BodyParams& robot_params) : /*servo_angles { 0.0 }, vars{ 0.0 },*/ params(robot_params) {
 
     // Calculate defaultPoss only if not calculated already - note defaultPoss are static members for the class
     if(!default_pos_calculated){

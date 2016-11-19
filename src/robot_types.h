@@ -18,6 +18,8 @@ struct BodyParams{
     double FEMUR_SQ;
     double TIBIA_SQ;
     double KNEE_TO_MOTOR_DIST_SQ;
+    double MAX_HEIGHT;
+    double MIN_HEIGHT;
 
     void compute_squares(){
         DIST_CENTER_SQ = pow(DIST_CENTER, 2);
@@ -30,12 +32,13 @@ struct BodyParams{
     BodyParams(double dist_center, double coxa, double femur, double tibia, double knee_to_motor_dist) : 
         DIST_CENTER(dist_center), COXA(coxa), FEMUR(femur), TIBIA(tibia), KNEE_TO_MOTOR_DIST(knee_to_motor_dist),
         DIST_CENTER_SQ(pow(dist_center, 2)), COXA_SQ(pow(coxa, 2)), FEMUR_SQ(pow(femur, 2)), TIBIA_SQ(pow(tibia, 2)), KNEE_TO_MOTOR_DIST_SQ(pow(knee_to_motor_dist, 2)) {}
-
-    @Not included:
-        #define HIPKNEEMAXHDIST     4
 */
 };
 
+
+/*
+    @ Remember to update State_t::updateVar and State_t::update if you add or remove any members
+*/
 struct DynamicVars{
 
     void operator=(const DynamicVars& obj_in);
@@ -66,8 +69,11 @@ struct LegAngles{
     double arm;
 };
 
-struct LegJoints{
 
+struct LegJoints{
+    LegJoints(int ID_knee, DnxHAL* dnx_port_knee, int ID_hip, DnxHAL* dnx_port_hip, int ID_arm, DnxHAL* dnx_port_arm) :
+        knee(ID_knee, dnx_port_knee), hip(ID_hip, dnx_port_hip), arm(ID_arm, dnx_port_arm) {}
+    
     ServoJoint knee;
     ServoJoint hip;
     ServoJoint arm;

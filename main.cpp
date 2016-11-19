@@ -38,8 +38,8 @@ int main(int argc, char **argv){
 	printf("Pixhawk initialized\n\r");
 
 	// Instantiate objects for communication with the servo motors 
-	//SerialAX12 HipsKnees(DnxHAL::Port_t(p9, p10), baud);
-	//SerialXL320 Arms(DnxHAL::Port_t(p13, p14), baud);
+	//SerialAX12 dnx_hips_knees(DnxHAL::Port_t(p9, p10), baud);
+	//SerialXL320 dnx_arms(DnxHAL::Port_t(p13, p14), baud);
 	printf("Communication ready\n\r");
 	
 

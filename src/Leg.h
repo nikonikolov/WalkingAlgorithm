@@ -59,7 +59,7 @@ class Leg{
 
 public:
 	
-	Leg(int ID_knee, int ID_hip, int ID_arm, DnxHAL* HipsKnees, DnxHAL* Arms, double height_in, const BodyParams& robot_params);
+	Leg(int ID_knee, int ID_hip, int ID_arm, DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, const BodyParams& robot_params);
 	~Leg();
 
 	/* ---------------------------------------- GETTER AND COPY ---------------------------------------- */

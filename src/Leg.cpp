@@ -4,14 +4,11 @@
 
 // Tripod constructor does not write to angles, so Leg constrcutor is only responsible for calculating the proper defaultPos
 Leg::Leg 	(int ID_knee, int ID_hip, int ID_arm,
-			DnxHAL* HipsKnees, DnxHAL* Arms, double height_in, const BodyParams& robot_params) :
+			DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, const BodyParams& robot_params) :
 	
 	state(height_in, robot_params), 
 	// Instantiate joints
-	joints	{ 	ServoJoint(ID_knee, HipsKnees), 
-				ServoJoint(ID_hip, HipsKnees), 
-				ServoJoint(ID_arm, Arms), 
-			} {
+	joints(ID_knee, dnx_hips_knees, ID_hip, dnx_hips_knees, ID_arm, dnx_arms) {
 
 	switch(ID_knee){
 		case wkq::KNEE_LEFT_FRONT:
