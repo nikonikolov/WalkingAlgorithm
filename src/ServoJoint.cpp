@@ -2,7 +2,7 @@
 
 #ifndef SIMULATION
 
-ServoJoint::ServoJoint(int ID_in, DnxHAL* serial_ptr_in) : ID(ID_in), serial_ptr(serial_ptr_in) {
+ServoJoint::ServoJoint(int ID_in, DnxHAL* dnx_ptr_in) : ID(ID_in), dnx_ptr(dnx_ptr_in) {
 	setReturnLevel(1);	
 	//setPunch(512);	
 }
@@ -13,55 +13,57 @@ int ServoJoint::getID() const {
 }
 
 int ServoJoint::setID(int newID){
-	return serial_ptr->setID(ID, newID);
+	return dnx_ptr->setID(ID, newID);
 }
 	
 int ServoJoint::getValue(int address){
-	return serial_ptr->getValue(ID, address);
+	return dnx_ptr->getValue(ID, address);
 }
     
 int ServoJoint::setBaud(int rate){
-	return serial_ptr->setBaud(ID, rate);
+	return dnx_ptr->setBaud(ID, rate);
 }
     
 int ServoJoint::setReturnLevel(int lvl){
-	return serial_ptr->setReturnLevel(ID, lvl);
+	return dnx_ptr->setReturnLevel(ID, lvl);
 }
 
 int ServoJoint::setLED(int colour){
-	return serial_ptr->setLED(ID, colour);
+	return dnx_ptr->setLED(ID, colour);
 }
 
 int ServoJoint::setGoalPosition(int angle){
-	return serial_ptr->setGoalPosition(ID, angle);
+	return dnx_ptr->setGoalPosition(ID, angle);
 }
 
+// angle is in radians
 int ServoJoint::setGoalPosition(double angle){
-	return serial_ptr->setGoalPosition(ID, angle);
+	return dnx_ptr->setGoalPosition(ID, angle);
 }
 
 int ServoJoint::setGoalVelocity(int velocity){
-	return serial_ptr->setGoalVelocity(ID, velocity);
+	return dnx_ptr->setGoalVelocity(ID, velocity);
 }
 
 int ServoJoint::setGoalTorque(int torque){
-	return serial_ptr->setGoalTorque(ID, torque);
+	return dnx_ptr->setGoalTorque(ID, torque);
 }
 
 int ServoJoint::setPunch(int punch){
-	return serial_ptr->setPunch(ID, punch);
+	return dnx_ptr->setPunch(ID, punch);
 }
 
 void ServoJoint::operator=(const ServoJoint& obj_in){
 	if(this != &obj_in){
 		ID = obj_in.ID;
-		serial_ptr = obj_in.serial_ptr;
+		dnx_ptr = obj_in.dnx_ptr;
 	}
 }
 
 
 #else
 
+void wait(int time){}
 
 ServoJoint::ServoJoint(int ID_in, DnxHAL* robot_view_in) : ID(ID_in)/*, robot_view(robot_view_in)*/{
 	switch(ID){
@@ -174,7 +176,7 @@ int ServoJoint::setGoalPosition(int angle_in){
 
 int ServoJoint::setGoalPosition(double angle_in){
 	angle=angle_in;
-	printf("%s +  set to %d \n\r", servo_name.c_str(), angle);
+	printf("%s +  set to %f \n\r", servo_name.c_str(), wkq::degrees(angle));
 	return 0;
 }
 

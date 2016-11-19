@@ -15,7 +15,9 @@ CURRENT STATE:
 #ifndef MASTER_H
 #define MASTER_H
 
+#ifndef SIMULATION
 #include "mbed.h"
+#endif
 
 class Master{
 public:

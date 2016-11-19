@@ -31,12 +31,17 @@ public:
 private:
 
 	int ID;
-	DnxHAL* serial_ptr;		// Pointer to the object (Knees/Hips/Arms/Wings) associated with the right serial port
+	DnxHAL* dnx_ptr;		// Pointer to the object (Knees/Hips/Arms/Wings) associated with the right serial port
 };
 
 #else
 
 #include "wkq.h"
+#include <string>
+using std::string;
+
+typedef int DnxHAL;
+void wait(int time);
 
 class ServoJoint{
 

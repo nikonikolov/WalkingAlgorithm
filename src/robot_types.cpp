@@ -15,6 +15,11 @@ void LegAngles::operator=(double value){
     arm     = value;
 }
 
+void LegAngles::print(){
+    printf("LegAngles: knee(degrees) %f\n\r", wkq::degrees(knee));
+    printf("LegAngles: hip(degrees) %f\n\r", wkq::degrees(hip));
+    printf("LegAngles: arm(degrees) %f\n\r", wkq::degrees(arm));
+}
 
 void DynamicVars::operator=(const DynamicVars& obj_in){
     if( this != &obj_in){
@@ -41,3 +46,13 @@ void DynamicVars::operator=(double value){
     ef_center_sq        = value;
 }
 
+void DynamicVars::print(){
+    printf("DynamicVars: hip_to_end %f\n\r", hip_to_end);                      
+    printf("DynamicVars: height %f\n\r", height);                          
+    printf("DynamicVars: arm_ground_to_ef %f\n\r", arm_ground_to_ef);                
+    printf("DynamicVars: ef_center %f\n\r", ef_center);                       
+    printf("DynamicVars: hip_to_end_sq %f\n\r", hip_to_end_sq);
+    printf("DynamicVars: height_sq %f\n\r", height_sq);
+    printf("DynamicVars: arm_ground_to_ef_sq %f\n\r", arm_ground_to_ef_sq);
+    printf("DynamicVars: ef_center_sq %f\n\r", ef_center_sq);
+}

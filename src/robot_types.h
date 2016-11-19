@@ -1,8 +1,10 @@
 #ifndef ROBOT_TYPES
 #define ROBOT_TYPES
 
-#include "ServoJoint.h"
 #include <cmath>
+
+#include "ServoJoint.h"
+#include "wkq.h"
 
 struct BodyParams{
 
@@ -41,6 +43,7 @@ struct BodyParams{
 */
 struct DynamicVars{
 
+    void print();
     void operator=(const DynamicVars& obj_in);
     void operator=(double value);
 
@@ -56,11 +59,8 @@ struct DynamicVars{
 
 
 struct LegAngles{
-    /*
-    LegAngles(double knee_in, double hip_in, double arm_in) :
-        knee(knee_in), hip(hip_in), arm(arm_in) {}
-    */
     
+    void print();
     void operator=(const LegAngles& obj_in);
     void operator=(double value);
   

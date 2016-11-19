@@ -152,7 +152,10 @@ void State_t::clear(){
 */
 void State_t::centerAngles(double height /*=0.0*/){
 
-    if(height != 0.0) height = vars.height;
+    if(height == 0.0) height = vars.height;
+
+    if      (height < params.MIN_HEIGHT) height = params.MIN_HEIGHT;
+    else if (height > params.MAX_HEIGHT) height = params.MAX_HEIGHT;
 
     servo_angles.hip = asin( (height - params.TIBIA) / params.FEMUR );
     servo_angles.knee = wkq::PI/9 - servo_angles.hip;

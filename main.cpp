@@ -19,19 +19,19 @@ int main(int argc, char **argv){
 	printf("MAIN started\n\r");
 
 	BodyParams robot_params;
-
 	robot_params.DIST_CENTER = 10.95;
 	robot_params.COXA = 2.65;
 	//robot_params.FEMUR = 17.5;
 	robot_params.FEMUR = 17.5-0.6;
 	robot_params.TIBIA = 30;
-	//robot_params.HIPKNEEMAXHDIST = 12.0;
 	robot_params.KNEE_TO_MOTOR_DIST = 2.25;
+	robot_params.MIN_HEIGHT = robot_params.TIBIA - robot_params.FEMUR*sin(wkq::radians(30));
+	robot_params.MAX_HEIGHT = robot_params.FEMUR*sin(wkq::radians(30)) + robot_params.TIBIA;
 	robot_params.compute_squares();
 	
 
 	int baud = 1000000; 		
-	double init_height = 10.0;	
+	double init_height = 20.0;	
 
 	Master* pixhawk = new Master();
 
