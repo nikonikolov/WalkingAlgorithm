@@ -30,14 +30,13 @@ FRAMEWORK:
 
 #include "wkq.h"
 #include "Tripod.h"
-#include "include.h"
 #include "Master.h"
 
 using wkq::RobotState_t;
 
 #ifndef SIMULATION
-#include "AX12A_Serial.h"
-#include "XL320_Serial.h"
+#include "SerialAX12.h"
+#include "SerialXL320.h"
 #endif
 
 #define TRIPOD_COUNT 	2
@@ -49,9 +48,9 @@ class Robot{
 
 public:
 
-	Robot(Master* pixhawk_in, DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, BodyParams robot_params, wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
+	Robot(Master* pixhawk_in, DnxHAL* HipsKnees, DnxHAL* Arms, double height_in, const BodyParams& robot_params, wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
 #ifndef SIMULATION
-	Robot(Master* pixhawk_in, int baud_in, double height_in, BodyParams robot_params, wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
+	Robot(Master* pixhawk_in, int baud_in, double height_in, const BodyParams& robot_params, wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
 #endif
 	~Robot();
 
@@ -91,8 +90,8 @@ private:
 
 	Tripod Tripods[TRIPOD_COUNT];
 	
-	//DnxSerialBase* Arms;
-	//DnxSerialBase* HipsKnees;
+	//DnxHAL* Arms;
+	//DnxHAL* HipsKnees;
 
 	Master* pixhawk;
 	// Both MAXes always positive; Negative limit same number

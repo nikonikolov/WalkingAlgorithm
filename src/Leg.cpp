@@ -4,7 +4,7 @@
 
 // Tripod constructor does not write to angles, so Leg constrcutor is only responsible for calculating the proper defaultPos
 Leg::Leg 	(int ID_knee, int ID_hip, int ID_arm,
-			DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, BodyParams robot_params) :
+			DnxHAL* HipsKnees, DnxHAL* Arms, double height_in, const BodyParams& robot_params) :
 	
 	state(height_in, robot_params), 
 	// Instantiate joints
@@ -45,7 +45,7 @@ Leg::Leg 	(int ID_knee, int ID_hip, int ID_arm,
 			leg_right = true;
 			break;
 		default:
-			pc.print_debug("WARNING: Invalid KNEE ID IN LEG CONSTRUCTOR\n\r");
+			printf("WARNING: Invalid KNEE ID IN LEG CONSTRUCTOR\n\r");
 	}
 }
 
@@ -82,12 +82,12 @@ void Leg::confQuadArms(){
 
 // input equals height required for the end effector; Untested for all joints and negative input
 void Leg::liftUp(double height){
-	state.servo_angles.knee = wkq::PI - state.servo_angles.knee + acos(1 - pow(height,2) / state.params.tibia_sq); 
+	state.servo_angles.knee = wkq::PI - state.servo_angles.knee + acos(1 - pow(height,2) / state.params.TIBIA_SQ); 
 }
 
 // input equals current height of the end effector
 void Leg::lowerDown(double height){
-	state.servo_angles.knee = wkq::PI - state.servo_angles.knee - acos(1 - pow(height,2) / state.params.tibia_sq); 
+	state.servo_angles.knee = wkq::PI - state.servo_angles.knee - acos(1 - pow(height,2) / state.params.TIBIA_SQ); 
 }
 
 /* 	
@@ -121,7 +121,7 @@ void Leg::IKBodyForward(double step_size){
 	// Convert to actual angle for the servo
 	state.servo_angles.arm = wkq::PI - angle_offset - ArmTmp; 			// NB: Valid for a LEFT servo facing down
 
-	state.updateVar(&vars.arm_ground_to_ef, arm_ground_to_ef_new, &vars.arm_ground_to_ef_sq, arm_ground_to_ef_sq_new);		// Automatically changes robot state in software
+	state.updateVar(&(state.vars.arm_ground_to_ef), arm_ground_to_ef_new, &(state.vars.arm_ground_to_ef_sq), arm_ground_to_ef_sq_new);		// Automatically changes robot state in software
 }
 
 
@@ -158,12 +158,12 @@ void Leg::stepForward(double step_size){
 	double arm_ground_to_ef_sq_new = Hip.dist_sq(EFNew);
 
 	// Cosine Rule to find new ARM angle
-	double ArgTriangle = 
+	double arg_triangle = 
 			acos( (Hip.dist_sq(HipNew) +  Hip.dist_sq(EFNew) - HipNew.dist_sq(EFNew)) / (2*Hip.dist(HipNew)*Hip.dist_sq(EFNew)) );
-	//state.servo_angles.arm = wkq::PI - angle_offset - ArgTriangle;
-	state.servo_angles.arm = ArgTriangle - angle_offset ;		// Unconfirmed that valid for all joints
+	//state.servo_angles.arm = wkq::PI - angle_offset - arg_triangle;
+	state.servo_angles.arm = arg_triangle - angle_offset ;		// Unconfirmed that valid for all joints
 
-	state.updateVar(&vars.arm_ground_to_ef_sq, arm_ground_to_ef_sq_new);				// Automatically changes hip_to_end, HIP and KNEE	
+	state.updateVar(&(state.vars.arm_ground_to_ef_sq), arm_ground_to_ef_sq_new);				// Automatically changes hip_to_end, HIP and KNEE	
 }
 
 
@@ -190,7 +190,7 @@ void Leg::IKBodyRotate(double angle){
 	if (angle>=0.0)	state.servo_angles.arm = wkq::PI/2 - ArmTmp + angle/2;  // - (- wkq::PI/2 + state.servo_angles.arm - angle/2)
 	else 			state.servo_angles.arm = -wkq::PI/2 + ArmTmp + angle/2;	// - (  wkq::PI/2 - state.servo_angles.arm - angle/2)
 
-	state.updateVar(&vars.arm_ground_to_ef, arm_ground_to_ef_new, &vars.arm_ground_to_ef_sq, arm_ground_to_ef_sq_new);					// Automatically changes robot state in software		
+	state.updateVar(&(state.vars.arm_ground_to_ef), arm_ground_to_ef_new, &(state.vars.arm_ground_to_ef_sq), arm_ground_to_ef_sq_new);					// Automatically changes robot state in software		
 }
 
 
@@ -202,16 +202,16 @@ void Leg::stepRotate(double step_size){
 // input equals height to be raised by; negative values also work
 void Leg::raiseBody(double hraise){
 
-	state.updateVar(&vars.HEIGHT, (state.vars.HEIGHT + hraise));			// hip_to_end, HIP and KNEE automatically get updated
+	state.updateVar(&(state.vars.height), (state.vars.height + hraise));			// hip_to_end, HIP and KNEE automatically get updated
 
 /*
-	if (&vars.hip_to_end > (state.params.TIBIA + state.params.FEMUR) ){
-		state.updateVar(&vars.hip_to_end, (state.params.TIBIA + state.params.FEMUR) );
+	if (&(state.vars.hip_to_end) > (state.params.TIBIA + state.params.FEMUR) ){
+		state.updateVar(&(state.vars.hip_to_end), (state.params.TIBIA + state.params.FEMUR) );
 		UpdateHeight();
 	}
 
-	else if (&vars.hip_to_end < (state.params.TIBIA - state.params.FEMUR) ){ 
-		state.updateVar(&vars.hip_to_end, 1.5 * (state.params.TIBIA - state.params.FEMUR) );	 // state.params.TIBIA - state.params.FEMUR is impossible position
+	else if (&(state.vars.hip_to_end) < (state.params.TIBIA - state.params.FEMUR) ){ 
+		state.updateVar(&(state.vars.hip_to_end), 1.5 * (state.params.TIBIA - state.params.FEMUR) );	 // state.params.TIBIA - state.params.FEMUR is impossible position
 		// Think of better way to calculate minimal position - use Hip limit angle
 		UpdateHeight();
 	}
@@ -248,33 +248,10 @@ void Leg::writeAngles(){
 	}
 }
 
-// WRITE only a single angle contained in state.servo_angles[] TO PHYSCIAL SERVO
-void Leg::writeJoint(int idx){
-	if(!leg_right){
-		joints.idx.setGoalPosition(state.servo_angles.idx);
+
+void Leg::copyState(const Leg& leg_in){
+	if(this != &leg_in){
+		this->state = leg_in.state;
 	}
-	else{
-		if(state.servo_angles.idx != 0)		joints.idx.setGoalPosition(-state.servo_angles.idx);
-		else								joints.idx.setGoalPosition(state.servo_angles.idx);
-	}
-}
-
-
-/* ------------------------------------------------- GETTER AND COPY ------------------------------------------------- */
-
-/*
-double Leg::get(int param_type, int idx) const{
-	if 		(param_type==SERVO_ANGLE) 	return state.servo_angles.idx;
-	else if (param_type==STATE_VAR) 	return state.vars.idx;
-	else if (param_type==defaultPos_VAR) 	return state.get(defaultPos_VAR, idx);
-	else if (param_type==defaultPos_ANGLE) return state.get(defaultPos_ANGLE, idx);
-	else if (param_type==PARAM) 		return state.params.idx;
-	else if (param_type==ANGLE_LIMIT) 	return state.angle_limits[idx];
-	else return 0.0;
-}
-*/
-
-void Leg::copyState(const Leg& LegIn){
-	state = LegIn.state;
 }
 

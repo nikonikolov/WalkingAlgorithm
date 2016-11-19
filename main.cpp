@@ -7,11 +7,6 @@
 #include "src/Tripod.h"
 #include "src/Robot.h"
 
-#include "src/DnxSerialBase.h"
-#include "src/AX12A_Serial.h"
-#include "src/XL320_Serial.h"
-#include "src/include.h"
-
 #include "src/Master.h"
 
 // ROS Functionality
@@ -19,47 +14,33 @@
 //#include "wkq_msgs/RPC.h"
 
 
-/*  
- *	Global vars defined in other header files:
- *	PC pc - specifies connected pc for debugging purposes - initialized in include.h and include.cpp
- */
-
 int main(int argc, char **argv){
 
-	pc.set_debug();
+	printf("MAIN started\n\r");
 
 	BodyParams robot_params;
 
-	/*	@to do: 
-			deal with square values
-	*/	
 	robot_params.DIST_CENTER = 10.95;
 	robot_params.COXA = 2.65;
 	//robot_params.FEMUR = 17.5;
-	//robot_params.COXA = 2.65-1.6;
 	robot_params.FEMUR = 17.5-0.6;
 	robot_params.TIBIA = 30;
 	//robot_params.HIPKNEEMAXHDIST = 12.0;
 	robot_params.KNEE_TO_MOTOR_DIST = 2.25;
-
-	// PARAM_STEP defined in State_t.h. Meaning of each value defined in the same header
-	//const double robot_params[PARAM_STEP] = { 10.95, 2.65, 17.5, 30.0, 12.0, 2.25};
-	//const double robot_params[PARAM_STEP] = { P_DISTCENTER, P_COXA, P_FEMUR, P_TIBIA, P_HIPKNEEMAXHDIST, P_KNEEMOTORDIST};
+	robot_params.compute_squares();
 	
-	pc.print_debug("MAIN started\n");
 
 	int baud = 1000000; 		
 	double init_height = 10.0;	
 
 	Master* pixhawk = new Master();
 
-	pc.print_debug("Pixhawk initialized\n");
+	printf("Pixhawk initialized\n\r");
 
 	// Instantiate objects for communication with the servo motors 
-	//AX12A_Serial HipsKnees(p9, p10, baud);
-	//XL320_Serial Arms(p13, p14, baud);
-
-	pc.print_debug("Communication ready\n");
+	//SerialAX12 HipsKnees(DnxHAL::Port_t(p9, p10), baud);
+	//SerialXL320 Arms(DnxHAL::Port_t(p13, p14), baud);
+	printf("Communication ready\n\r");
 	
 
 	// Instantiate Robot
@@ -69,11 +50,11 @@ int main(int argc, char **argv){
 		wk_quad = new Robot(pixhawk, baud, init_height, robot_params, wkq::RS_FLAT_QUAD);					
 	}
 	catch(const string& msg){
-		pc.print_debug(msg);
+		printf("%s\n\r", msg.c_str());
 		exit(EXIT_FAILURE);
 	}
 
-	pc.print_debug("Robot Initialized\n");
+	printf("Robot Initialized\n\r");
 
 /*
 	// INIT ROS
@@ -90,11 +71,11 @@ int main(int argc, char **argv){
 
 	// Make the robot do something. Examples shown below. Check Robot.h for possible functions
 	//wk_quad->Stand();							// make the robot stand on its legs
-	//pc.print_debug("Robot Standing\n");		// make the robot walk
+	//printf("Robot Standing\n\r");		// make the robot walk
 	//wk_quad->WalkForward(0.5);
 
 */
-	pc.print_debug("End of Program\n");
+	printf("End of Program\n\r");
 	return 0;
 }
 

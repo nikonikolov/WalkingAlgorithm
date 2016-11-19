@@ -2,7 +2,7 @@
 
 #ifndef SIMULATION
 
-ServoJoint::ServoJoint(int ID_in, DnxSerialBase* serial_ptr_in) : ID(ID_in), serial_ptr(serial_ptr_in) {
+ServoJoint::ServoJoint(int ID_in, DnxHAL* serial_ptr_in) : ID(ID_in), serial_ptr(serial_ptr_in) {
 	setReturnLevel(1);	
 	//setPunch(512);	
 }
@@ -63,7 +63,7 @@ void ServoJoint::operator=(const ServoJoint& obj_in){
 #else
 
 
-ServoJoint::ServoJoint(int ID_in, DnxSerialBase* robot_view_in) : ID(ID_in)/*, robot_view(robot_view_in)*/{
+ServoJoint::ServoJoint(int ID_in, DnxHAL* robot_view_in) : ID(ID_in)/*, robot_view(robot_view_in)*/{
 	switch(ID){
 		case wkq::KNEE_LEFT_FRONT	:
 			servo_name = "knee_left_front";
@@ -174,7 +174,7 @@ int ServoJoint::setGoalPosition(int angle_in){
 
 int ServoJoint::setGoalPosition(double angle_in){
 	angle=angle_in;
-	pc.print_debug(servo_name + " set to " + dtos(wkq::degrees(angle)) +"\n\r");
+	printf("%s +  set to %d \n\r", servo_name.c_str(), angle);
 	return 0;
 }
 

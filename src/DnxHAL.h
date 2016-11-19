@@ -13,21 +13,32 @@ FUNCTIONALITY:
 
 */
 
-#ifndef DNXSERIALBASE_H
-#define DNXSERIALBASE_H
+#ifndef DNXHAL_H
+#define DNXHAL_H
 
-#include "include.h"
-#include <math.h>
+//#define _USE_MATH_DEFINES
+//#include <math.h>
 #include <cstdint>
+#include <string>
+using std::string;
 
+// Include platform specific libraries
+#include "mbed.h"
 
-class DnxSerialBase{
+class DnxHAL{
 
 public:
 
-	DnxSerialBase(PinName tx, PinName rx, int baudIn, int ReturnLvlIn =1);
+	// Define the type for the constructor argument
+    struct Port_t{
+    	Port_t(PinName tx_in, PinName rx_in) : tx(tx_in), rx(rx_in) {}
+    	PinName tx;
+    	PinName rx;
+    };
 
-	virtual ~DnxSerialBase();
+	DnxHAL(const DnxHAL::Port_t& port_in, int baud_in, int return_lvl_in =1);
+
+	virtual ~DnxHAL();
 
     int setID(int ID, int newID);
 	int getValue(int ID, int address);
@@ -55,9 +66,9 @@ protected:
 	int read(uint8_t* buf, int nMax=255);
 
 	int angleScale(double angle);
-	int AddressLength(int address, const uint8_t * TWO_BYTE_ADDRESSES);
+	int getAddressLen(int address, const uint8_t * TWO_BYTE_ADDRESSES);
 	void packetPrint(int bytes, uint8_t* buf);
-	
+
 	virtual int statusError(uint8_t* buf, int n) =0;
 	virtual int send(int ID, int bytes, uint8_t* parameters, uint8_t ins) =0;
 
@@ -69,31 +80,33 @@ protected:
 	// and others don't respond. ID_Broadcast does not reply as well 
     uint8_t reply_buf[256];		
 
-    mbed::Serial* port;
-    int baud;
-    double bitPeriod;
-    int ReturnLvl = 1;
+    mbed::Serial* port_;
+    int baud_;
+    double bit_period_;
+    int return_lvl_ = 1;
 
+    bool debug_ = true;
+    FILE* fp_debug_ = stdout;
 };
 
 // Control table: Only matching addresses are included
-#define DnxSerialBase_ID 						3
-#define DnxSerialBase_BAUD 						4
+#define DNXHAL_ID 						3
+#define DNXHAL_BAUD 						4
 
 const uint8_t ID_Broadcast = 0xFE; // 254(0xFE) ID writes to all servos on the line
 
 template<class Type>
-inline uint8_t DnxSerialBase::lobyte(Type num){
+inline uint8_t DnxHAL::lobyte(Type num){
 	return (uint8_t)num;
 }
 
 template<class Type>
-inline uint8_t DnxSerialBase::hibyte(Type num){
+inline uint8_t DnxHAL::hibyte(Type num){
 	return (uint8_t) (((uint16_t)num)>>8);
 }
 
 template<class T1, class T2>
-inline uint16_t DnxSerialBase::makeword(T1 num1, T2 num2){
+inline uint16_t DnxHAL::makeword(T1 num1, T2 num2){
 	return ( ((uint16_t)num1 & 0x00ff) | ( ((uint16_t)(num2) & 0x00ff) << 8 ) );
 }
 

@@ -27,6 +27,9 @@ namespace wkq{
 		return radians/wkq::PI*180.0;
 	}
 
+	inline bool compare_doubles(double a, double b, double error = 0.01){
+		return fabs(a - b) <= error;
+	}
 
 	/* 	SERVO NAMES: Number corresponds to ID of the servo
 	 	NOTE: Try to keep IDs the same. Changing them will cause bugs in Tripod constructor parameters 

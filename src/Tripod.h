@@ -41,7 +41,7 @@ class Tripod{
 
 public:
 	Tripod(int ID_front_knee, int ID_middle_knee, int ID_back_knee,
-			DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, BodyParams robot_params);
+			DnxHAL* HipsKnees, DnxHAL* Arms, double height_in, const BodyParams& robot_params);
 
 	~Tripod ();
 
@@ -57,7 +57,7 @@ public:
 	void standQuad();					// Same as stand() but arms configured as quad
 	void flatQuad();					// Straighten legs to fly as a quad
 
-	double standing();					// Determines if standing, and if not returns by how much should be lifted
+	//double standing();					// Determines if standing, and if not returns by how much should be lifted
 
 	/* ------------------------------------ WALKING MOVEMENTS ----------------------------------- */
 	
@@ -84,7 +84,8 @@ private:
 	void writeAngles();
 	void writeHipKneeAngles();
 
-	Leg Legs[LEG_COUNT];
+	//TripodLegs legs;
+	Leg legs[LEG_COUNT];
 
 	static const double leg_lift;
 };

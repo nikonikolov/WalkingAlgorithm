@@ -15,8 +15,7 @@ CURRENT STATE:
 #ifndef MASTER_H
 #define MASTER_H
 
-#include "include.h"
-
+#include "mbed.h"
 
 class Master{
 public:
@@ -34,7 +33,7 @@ private:
     mbed::Serial* port;
 #endif
     int baud;
-    double bitPeriod;
+    double bit_period_;
 };
 
 

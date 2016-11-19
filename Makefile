@@ -4,7 +4,7 @@
 GCC_BIN = 
 PROJECT = bin/wkquad
 OBJECTS = ./main.o $(HARDWARE_OBJS) $(SOFTWARE_OBJS)
-HARDWARE_OBJS = ./src/include.o ./src/DnxSerialBase.o ./src/AX12A_Serial.o ./src/XL320_Serial.o ./src/PCSerial.o 
+HARDWARE_OBJS = ./src/DnxHAL.o ./src/SerialAX12.o ./src/SerialXL320.o 
 SOFTWARE_OBJS = ./src/ServoJoint.o ./src/robot_types.o ./src/State_t.o ./src/Leg.o ./src/Tripod.o ./src/Robot.o ./src/wkq.o ./src/Master.o
 
 SOFTWARE_SRCS = ./src/ServoJoint.cpp ./src/robot_types.cpp ./src/State_t.cpp ./src/Leg.cpp ./src/Tripod.cpp ./src/Robot.cpp ./src/wkq.cpp ./src/Master.cpp
@@ -47,8 +47,8 @@ endif
 all: $(PROJECT).bin $(PROJECT).hex size
 
 # to compile with debug information use command make bin/sim GDB=-g
-bin/sim: $(SOFTWARE_SRCS) $(SOFTWARE_HDRS) ./src/include.cpp ./src/include.h ./src/PCSerial.cpp ./src/PCSerial.h simulation.cpp 
-	g++ -DSIMULATION -std=gnu++11 $(GDB) simulation.cpp $(SOFTWARE_SRCS) ./src/PCSerial.cpp ./src/include.cpp -o bin/sim
+bin/sim: $(SOFTWARE_SRCS) $(SOFTWARE_HDRS) simulation.cpp 
+	g++ -DSIMULATION -std=gnu++11 $(GDB) simulation.cpp $(SOFTWARE_SRCS) -o bin/sim
 
 clean:
 	-rm -f $(PROJECT).bin $(PROJECT).elf $(PROJECT).hex $(PROJECT).map $(PROJECT).lst $(OBJECTS) $(DEPS)

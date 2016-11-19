@@ -6,7 +6,6 @@
 
 struct BodyParams{
 
-//public:
     //void operator=(const BodyParams& obj_in);
  
     double DIST_CENTER;
@@ -20,21 +19,17 @@ struct BodyParams{
     double TIBIA_SQ;
     double KNEE_TO_MOTOR_DIST_SQ;
 
+    void compute_squares(){
+        DIST_CENTER_SQ = pow(DIST_CENTER, 2);
+        COXA_SQ = pow(COXA, 2);
+        FEMUR_SQ = pow(FEMUR, 2);
+        TIBIA_SQ = pow(TIBIA, 2);
+        KNEE_TO_MOTOR_DIST_SQ = pow(KNEE_TO_MOTOR_DIST, 2);
+    }
 /*
     BodyParams(double dist_center, double coxa, double femur, double tibia, double knee_to_motor_dist) : 
         DIST_CENTER(dist_center), COXA(coxa), FEMUR(femur), TIBIA(tibia), KNEE_TO_MOTOR_DIST(knee_to_motor_dist),
         DIST_CENTER_SQ(pow(dist_center, 2)), COXA_SQ(pow(coxa, 2)), FEMUR_SQ(pow(femur, 2)), TIBIA_SQ(pow(tibia, 2)), KNEE_TO_MOTOR_DIST_SQ(pow(knee_to_motor_dist, 2)) {}
-
-    const double DIST_CENTER;
-    const double COXA;
-    const double FEMUR;
-    const double TIBIA;
-    const double KNEE_TO_MOTOR_DIST;
-    const double DIST_CENTER_SQ;
-    const double COXA_SQ;
-    const double FEMUR_SQ;
-    const double TIBIA_SQ;
-    const double KNEE_TO_MOTOR_DIST_SQ;
 
     @Not included:
         #define HIPKNEEMAXHDIST     4
@@ -43,7 +38,6 @@ struct BodyParams{
 
 struct DynamicVars{
 
-//public:
     void operator=(const DynamicVars& obj_in);
     void operator=(double value);
 
@@ -59,9 +53,6 @@ struct DynamicVars{
 
 
 struct LegAngles{
-
-//public:
-    
     /*
     LegAngles(double knee_in, double hip_in, double arm_in) :
         knee(knee_in), hip(hip_in), arm(arm_in) {}
@@ -73,7 +64,6 @@ struct LegAngles{
     double knee;
     double hip;
     double arm;
-    //double wing;
 };
 
 struct LegJoints{
@@ -83,10 +73,16 @@ struct LegJoints{
     ServoJoint arm;
 };
 
-/*
-struct JointLimits{
 
-//public:
+
+/*
+struct TripodLegs{
+    Leg front_leg;
+    Leg back_leg;
+    Leg middle_leg;
+};
+
+struct JointLimits{
 
     JointLimits(knee_max_in, knee_min_in, hip_max_in, hip_min_in, arm_max_in, arm_min_in) :
         knee_max(knee_max_in), knee_min(knee_min_in), 

@@ -1,23 +1,19 @@
-#include "AX12A_Serial.h"
+#include "SerialAX12.h"
 
 
-/* ******************************** PUBLIC METHODS ************************************** */
-
-AX12A_Serial::AX12A_Serial(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn /*=1*/) :
-	DnxSerialBase(tx, rx, baudIn, ReturnLvlIn){
-	pc.print_debug("AX12A_Serial object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + dtos(bitPeriod) + " us\n\r");
+SerialAX12::SerialAX12(const DnxHAL::Port_t& port_in, int baud_in, int return_level_in /*=1*/) :
+	DnxHAL(port_in, baud_in, return_level_in){
+	if(debug_) fprintf(fp_debug_, "SerialAX12: Object attached to serial at baud rate %ld and bit period of %f us\n", baud_in, bit_period_);
 }
 
-
-
-AX12A_Serial::~AX12A_Serial(){}
+SerialAX12::~SerialAX12(){}
 
 
 
 // 1: 1Mbps, 3: 500 000, 4: 400 000, 7: 250 000, 9: 200 000, 16: 115200, 34: 57600, 103: 19200, 207: 9600
-int AX12A_Serial::setBaud(int ID, int rate) {
+int SerialAX12::setBaud(int ID, int rate) {
 	if ( rate != 1 && rate != 3 && rate != 4 && rate != 7 && rate != 9 && rate != 16  && rate != 34 && rate != 103 && rate != 207 ) {
-		pc.print_debug("Incorrect baud rate\n\r");
+		if(debug_) fprintf(fp_debug_, "SerialAX12: Incorrect baud rate\n");
 		return 1;
 	}
 
@@ -25,38 +21,54 @@ int AX12A_Serial::setBaud(int ID, int rate) {
 }
 
 // Set which commands return status; 0: None, 1: Read, 2: All.
-int AX12A_Serial::setReturnLevel(int ID, int lvl) {
-	ReturnLvl=lvl;
-	return dataPush(ID, AX_RETURN_LEVEL, ReturnLvl);
+int SerialAX12::setReturnLevel(int ID, int lvl) {
+	return_lvl_ = lvl;
+	return dataPush(ID, AX_RETURN_LEVEL, return_lvl_);
 }
 
 
 
 // 1024 = -150 degrees CCW, 512 = 0 degrees (ORIGIN), 0 = +150 degrees CW
-int AX12A_Serial::setGoalPosition(int ID, int angle){
+int SerialAX12::setGoalPosition(int ID, int angle){
 	return dataPush(ID, AX_GOAL_POSITION, angle);
 }
 
-int AX12A_Serial::setGoalPosition(int ID, double angle){
+int SerialAX12::setGoalPosition(int ID, double angle){
 	return dataPush(ID, AX_GOAL_POSITION, angleScale(angle));
 }
 
-int AX12A_Serial::setGoalVelocity(int ID, int velocity){
+int SerialAX12::setGoalVelocity(int ID, int velocity){
 	return dataPush(ID, AX_GOAL_VELOCITY, velocity);
 }
 
-int AX12A_Serial::setGoalTorque(int ID, int torque){
+int SerialAX12::setGoalTorque(int ID, int torque){
 	return dataPush(ID, AX_MAX_TORQUE, torque);
 }
 
-int AX12A_Serial::setPunch(int ID, int punch){
+int SerialAX12::setPunch(int ID, int punch){
 	return dataPush(ID, AX_PUNCH, punch);
 }
 
 // Turn LED on (0x01) and off (0x00)
-int AX12A_Serial::setLED(int ID, int value){
+int SerialAX12::setLED(int ID, int value){
 	return dataPush(ID, AX_LED, value);
 }
+
+int SerialAX12::setCCWLimit(int ID, int value){
+	return dataPush(ID, AX_CCW_ANGLE_LIMIT, value);
+}
+int SerialAX12::setCWLimit(int ID, int value){	
+	return dataPush(ID, AX_CW_ANGLE_LIMIT, value);
+}
+
+int SerialAX12::enable(int ID){
+	return dataPush(ID, AX_TORQUE_ENABLE, 1);
+}
+
+int SerialAX12::disable(int ID){
+	return dataPush(ID, AX_TORQUE_ENABLE, 0);
+}
+
 
 /* ******************************** PUBLIC METHODS END ************************************** */
 
@@ -64,7 +76,7 @@ int AX12A_Serial::setLED(int ID, int value){
 
 
 // Dynamixel Communication 1.0 Checksum
-uint8_t AX12A_Serial::update_crc(uint8_t *data_blk_ptr, const uint16_t& data_blk_size) {
+uint8_t SerialAX12::update_crc(uint8_t *data_blk_ptr, const uint16_t& data_blk_size) {
     
     uint8_t crc_accum=0;
     
@@ -78,23 +90,23 @@ uint8_t AX12A_Serial::update_crc(uint8_t *data_blk_ptr, const uint16_t& data_blk
 
 
 // Return Length of Address
-int AX12A_Serial::AddressLength(int address) {
-	return DnxSerialBase::AddressLength(address, TWO_BYTE_ADDRESSES);
+int SerialAX12::getAddressLen(int address) {
+	return DnxHAL::getAddressLen(address, TWO_BYTE_ADDRESSES);
 }
 
 
-int AX12A_Serial::statusError(uint8_t* buf, int n) {
+int SerialAX12::statusError(uint8_t* buf, int n) {
 	
 	// Minimum return length
 	if (n < 6) {
 		flush();
-		pc.print_debug("READING CORRUPTION\n\r");
+		if(debug_) fprintf(fp_debug_, "SerialAX12: READING CORRUPTION\n");
 		return -1; 
 	}
 
 	if ((buf[0]!=0xFF)||(buf[1]!=0xFF)) {
 		flush();
-		pc.print_debug("WRONG RETURN HEADER\n\r");
+		if(debug_) fprintf(fp_debug_, "SerialAX12: WRONG RETURN HEADER\n");
 		packetPrint(n, buf);
 		return -1; 
 	}
@@ -103,37 +115,37 @@ int AX12A_Serial::statusError(uint8_t* buf, int n) {
 	// The last byte does not get included in the checksum
 	if(checksum != buf[n-1]){
 		flush();
-			pc.print_debug("WRONG RETURN CHECKSUM\n\r");
+			if(debug_) fprintf(fp_debug_, "SerialAX12: WRONG RETURN CHECKSUM\n");
 			packetPrint(n, buf);
-			pc.print_debug("CHECKSUM READ IS " + to_hex(checksum)+"\n\r");
+			if(debug_) fprintf(fp_debug_, "SerialAX12: CHECKSUM READ IS %x\n", checksum);
 		return -1;
 	}
 
 	if ( (buf[3]+4) != n ) {
 		flush();
-		pc.print_debug("WRONG RETURN LENGHT\n\r");
+		if(debug_) fprintf(fp_debug_, "SerialAX12: WRONG RETURN LENGHT\n");
 		packetPrint(n, buf);
 		return -1;
 	}
 
 	if(buf[4]!=0 ){
-		pc.print_debug("STATUS ERROR \n\r");
+		if(debug_) fprintf(fp_debug_, "SerialAX12: STATUS ERROR \n");
 		// bit 0
-		 if ( !(buf[4] & 0x01) ) pc.print_debug("VOLTAGE OUT OF RANGE\n\r");	
+		 if ( !(buf[4] & 0x01) ) if(debug_) fprintf(fp_debug_, "SerialAX12: VOLTAGE OUT OF RANGE\n");	
 		// bit 1
-		else if ( !(buf[4] & 0x02) ) pc.print_debug("REQUIRED POSITION OUT OF RANGE\n\r");
+		else if ( !(buf[4] & 0x02) ) if(debug_) fprintf(fp_debug_, "SerialAX12: REQUIRED POSITION OUT OF RANGE\n");
 		// bit 2
-		else if ( !(buf[4] & 0x04) ) pc.print_debug("TEMPERATURE OUT OF RANGE\n\r");
+		else if ( !(buf[4] & 0x04) ) if(debug_) fprintf(fp_debug_, "SerialAX12: TEMPERATURE OUT OF RANGE\n");
 		// bit 3
-		else if ( !(buf[4] & 0x08) ) pc.print_debug("COMMAND OUT OF RANGE\n\r");
+		else if ( !(buf[4] & 0x08) ) if(debug_) fprintf(fp_debug_, "SerialAX12: COMMAND OUT OF RANGE\n");
 		// bit 4
-		else if ( !(buf[4] & 0x10) ) pc.print_debug("CORRUPTED PACKAGE SENT - CRC DOES NOT MATCH\n\r");
+		else if ( !(buf[4] & 0x10) ) if(debug_) fprintf(fp_debug_, "SerialAX12: CORRUPTED PACKAGE SENT - CRC DOES NOT MATCH\n");
 		// bit 5
-		else if ( !(buf[4] & 0x20) ) pc.print_debug("LOAD OUT OF RANGE\n\r");
+		else if ( !(buf[4] & 0x20) ) if(debug_) fprintf(fp_debug_, "SerialAX12: LOAD OUT OF RANGE\n");
 		// bit 6
-		else if ( !(buf[4] & 0x40) ) pc.print_debug("UNDEFINED OR MISSING COMMAND\n\r");
+		else if ( !(buf[4] & 0x40) ) if(debug_) fprintf(fp_debug_, "SerialAX12: UNDEFINED OR MISSING COMMAND\n");
 		// bit 7
-		else if ( !(buf[4] & 0x80) ) pc.print_debug("GLITCH\n\r");
+		else if ( !(buf[4] & 0x80) ) if(debug_) fprintf(fp_debug_, "SerialAX12: GLITCH\n");
 		return -1;
 	}
 
@@ -143,7 +155,7 @@ int AX12A_Serial::statusError(uint8_t* buf, int n) {
 
 // Packs data and sends it to the servo
 // Dynamixel Communication 1.0 Protocol: Header, ID, Packet Length, Instruction, Parameter, 16bit CRC
-int AX12A_Serial::send(int ID, int packetLength, uint8_t* parameters, uint8_t ins) {
+int SerialAX12::send(int ID, int packetLength, uint8_t* parameters, uint8_t ins) {
 	
 	uint8_t buf[packetLength+6]; // Packet
 
@@ -170,35 +182,35 @@ int AX12A_Serial::send(int ID, int packetLength, uint8_t* parameters, uint8_t in
 
 	// Transmit
 	write(buf, packetLength+6);
-	//pc.print_debug("Packet written");
+	//if(debug_) fprintf(fp_debug_, "Packet written");
 	
 	// Broadcast and Reply Lvl less than 2 do not reply
-	if (ID == ID_Broadcast || ReturnLvl==0 || (ReturnLvl==1 && ins!=AX_INS_Read)) {
+	if (ID == ID_Broadcast || return_lvl_==0 || (return_lvl_==1 && ins!=AX_INS_Read)) {
 		return 0;	
 	}
 
 	
 	// Read reply
-	pc.print_debug("Reading reply\n\r");	
+	if(debug_) fprintf(fp_debug_, "SerialAX12: Reading reply\n");	
 
 	int n = read(reply_buf);
 	if (n == 0) {
-		pc.print_debug("Could not read status packet\n\r");
+		if(debug_) fprintf(fp_debug_, "SerialAX12: Could not read status packet\n");
 		return 0;
 	}
 
-	pc.print_debug("- Read " + itos(n) + " bytes\n\r");
+	if(debug_) fprintf(fp_debug_, "SerialAX12: - Read %d bytes\n", n);
 
 	return statusError(reply_buf, n); // Return Error code
 }
 
 
 // dataPack sets the parameters in char array and returns length.
-int AX12A_Serial::dataPack(uint8_t ins, uint8_t ** parameters, int address, int value /*=0*/){
+int SerialAX12::dataPack(uint8_t ins, uint8_t ** parameters, int address, int value /*=0*/){
 
 	uint8_t* data; 
 	
-	int adrl = AddressLength(address);
+	int adrl = getAddressLen(address);
 
 	int size;
 	if (ins == AX_INS_Write) size = adrl+1;
@@ -225,7 +237,7 @@ int AX12A_Serial::dataPack(uint8_t ins, uint8_t ** parameters, int address, int 
 
 
 // dataPush is a generic wrapper for single value SET instructions for public methods
-int AX12A_Serial::dataPush(int ID, int address, int value){
+int SerialAX12::dataPush(int ID, int address, int value){
 	flush(); // Flush reply for safety															
 	
 	uint8_t* parameters;
@@ -240,7 +252,7 @@ int AX12A_Serial::dataPush(int ID, int address, int value){
 
 
 // dataPull is a generic wrapper for single value GET instructions for public methods
-int AX12A_Serial::dataPull(int ID, int address){
+int SerialAX12::dataPull(int ID, int address){
 	flush(); // Flush reply	for safety														
 	
 	uint8_t* parameters;
@@ -263,14 +275,14 @@ int AX12A_Serial::dataPull(int ID, int address){
    	}
 
    	else{
-   		pc.print_debug("WRONG ID " + to_hex(reply_buf[2]) + " REPLIED\n\r");
+   		if(debug_) fprintf(fp_debug_, "SerialAX12: WRONG ID %x REPLIED\n", reply_buf[2]);
    		return -1;
    	}
 }
 
 
 
-const uint8_t AX12A_Serial::TWO_BYTE_ADDRESSES[11] = { 0, 6, 8, 14, 30, 32, 34, 36, 38, 40, 48 };
+const uint8_t SerialAX12::TWO_BYTE_ADDRESSES[11] = { 0, 6, 8, 14, 30, 32, 34, 36, 38, 40, 48 };
 
 
 /* ******************************** PRRIVATE METHODS END ************************************** */

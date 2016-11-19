@@ -24,19 +24,18 @@ FRAMEWORK:
 */
 
 
-#ifndef XL320_SERIAL_H
-#define XL320_SERIAL_H
+#ifndef SERIALXL320_H
+#define SERIALXL320_H
 
-#include "DnxSerialBase.h"
+#include "DnxHAL.h"
 
 
-class XL320_Serial : public DnxSerialBase {
+class SerialXL320 : public DnxHAL {
  
 public:
  	
-	XL320_Serial(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn =1);
-
-    ~XL320_Serial();
+	SerialXL320(const DnxHAL::Port_t& port_in, int baud_in, int return_lvl_in=1);
+    ~SerialXL320();
     
     int setBaud(int ID, int rate);
     int setReturnLevel(int ID, int lvl);
@@ -46,22 +45,18 @@ public:
 	int setGoalVelocity(int ID, int velocity);
 	int setGoalTorque(int ID, int torque);
 	int setPunch(int ID, int punch);			// Sets the current to drive the motors
+    int setLED(int ID, int colour);
     
     int setP(int ID, int value);
 	int setI(int ID, int value);
 	int setD(int ID, int value);
-
-	//int Test(int ID);
-    int Ping(int ID=1);
-    int setLED(int ID, int colour); 
-    int Rainbow(int ID);
 
 private:
 	
 	uint16_t update_crc(uint16_t crc_accum, uint8_t *data_blk_ptr, const uint16_t& data_blk_size);
 	int PacketLength(uint8_t* buf);				// Returns length of packet
 
-	int AddressLength(int address);				// Returns length of an address in the Motor Control Table
+	int getAddressLen(int address);				// Returns length of an address in the Motor Control Table
 	int statusError(uint8_t* buf, int n);
 	int send(int ID, int bytes, uint8_t* parameters, uint8_t ins);
 
@@ -70,7 +65,6 @@ private:
 	int dataPull(int ID, int address);
     
 	static const uint8_t TWO_BYTE_ADDRESSES[11];
-
 };
 
 // EEPROM 
@@ -128,4 +122,4 @@ const uint8_t XL_INS_SyncWrite = 0x83;    // Write data from the same location a
 const uint8_t XL_INS_BulkRead = 0x92;     // Read data from the different locations and different sizes for multiple devices simultaneously
 const uint8_t XL_INS_BulkWrite = 0x93;    // Write data from the different locations and different sizes for multiple devices simultaneously
 
-#endif  // XL320_Serial_H
+#endif  // SERIALXL320_H

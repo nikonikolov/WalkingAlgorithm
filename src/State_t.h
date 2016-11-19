@@ -58,7 +58,6 @@ FRAMEWORK:
 #define STATE_T_H
 
 #include "wkq.h"
-#include "include.h"
 #include <cmath>
 #include "robot_types.h"
 #include <stddef.h>
@@ -68,61 +67,56 @@ class State_t{
 
 public:
 	
-	State_t(double height_in, BodyParams& robot_params);
-
+	State_t(double height_in, const BodyParams& robot_params);
 	~State_t();
 
-	/* ---------------------------------------- GETTER AND COPY ---------------------------------------- */
-
-	//double get(int param_type, int idx) const;
 	void operator=(const State_t& StateIn);
 
 
 	/* ------------------------------------ LEG STATIC POSITIONS ----------------------------------- */
 
-	void legDefaultPos();					// Reset all Leg variables to their defaultPos values
-	void legCenter();					// Reset all Legs to their central positions and keep current height
-	void legStand();					// Centralize all Legs for a standing state where height = Tibia
-	void legFlatten();					// flatten the knee
-
+	void legDefaultPos();									// Reset all Leg variables to their defaultPos values
+	void legCenter();										// Reset all Legs to their central positions and keep current height
+	void legStand();										// Centralize all Legs for a standing state where height = Tibia
+	void legFlatten();										// flatten the knee
 
 	/* ------------------------------------ MAINTAINING LEG STATE ----------------------------------- */
 
-	void updateVar(int* address, double value, bool update_state=true);
-	void updateVar(int* address, double value, int* address_sq, double value_sq);
+	void updateVar(double* address, double value, bool update_state=true);
+	void updateVar(double* address, double value, double* address_sq, double value_sq);
 
-	void clear();										// Clears vars[] - needed for flight-related actions
-	//void StateVerify();								// Verifies the current leg state is physically possible and accurate
+	void clear();											// Clears vars[] - needed for flight-related actions
+	//void StateVerify();									// Verifies the current leg state is physically possible and accurate
 
-	void centerAngles(double height =0.0); // Compute median HIP, KNEE based on params[] and HEIGHT/height. Calls computeEFVars()
-//	void setAngles(double knee, double hip, double arm, double wing);	// Calls computeVars()
+	void centerAngles(double height =0.0); 					// Compute median HIP, KNEE based on params[] and HEIGHT/height. Calls computeEFVars()
 	void setAngles(double knee, double hip, double arm);	// Calls computeVars()
 
 
-	/* ============================================== PUBLIC MEMBER DATA ============================================== */
+	/* ------------------------------------ PUBLIC MEMBER DATA ------------------------------------ */
 
-	BodyParams 				params;						// Store const parameters of the robot
-	LegAngles 				servo_angles;						// In radians: 0.0 - center, positive - CW, negative - CCW
-	DynamicVars 			vars;						// Store current values of variables that determine state of the robot
+	BodyParams 				params;							// Store const parameters of the robot
+	LegAngles 				servo_angles;					// In radians: 0.0 - center, positive - CW, negative - CCW
+	DynamicVars 			vars;							// Store current values of variables that determine state of the robot
 
-	//static Leg_Joints 		angle_limits_max, angle_limits_min;					// Store angle limits of the robot
+	//static Leg_Joints 	angle_limits_max;				// Store max angle limits of the robot
+	//static Leg_Joints 	angle_limits_min;				// Store min angle limits of the robot
 
 private:
 
 	/* ------------------------------------ MAINTAINING LEG STATE ----------------------------------- */
 
-	void update(int idx);				// Auto-invoked when any vars[] changes in order to keep leg state consistent
-	void updateAngles();						// Update KNEE and HIP servo_angles basing on the current hip_to_end and HEIGHT
-	void computeEFVars(double height=0.0); // Compute hip_to_end, arm_ground_to_ef based on KNEE, HEIGHT/height; called by centerAngles()
-	void computeVars();							// Computes valid vars[] basing on servo_angles[]
+	void update(double* address);							// Auto-invoked when any vars[] changes in order to keep leg state consistent
+	void updateAngles();									// Update KNEE and HIP servo_angles basing on the current hip_to_end and HEIGHT
+	void computeEFVars(double height=0.0); 					// Compute hip_to_end, arm_ground_to_ef based on KNEE, HEIGHT/height; called by centerAngles()
+	void computeVars();										// Computes valid vars[] basing on servo_angles[]
 
 
-	/* ============================================== PRIVATE MEMBER DATA ============================================== */
+	/* ------------------------------------ PRIVATE MEMBER DATA ------------------------------------ */
 	
-	static LegAngles 		default_pos_angles;			// Store default values for vars.var_count
-	static DynamicVars		default_pos_vars; 			// Store default values for servo_angles[VAR_COUNT]
+	static LegAngles 		default_pos_angles;				// Store default values for vars.var_count
+	static DynamicVars		default_pos_vars; 				// Store default values for servo_angles[VAR_COUNT]
 
-	static bool 			default_pos_calculated;		// Needed to know whether to calculate defaultPoss
+	static bool 			default_pos_calculated;			// Needed to know whether to calculate defaultPoss
 };
 
 

@@ -1,105 +1,72 @@
-#include "XL320_Serial.h"
+#include "SerialXL320.h"
 
 
 /* ******************************** PUBLIC METHODS ************************************** */
 
-XL320_Serial::XL320_Serial(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn /*=1*/) :
-	DnxSerialBase(tx, rx, baudIn, ReturnLvlIn){
-	pc.print_debug("XL320_Serial object attached to serial at baud rate " + itos(baudIn) + " and bitPeriod of " + dtos(bitPeriod) + " us\n\r");
+SerialXL320::SerialXL320(const DnxHAL::Port_t& port_in, int baud_in, int return_level_in /*=1*/) :
+    DnxHAL(port_in, baud_in, return_level_in){
+    if(debug_) fprintf(fp_debug_, "XL320_SERIAL: Object attached to serial at baud rate %ld and bit period of %f us\n", baud_in, bit_period_);
 }
 
-
-XL320_Serial::~XL320_Serial(){}
-
+SerialXL320::~SerialXL320(){}
 
 
 // 0: 9600, 1:57600, 2:115200, 3:1Mbps
-int XL320_Serial::setBaud(int ID, int rate) {
+int SerialXL320::setBaud(int ID, int rate) {
 	if ((rate > 3) || rate < 0) {
-		pc.print_debug("XL320_Serial: Incorrect baud rate\n\r");
+		if(debug_) fprintf(fp_debug_, "SerialXL320: Incorrect baud rate\n\r");
 		return 1;
 	}
 	return dataPush(ID, XL_BAUD_RATE, rate);
 }
 
 // Set which commands return status; 0: None, 1: Read, 2: All.
-int XL320_Serial::setReturnLevel(int ID, int lvl) {
-	ReturnLvl=lvl;
-	return dataPush(ID, XL_RETURN_LEVEL, ReturnLvl);
+int SerialXL320::setReturnLevel(int ID, int lvl) {
+	return_lvl_=lvl;
+	return dataPush(ID, XL_RETURN_LEVEL, return_lvl_);
 }
 
 
 
 // 1024 = -150 degrees CCW, 512 = 0 degrees (ORIGIN), 0 = +150 degrees CW
-int XL320_Serial::setGoalPosition(int ID, int angle){
+int SerialXL320::setGoalPosition(int ID, int angle){
 	return dataPush(ID, XL_GOAL_POSITION_L, angle);
 }
 
-int XL320_Serial::setGoalPosition(int ID, double angle){
+int SerialXL320::setGoalPosition(int ID, double angle){
 	return dataPush(ID, XL_GOAL_POSITION_L, angleScale(angle));
 }
 
-int XL320_Serial::setGoalVelocity(int ID, int velocity){
+int SerialXL320::setGoalVelocity(int ID, int velocity){
 	return dataPush(ID, XL_GOAL_SPEED_L, velocity);
 }
 
-int XL320_Serial::setGoalTorque(int ID, int torque){
+int SerialXL320::setGoalTorque(int ID, int torque){
 	return dataPush(ID, XL_GOAL_TORQUE, torque);
 }
 
-int XL320_Serial::setPunch(int ID, int punch){
+int SerialXL320::setPunch(int ID, int punch){
 	return dataPush(ID, XL_PUNCH, punch);
 }
 
+// Sets motor led colours. r = 1, g = 2, y = 3, b = 4, p = 5, c = 6, w = 7, o = 0
+int SerialXL320::setLED(int ID, int colour){
+    return dataPush(ID, XL_LED, colour);
+}
 
-
-int XL320_Serial::setP(int ID, int value){
+int SerialXL320::setP(int ID, int value){
 	return dataPush(ID, XL_P_GAIN, value);
 }
 
-int XL320_Serial::setI(int ID, int value){
+int SerialXL320::setI(int ID, int value){
 	return dataPush(ID, XL_I_GAIN, value);
 }
 
-int XL320_Serial::setD(int ID, int value){
+int SerialXL320::setD(int ID, int value){
 	return dataPush(ID, XL_D_GAIN, value);
 }
 
 
-
-// Ping
-int XL320_Serial::Ping(int ID /*=1*/){
-
-	int ec = send(ID, 0, NULL, XL_INS_Ping);
-	pc.print_debug(" - ec " + itos(ec));
-	if (ec != 0) {
-		pc.print_debug("PING { ");
-		for (int i = 0; i < 15; ++i){
-			pc.print_debug(to_hex(reply_buf[i]) + " ");
-		}
-		pc.print_debug("}\n\r");
-	}
-
-	return ec;
-}
-
-// Sets motor led colours. r = 1, g = 2, y = 3, b = 4, p = 5, c = 6, w = 7, o = 0
-int XL320_Serial::setLED(int ID, int colour){
-	return dataPush(ID, XL_LED, colour);
-}
-
-// Rainbow
-int XL320_Serial::Rainbow(int ID){
-	for (int i = 1; i < 8; ++i)
-	{
-		int status = setLED(ID, i);
-		if (status != 0) {
-			return status;
-		}
-		wait(1);
-	}
-	return setLED(ID, 0);
-}
 
 /* ******************************** PUBLIC METHODS END************************************** */
 
@@ -108,7 +75,7 @@ int XL320_Serial::Rainbow(int ID){
 
 
 // Dynamixel Communication 2.0 Checksum
-uint16_t XL320_Serial::update_crc(uint16_t crc_accum, uint8_t *data_blk_ptr, const uint16_t& data_blk_size) {
+uint16_t SerialXL320::update_crc(uint16_t crc_accum, uint8_t *data_blk_ptr, const uint16_t& data_blk_size) {
     uint16_t i, j;
     uint16_t crc_table[256] = {
         0x0000, 0x8005, 0x800F, 0x000A, 0x801B, 0x001E, 0x0014, 0x8011,
@@ -154,7 +121,7 @@ uint16_t XL320_Serial::update_crc(uint16_t crc_accum, uint8_t *data_blk_ptr, con
 
 
 // Returns Length of Packet
-int XL320_Serial::PacketLength(uint8_t* buf) {
+int SerialXL320::PacketLength(uint8_t* buf) {
 	// Header(3) + Reserved(1) + ID(1) +  Packet Length(?) + CRC(2)
 	int Length = makeword(buf[5], buf[6]) + 7;
 	return Length;
@@ -162,23 +129,23 @@ int XL320_Serial::PacketLength(uint8_t* buf) {
 
 
 // Returns Length of Address
-int XL320_Serial::AddressLength(int address) {
-	return DnxSerialBase::AddressLength(address, TWO_BYTE_ADDRESSES);
+int SerialXL320::getAddressLen(int address) {
+	return DnxHAL::getAddressLen(address, TWO_BYTE_ADDRESSES);
 }
 
 
-int XL320_Serial::statusError(uint8_t* buf, int n) {
+int SerialXL320::statusError(uint8_t* buf, int n) {
 
 	// Minimum return length
 	if (n < 11) {
 		flush();
-		pc.print_debug("READING CORRUPTION\n\r");
+		if(debug_) fprintf(fp_debug_, "SerialXL320: READING CORRUPTION\n\r");
 		return -1; 
 	}
 
 	if ((buf[0]!=0xFF)||(buf[1]!=0xFF)||(buf[2]!=0xFD)||(buf[3]!=0x00)) {
 		flush();
-		pc.print_debug("WRONG RETURN HEADER\n\r");
+		if(debug_) fprintf(fp_debug_, "SerialXL320: WRONG RETURN HEADER\n\r");
 		packetPrint(n, buf);	
 		return -1; 
 	}
@@ -186,7 +153,7 @@ int XL320_Serial::statusError(uint8_t* buf, int n) {
 	int l = PacketLength(buf);
 	if (l != n) {
 		flush();
-		pc.print_debug("WRONG RETURN LENGTH\n\r");
+		if(debug_) fprintf(fp_debug_, "SerialXL320: WRONG RETURN LENGTH\n\r");
 		packetPrint(n, buf);	
 		return -1;
 	}
@@ -195,20 +162,20 @@ int XL320_Serial::statusError(uint8_t* buf, int n) {
 	uint16_t checksum = makeword(buf[n-2],buf[n-1]);
 	if (CRC != checksum){ 
 		flush();
-		pc.print_debug("WRONG CHECKSUM\n\r");
+		if(debug_) fprintf(fp_debug_, "SerialXL320: WRONG CHECKSUM\n\r");
 		return -1;
 	}
 
 
 	if(buf[8]!=0 ){
-		pc.print_debug("STATUS ERROR \n\r");
-		if 		(buf[8] == 0x01) pc.print_debug("FAILED PROCESS OF INSTRUCTION\n\r");	
-		else if (buf[8] == 0x02) pc.print_debug("UNDEFINED INSTRUCTION OR ACTION WITHOUT REG WRITE\n\r");
-		else if (buf[8] == 0x03) pc.print_debug("CORRUPTED PACKAGE SENT - CRC DOES NOT MATCH\n\r");
-		else if (buf[8] == 0x04) pc.print_debug("VALUE TO WRITE OUT OF RANGE\n\r");
-		else if (buf[8] == 0x05) pc.print_debug("RECEIVED VALUE LENGTH SHORTER IN BYTES THAN REQUIRED FOR THIS ADDRESS\n\r");
-		else if (buf[8] == 0x06) pc.print_debug("RECEIVED VALUE LENGTH LONGER IN BYTES THAN REQUIRED FOR THIS ADDRESS\n\r");
-		else if (buf[8] == 0x07) pc.print_debug("READ_ONLY OR WRITE_ONLY ADDRESS\n\r");
+		if(debug_) fprintf(fp_debug_, "SerialXL320: STATUS ERROR \n\r");
+		if 		(buf[8] == 0x01) if(debug_) fprintf(fp_debug_, "SerialXL320: FAILED PROCESS OF INSTRUCTION\n\r");	
+		else if (buf[8] == 0x02) if(debug_) fprintf(fp_debug_, "SerialXL320: UNDEFINED INSTRUCTION OR ACTION WITHOUT REG WRITE\n\r");
+		else if (buf[8] == 0x03) if(debug_) fprintf(fp_debug_, "SerialXL320: CORRUPTED PACKAGE SENT - CRC DOES NOT MATCH\n\r");
+		else if (buf[8] == 0x04) if(debug_) fprintf(fp_debug_, "SerialXL320: VALUE TO WRITE OUT OF RANGE\n\r");
+		else if (buf[8] == 0x05) if(debug_) fprintf(fp_debug_, "SerialXL320: RECEIVED VALUE LENGTH SHORTER IN BYTES THAN REQUIRED FOR THIS ADDRESS\n\r");
+		else if (buf[8] == 0x06) if(debug_) fprintf(fp_debug_, "SerialXL320: RECEIVED VALUE LENGTH LONGER IN BYTES THAN REQUIRED FOR THIS ADDRESS\n\r");
+		else if (buf[8] == 0x07) if(debug_) fprintf(fp_debug_, "SerialXL320: READ_ONLY OR WRITE_ONLY ADDRESS\n\r");
 		return -1;
 	}
 
@@ -218,7 +185,7 @@ int XL320_Serial::statusError(uint8_t* buf, int n) {
 
 // Packs data and sends it to the servo
 // Dynamixel Communication 2.0 Protocol: Header, Reserved, ID, Packet Length, Instruction, Parameter, 16bit CRC
-int XL320_Serial::send(int ID, int packetLenght, uint8_t* parameters, uint8_t ins) {
+int SerialXL320::send(int ID, int packetLenght, uint8_t* parameters, uint8_t ins) {
 	uint8_t buf[255]; // Packet
 
 	// Header
@@ -253,20 +220,20 @@ int XL320_Serial::send(int ID, int packetLenght, uint8_t* parameters, uint8_t in
 	write(buf, packetLenght+10);
 
 	// Broadcast and Reply Lvl less than 2 do not reply
-	if (ID == ID_Broadcast || ReturnLvl==0 || (ReturnLvl==1 && ins!=XL_INS_Read)) {
+	if (ID == ID_Broadcast || return_lvl_==0 || (return_lvl_==1 && ins!=XL_INS_Read)) {
 		return 0;	
 	}
 
 	// Read reply
-	pc.print_debug("Reading reply\n\r");
+	if(debug_) fprintf(fp_debug_, "SerialXL320: Reading reply\n\r");
 	
 	int n = read(reply_buf);
 	if (n == 0) {
-		pc.print_debug("Could not read status packet\n\r");
+		if(debug_) fprintf(fp_debug_, "SerialXL320: Could not read status packet\n\r");
 		return 0;
 	}
 
-	pc.print_debug("- Read" + itos(n) + " bytes\n\r");
+	if(debug_) fprintf(fp_debug_, "SerialXL320: - Read %d bytes\n\r", n);
 
 	return statusError(reply_buf, n); // Return Error code
 }
@@ -275,11 +242,11 @@ int XL320_Serial::send(int ID, int packetLenght, uint8_t* parameters, uint8_t in
 
 
 // dataPack sets the parameters in char array and returns length.
-int XL320_Serial::dataPack(uint8_t ins, uint8_t ** parameters, int address, int value /*=0*/){
+int SerialXL320::dataPack(uint8_t ins, uint8_t ** parameters, int address, int value /*=0*/){
 
 	uint8_t* data; 
 	
-	int adrl = AddressLength(address);
+	int adrl = getAddressLen(address);
 
 	int size;
 	if (ins == XL_INS_Write) size = adrl+2;
@@ -308,7 +275,7 @@ int XL320_Serial::dataPack(uint8_t ins, uint8_t ** parameters, int address, int 
 }
 
 // dataPush is a generic wrapper for single value SET instructions for public methods
-int XL320_Serial::dataPush(int ID, int address, int value){
+int SerialXL320::dataPush(int ID, int address, int value){
 	flush(); // Flush reply	for safety
 	
 	uint8_t* parameters;
@@ -323,7 +290,7 @@ int XL320_Serial::dataPush(int ID, int address, int value){
 
 
 // dataPull is a generic wrapper for single value GET instructions for public methods
-int XL320_Serial::dataPull(int ID, int address){
+int SerialXL320::dataPull(int ID, int address){
 	flush(); // Flush reply	for safety
 	
 	uint8_t* parameters;
@@ -347,13 +314,13 @@ int XL320_Serial::dataPull(int ID, int address){
    	}
 
    	else{
-   		pc.print_debug("WRONG ID REPLIED\n\r");
+   		if(debug_) fprintf(fp_debug_, "SerialXL320: WRONG ID REPLIED\n\r");
    		return -1;
    	}
 }
 
 
-const uint8_t XL320_Serial::TWO_BYTE_ADDRESSES[11] = { 0, 6, 8, 15, 30, 32, 35, 37, 39, 41, 51 };
+const uint8_t SerialXL320::TWO_BYTE_ADDRESSES[11] = { 0, 6, 8, 15, 30, 32, 35, 37, 39, 41, 51 };
 
 
 /* ******************************** PRIVATE METHODS END ************************************** */

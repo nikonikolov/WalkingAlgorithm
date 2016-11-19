@@ -24,18 +24,17 @@ FRAMEWORK:
 */
 
 
-#ifndef AX12A_SERIAL_H
-#define AX12A_SERIAL_H
+#ifndef SerialAX12_H
+#define SerialAX12_H
 
-#include "DnxSerialBase.h"
+#include "DnxHAL.h"
 
-class AX12A_Serial : public DnxSerialBase{
+class SerialAX12 : public DnxHAL{
  
 public:
  	
-	AX12A_Serial(PinName tx, PinName rx, int baudIn, const int ReturnLvlIn =1);
-
-	~AX12A_Serial();
+	SerialAX12(const DnxHAL::Port_t& port_in, int baud_in, int return_level_in =1);
+	~SerialAX12();
 
     int setBaud(int ID, int rate);
     int setReturnLevel(int ID, int lvl);
@@ -45,14 +44,20 @@ public:
 	int setGoalVelocity(int ID, int velocity);
 	int setGoalTorque(int ID, int torque);
 	int setPunch(int ID, int punch);
-
     int setLED(int ID, int colour);
+
+    int setCCWLimit(int ID, int value);
+    int setCWLimit(int ID, int value);
+    int setPresentSpeed(int ID, int value);
+    int enable(int ID);
+    int disable(int ID);
+
 
 private:
 
 	uint8_t update_crc(uint8_t *data_blk_ptr, const uint16_t& data_blk_size);	
 
-	int AddressLength(int address);
+	int getAddressLen(int address);
 	int statusError(uint8_t* buf, int n);
 	int send(int ID, int packetLength, uint8_t* parameters, uint8_t ins);
 
@@ -111,4 +116,4 @@ const uint8_t AX_INS_Action = 0x05;       // Go command for Reg Write
 const uint8_t AX_INS_Factory = 0x06;      // Reset All data to factory default settings
 const uint8_t AX_INS_SyncWrite = 0x83;    // Write data from the same location and same size for multiple devices simultaneously
 
-#endif  // AX12A_SERIAL_H
+#endif  // SerialAX12_H

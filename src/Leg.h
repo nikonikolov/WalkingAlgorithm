@@ -51,9 +51,7 @@ FRAMEWORK:
 
 #include "ServoJoint.h"
 #include "State_t.h"
-//#include "Point.h"
 #include "wkq.h"
-#include "include.h"
 #include <cmath>
 
 
@@ -61,13 +59,13 @@ class Leg{
 
 public:
 	
-	Leg(int ID_knee, int ID_hip, int ID_arm, DnxSerialBase* HipsKnees, DnxSerialBase* Arms, double height_in, BodyParams robot_params);
+	Leg(int ID_knee, int ID_hip, int ID_arm, DnxHAL* HipsKnees, DnxHAL* Arms, double height_in, const BodyParams& robot_params);
 	~Leg();
 
 	/* ---------------------------------------- GETTER AND COPY ---------------------------------------- */
 
 	double get(int param_type, int idx) const;
-	void copyState(const Leg& LegIn);								// Copy the state of input Leg
+	void copyState(const Leg& leg_in);								// Copy the state of input Leg
 
 	/* ---------------------------------------- STATIC POSITIONS ---------------------------------------- */
 
