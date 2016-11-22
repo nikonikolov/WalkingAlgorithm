@@ -28,11 +28,14 @@ Robot::Robot(Master* pixhawk_in, DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, doubl
 	printf("ROBOT done\n\r");
 }
 
+/*
+Robot::Robot(Master* pixhawk_in, int baud_in, double height_in, const BodyParams& robot_params, wkq::RobotState_t state_in/* = wkq::RS_DEFAULT*) : 
 #ifndef SIMULATION
-Robot::Robot(Master* pixhawk_in, int baud_in, double height_in, const BodyParams& robot_params, wkq::RobotState_t state_in/* = wkq::RS_DEFAULT*/) : 
 	Robot(pixhawk_in, new SerialAX12(DnxHAL::Port_t(p9, p10), baud_in), new SerialXL320(DnxHAL::Port_t(p13, p14), baud_in), height_in, robot_params, state_in) {}
+#else
+	Robot(pixhawk_in, NULL, NULL, height_in, robot_params, state_in) {}
 #endif
-
+*/
 Robot::~Robot(){}
 
 
