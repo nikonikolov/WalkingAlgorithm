@@ -35,8 +35,8 @@ FRAMEWORK:
 using wkq::RobotState_t;
 
 #ifndef SIMULATION
-#include "SerialAX12.h"
-#include "SerialXL320.h"
+#include "../libdnx/SerialAX12.h"
+#include "../libdnx/SerialXL320.h"
 #endif
 
 #define TRIPOD_COUNT 	2
@@ -74,6 +74,7 @@ public:
 	/* ------------------------------------ TESTING FUNCTIONS ----------------------------------- */
 
 	void test();
+	void testSingleTripodStand();
 	void singleStepForwardTest(double coeff);
 	void quadSetup();			// set the legs so that Pixhawk calibration can be performed 
 

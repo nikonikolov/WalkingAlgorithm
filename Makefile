@@ -4,7 +4,7 @@
 GCC_BIN = 
 PROJECT = bin/wkquad
 OBJECTS = ./main.o $(HARDWARE_OBJS) $(SOFTWARE_OBJS)
-HARDWARE_OBJS = ./src/DnxHAL.o ./src/SerialAX12.o ./src/SerialXL320.o 
+HARDWARE_OBJS = ./libdnx/mbed/DnxHAL.o ./libdnx/SerialAX12.o ./libdnx/SerialXL320.o 
 SOFTWARE_OBJS = ./src/ServoJoint.o ./src/robot_types.o ./src/State_t.o ./src/Leg.o ./src/Tripod.o ./src/Robot.o ./src/wkq.o ./src/Master.o
 
 SOFTWARE_SRCS = ./src/ServoJoint.cpp ./src/robot_types.cpp ./src/State_t.cpp ./src/Leg.cpp ./src/Tripod.cpp ./src/Robot.cpp ./src/wkq.cpp ./src/Master.cpp

@@ -113,6 +113,8 @@ private:
 	double angle_offset;						// Angle between Y-axis and servo orientation; always positive
 	bool leg_right;								// 1.0 - Leg is LEFT, -1.0 - Leg is RIGHT
 	wkq::LegID leg_id; 							// ID of the leg
+
+	bool debug_ = true;
 };
 
 

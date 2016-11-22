@@ -84,6 +84,7 @@ void Robot::walkForward(double coeff){
 	// repeat until walkForward signal stops
 	while(continue_movement){
 		Tripods[tripod_up].liftUp(ef_raise);
+		wait(2);
 		//printf("First tripod lifted\n\r");
 		Tripods[tripod_down].bodyForward(step_size);
 		//printf("Second tripod moved body forward\n\r");
@@ -91,19 +92,23 @@ void Robot::walkForward(double coeff){
 		// Read Input and find out whether movement should go on
 		continue_movement = pixhawk->inputWalkForward();
 
+		wait(2);
 		// Movement goes on
 		if(continue_movement){
 			Tripods[tripod_up].stepForward(step_size);
 			//printf("First tripod put down legs for another step forward\n\r");
 			std::swap(tripod_up, tripod_down);			// swap the roles of the Tripods
+			wait(2);
 		}
 		
 		// Movement stops
 		else{
 			Tripods[tripod_up].finishStep();
 			//printf("First tripod finished step\n\r");
+		wait(2);
 			Tripods[tripod_down].liftUp(ef_raise);
 			//printf("Second tripod lifted\n\r");
+		wait(2);
 			Tripods[tripod_down].finishStep();
 			//printf("Second tripod finished step\n\r");
 		}
@@ -142,6 +147,10 @@ void Robot::writeAngles(){
 
 void Robot::test(){
 	//Tripods[TRIPOD_LEFT].liftUp(ef_raise);
+}
+
+void Robot::testSingleTripodStand(){
+	Tripods[TRIPOD_LEFT].liftUp(5);
 }
 
 void Robot::singleStepForwardTest(double coeff){

@@ -230,12 +230,18 @@ void Leg::quadSetup(){
 
 // Write state.servo_angles[] to physcial servos in order ARM, HIP, KNEE
 void Leg::writeAngles(){
+	if(debug_) printf("Leg: enter writeAngles\n\r");
+
 	if(!leg_right){
+		if(debug_) printf("Leg: writeAngles - left leg\n\r");
+
 		joints.arm.setGoalPosition(state.servo_angles.arm);
 		joints.hip.setGoalPosition(state.servo_angles.hip);
 		joints.knee.setGoalPosition(state.servo_angles.knee);
 	}
 	else{
+		if(debug_) printf("Leg: writeAngles - right leg\n\r");
+	
 		if(state.servo_angles.arm != 0)		joints.arm.setGoalPosition(-state.servo_angles.arm);
 		else								joints.arm.setGoalPosition(state.servo_angles.arm);
 		if(state.servo_angles.hip != 0)		joints.hip.setGoalPosition(-state.servo_angles.hip);
@@ -243,6 +249,8 @@ void Leg::writeAngles(){
 		if(state.servo_angles.knee != 0)	joints.knee.setGoalPosition(-state.servo_angles.knee);
 		else								joints.knee.setGoalPosition(state.servo_angles.knee);
 	}
+
+	if(debug_) printf("Leg: done with writeAngles\n\r");
 }
 
 

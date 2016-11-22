@@ -3,7 +3,7 @@
 
 #ifndef SIMULATION
 
-#include "DnxHAL.h"
+#include "../libdnx/mbed/DnxHAL.h"
 
 
 
