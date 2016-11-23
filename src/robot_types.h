@@ -8,10 +8,10 @@
 
 struct BodyParams{
 
-    //void operator=(const BodyParams& obj_in);
- 
     double DIST_CENTER;
+#ifdef DOF3
     double COXA;
+#endif
     double FEMUR;
     double TIBIA;
     double KNEE_TO_MOTOR_DIST;
@@ -25,16 +25,13 @@ struct BodyParams{
 
     void compute_squares(){
         DIST_CENTER_SQ = pow(DIST_CENTER, 2);
+#ifdef DOF3
         COXA_SQ = pow(COXA, 2);
+#endif        
         FEMUR_SQ = pow(FEMUR, 2);
         TIBIA_SQ = pow(TIBIA, 2);
         KNEE_TO_MOTOR_DIST_SQ = pow(KNEE_TO_MOTOR_DIST, 2);
     }
-/*
-    BodyParams(double dist_center, double coxa, double femur, double tibia, double knee_to_motor_dist) : 
-        DIST_CENTER(dist_center), COXA(coxa), FEMUR(femur), TIBIA(tibia), KNEE_TO_MOTOR_DIST(knee_to_motor_dist),
-        DIST_CENTER_SQ(pow(dist_center, 2)), COXA_SQ(pow(coxa, 2)), FEMUR_SQ(pow(femur, 2)), TIBIA_SQ(pow(tibia, 2)), KNEE_TO_MOTOR_DIST_SQ(pow(knee_to_motor_dist, 2)) {}
-*/
 };
 
 
@@ -46,6 +43,11 @@ struct DynamicVars{
     void print();
     void operator=(const DynamicVars& obj_in);
     void operator=(double value);
+
+    double center_ground_to_ef;             // Direct distance from the center ground projection to the end effector
+    //double height;                          // Height of the robot center as it stays invariant
+    //double
+
 
     double hip_to_end;                      // Direct distance from hip mount point to the point where the end effector touches ground
     double height;                          // Vertical distance from hip mount point to ground
@@ -65,17 +67,27 @@ struct LegAngles{
     void operator=(double value);
   
     double knee;
+#ifdef DOF3
     double hip;
+#endif
     double arm;
 };
 
 
 struct LegJoints{
+
+#ifndef DOF3
+    LegJoints(int ID_knee, DnxHAL* dnx_port_knee, int ID_arm, DnxHAL* dnx_port_arm) :
+        knee(ID_knee, dnx_port_knee), arm(ID_arm, dnx_port_arm) {}
+#else    
     LegJoints(int ID_knee, DnxHAL* dnx_port_knee, int ID_hip, DnxHAL* dnx_port_hip, int ID_arm, DnxHAL* dnx_port_arm) :
         knee(ID_knee, dnx_port_knee), hip(ID_hip, dnx_port_hip), arm(ID_arm, dnx_port_arm) {}
-    
+#endif
+
     ServoJoint knee;
+#ifdef DOF3
     ServoJoint hip;
+#endif
     ServoJoint arm;
 };
 

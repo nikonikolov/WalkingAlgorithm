@@ -179,16 +179,6 @@ void Robot::singleStepForwardTest(double coeff){
 }
 
 
-// set the legs so that Pixhawk calibration can be performed 
-void Robot::quadSetup(){
-	Tripods[TRIPOD_LEFT].quadSetup();
-	wait(wait_time);
-	Tripods[TRIPOD_RIGHT].quadSetup();
-
-	state = wkq::RS_QUAD_SETUP;
-}			
-
-
 /* ================================================= ROS COMMUNICATION ================================================= */
 
 /*

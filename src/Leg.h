@@ -58,8 +58,12 @@ FRAMEWORK:
 class Leg{
 
 public:
-	
+
+#ifndef DOF3	
+	Leg(int ID_knee, int ID_arm, DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, const BodyParams& robot_params);
+#else
 	Leg(int ID_knee, int ID_hip, int ID_arm, DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, const BodyParams& robot_params);
+#endif
 	~Leg();
 
 	/* ---------------------------------------- GETTER AND COPY ---------------------------------------- */
@@ -92,10 +96,6 @@ public:
 	
 	void raiseBody(double hraise);
 
-	/* ---------------------------------------- TESTING FUNCTIONS ---------------------------------------- */
-
-	void quadSetup();
-	
 	/* ---------------------------------------- WRITE TO SERVOS ---------------------------------------- */
 
 	void writeAngles();							// Write servo_angles[] to physcial servos in order ARM, HIP, KNEE
@@ -114,7 +114,7 @@ private:
 	bool leg_right;								// 1.0 - Leg is LEFT, -1.0 - Leg is RIGHT
 	wkq::LegID leg_id; 							// ID of the leg
 
-	bool debug_ = true;
+	bool debug_ = false;
 };
 
 

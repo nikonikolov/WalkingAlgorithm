@@ -3,7 +3,9 @@
 void LegAngles::operator=(const LegAngles& obj_in){
     if( this != &obj_in){
         this->knee  = obj_in.knee;
+#ifdef DOF3
         this->hip   = obj_in.hip;
+#endif
         this->arm   = obj_in.arm;
     }
 }
@@ -11,13 +13,17 @@ void LegAngles::operator=(const LegAngles& obj_in){
 
 void LegAngles::operator=(double value){
     knee    = value;
+#ifdef DOF3
     hip     = value;
+#endif
     arm     = value;
 }
 
 void LegAngles::print(){
     printf("LegAngles: knee(degrees) %f\n\r", wkq::degrees(knee));
+#ifdef DOF3
     printf("LegAngles: hip(degrees) %f\n\r", wkq::degrees(hip));
+#endif
     printf("LegAngles: arm(degrees) %f\n\r", wkq::degrees(arm));
 }
 

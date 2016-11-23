@@ -2,12 +2,21 @@
 
 const double Tripod::leg_lift = 5.0; 
 
+#ifndef DOF3
+Tripod::Tripod (int ID_front_knee, int ID_middle_knee, int ID_back_knee,
+				DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, const BodyParams& robot_params) :
+	legs{	Leg(ID_front_knee, 	ID_front_knee+6, 	dnx_hips_knees, dnx_arms, height_in, robot_params),
+			Leg(ID_middle_knee, ID_middle_knee+6, 	dnx_hips_knees, dnx_arms, height_in, robot_params),
+			Leg(ID_back_knee, 	ID_back_knee+6, 	dnx_hips_knees, dnx_arms, height_in, robot_params)
+		} {}
+#else
 Tripod::Tripod (int ID_front_knee, int ID_middle_knee, int ID_back_knee,
 				DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, const BodyParams& robot_params) :
 	legs{	Leg(ID_front_knee, 	ID_front_knee+6, 	ID_front_knee+18, 	dnx_hips_knees, dnx_arms, height_in, robot_params),
 			Leg(ID_middle_knee, ID_middle_knee+6, 	ID_middle_knee+18, 	dnx_hips_knees, dnx_arms, height_in, robot_params),
 			Leg(ID_back_knee, 	ID_back_knee+6, 	ID_back_knee+18, 	dnx_hips_knees, dnx_arms, height_in, robot_params)
 		} {}
+#endif		
 Tripod::~Tripod(){}
 
 
@@ -98,15 +107,6 @@ void Tripod::copyState(const Tripod& tripod_in){
 	writeAngles();
 }
 
-
-/* ================================================= TESTING FUNCTIONS ================================================= */
-
-void Tripod::quadSetup(){
-	legs[0].standQuad();
-	legs[1].quadSetup();
-	legs[2].standQuad();
-	writeAngles();
-}
 
 
 /* ================================================= PRIVATE FUNCTIONALITY ================================================= */

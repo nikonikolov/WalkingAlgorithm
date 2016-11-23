@@ -19,24 +19,32 @@ int main(int argc, char **argv){
 	printf("MAIN started\n\r");
 
 	BodyParams robot_params;
+
+#ifndef DOF3
+	robot_params.DIST_CENTER = 10.95 + 2.15;
+	robot_params.FEMUR = 17.1;
+	robot_params.TIBIA = 15;
+	robot_params.KNEE_TO_MOTOR_DIST = 2.6;
+	robot_params.MIN_HEIGHT = robot_params.TIBIA*cos(wkq::radians(60));
+	robot_params.MAX_HEIGHT = robot_params.TIBIA;
+	robot_params.compute_squares();
+#else 
 	robot_params.DIST_CENTER = 10.95;
 	robot_params.COXA = 2.65;
-	//robot_params.FEMUR = 17.5;
-	robot_params.FEMUR = 17.5-0.6;
+	robot_params.FEMUR = 17.1;
 	robot_params.TIBIA = 30;
-	robot_params.KNEE_TO_MOTOR_DIST = 2.25;
+	robot_params.KNEE_TO_MOTOR_DIST = 2.6;
 
 	// VERIFY THIS
 	robot_params.MIN_HEIGHT = robot_params.TIBIA - robot_params.FEMUR*sin(wkq::radians(70));
 	robot_params.MAX_HEIGHT = robot_params.FEMUR*sin(wkq::radians(70)) + robot_params.TIBIA;
-	//robot_params.MAX_HEIGHT = robot_params.FEMUR*sin(wkq::radians(20)) + robot_params.TIBIA;
 	robot_params.compute_squares();
-	
+#endif	
 
 	//int baud = 1000000; 		
 	int baud = 115200;
 	int baud_xl320 = 1000000; 		
-	double init_height = 40.0;	
+	double init_height = 15.0;	
 
 	Master* pixhawk = new Master();
 
@@ -44,8 +52,9 @@ int main(int argc, char **argv){
 
 	// Instantiate objects for communication with the servo motors 
 	SerialAX12 dnx_hips_knees(DnxHAL::Port_t(p9, p10), baud);
-	//SerialXL320 dnx_arms(DnxHAL::Port_t(p13, p14), baud);
+#ifdef DOF3
 	SerialXL320 dnx_arms(DnxHAL::Port_t(p13, p14), baud_xl320);
+#endif
 	printf("Communication ready\n\r");
 	
 
@@ -56,7 +65,12 @@ int main(int argc, char **argv){
 	//	wk_quad = new Robot(pixhawk, baud, init_height, robot_params, wkq::RS_FLAT_QUAD);					
 	//	wk_quad = new Robot(pixhawk, baud, init_height, robot_params, wkq::RS_DEFAULT);					
 	
+#ifndef DOF3
+		wk_quad = new Robot(pixhawk, &dnx_hips_knees, &dnx_hips_knees, init_height, robot_params, wkq::RS_DEFAULT);					
+		wk_quad = new Robot(pixhawk, &dnx_hips_knees, &dnx_hips_knees, init_height, robot_params, wkq::RS_FLAT_QUAD);					
+#else
 		wk_quad = new Robot(pixhawk, &dnx_hips_knees, &dnx_arms, init_height, robot_params, wkq::RS_DEFAULT);					
+#endif
 	}
 	catch(const string& msg){
 		printf("%s\n\r", msg.c_str());
@@ -65,7 +79,7 @@ int main(int argc, char **argv){
 
 	printf("Robot Initialized\n\r");
 
-	wk_quad->testSingleTripodStand();
+	//wk_quad->testSingleTripodStand();
 	//wk_quad->walkForward(0.5);
 
 /*
