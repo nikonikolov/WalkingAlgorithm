@@ -1,8 +1,4 @@
 Notes.txt
 bin/*
-*.bin
-*.elf
-*.hex
-*.d
-*.o
-backup/
+src/*.d
+src/*.o

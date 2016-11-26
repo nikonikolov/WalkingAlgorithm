@@ -1,20 +1,20 @@
 #include "Tripod.h"
 
-const double Tripod::leg_lift = 5.0; 
+const double Tripod::leg_lift = 10.0; 
 
-#ifndef DOF3
-Tripod::Tripod (int ID_front_knee, int ID_middle_knee, int ID_back_knee,
-				DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, const BodyParams& robot_params) :
-	legs{	Leg(ID_front_knee, 	ID_front_knee+6, 	dnx_hips_knees, dnx_arms, height_in, robot_params),
-			Leg(ID_middle_knee, ID_middle_knee+6, 	dnx_hips_knees, dnx_arms, height_in, robot_params),
-			Leg(ID_back_knee, 	ID_back_knee+6, 	dnx_hips_knees, dnx_arms, height_in, robot_params)
-		} {}
-#else
+#ifdef DOF3
 Tripod::Tripod (int ID_front_knee, int ID_middle_knee, int ID_back_knee,
 				DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, const BodyParams& robot_params) :
 	legs{	Leg(ID_front_knee, 	ID_front_knee+6, 	ID_front_knee+18, 	dnx_hips_knees, dnx_arms, height_in, robot_params),
 			Leg(ID_middle_knee, ID_middle_knee+6, 	ID_middle_knee+18, 	dnx_hips_knees, dnx_arms, height_in, robot_params),
 			Leg(ID_back_knee, 	ID_back_knee+6, 	ID_back_knee+18, 	dnx_hips_knees, dnx_arms, height_in, robot_params)
+		} {}
+#else
+Tripod::Tripod (int ID_front_knee, int ID_middle_knee, int ID_back_knee,
+				DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, const BodyParams& robot_params) :
+	legs{	Leg(ID_front_knee, 	ID_front_knee+6, 	dnx_hips_knees, dnx_arms, height_in, robot_params),
+			Leg(ID_middle_knee, ID_middle_knee+6, 	dnx_hips_knees, dnx_arms, height_in, robot_params),
+			Leg(ID_back_knee, 	ID_back_knee+6, 	dnx_hips_knees, dnx_arms, height_in, robot_params)
 		} {}
 #endif		
 Tripod::~Tripod(){}
@@ -22,63 +22,67 @@ Tripod::~Tripod(){}
 
 /* ================================================= STATIC POSITIONS ================================================= */
 
-void Tripod::defaultPos(){
-	setPosition(&Leg::defaultPos);
+void Tripod::setPosition(wkq::RobotState_t robot_state){
+	for(int i=0; i<LEG_COUNT; i++){
+		legs[i].setPosition(robot_state);
+	}
+	writeAngles();
 }
+
 
 void Tripod::center(){
 	liftUp(leg_lift);
 	for(int i=0; i<LEG_COUNT; i++){
-		if(i==0) legs[i].center();
+		if(i==0) legs[i].setPosition(wkq::RS_CENTERED);
 		// All legs have same center positions so save computations by copying states
 		else legs[i].copyState(legs[0]);
 		legs[i].writeAngles();
 	}
 }
 
-void Tripod::stand(){
-	setPosition(&Leg::stand);
-}
-
-void Tripod::standQuad(){
-	setPosition(&Leg::standQuad);
-}
-
-void Tripod::flatQuad(){
-	setPosition(&Leg::flatQuad);
-}
-
-
 /* ================================================= WALKING MOVEMENTS ================================================= */
 
-void Tripod::bodyForward (double step_size){
-	makeMovement(&Leg::IKBodyForward, step_size, "MOVING BODY FORWARD\n\r");
+void Tripod::bodyForward(double step_size){
+	makeMovement(&Leg::IKBodyForward, step_size, "Tripod: bodyForward");
 }
 
-void Tripod::stepForward (double step_size){
-	makeMovement(&Leg::stepForward, step_size, "TRIPOD STEPPING FORWARD\n\r");
+void Tripod::stepForward(double step_size){
+	makeMovement(&Leg::stepForward, step_size, "Tripod: stepForward");
+}
+
+void Tripod::bodyForwardRectangularGait(double step_size){
+	makeMovement(&Leg::IKBodyForwardRectangularGait, step_size, "Tripod: bodyForwardRectangularGait");
+}
+
+void Tripod::stepForwardRectangularGait(double step_size){
+	makeMovement(&Leg::stepForwardRectangularGait, step_size, "Tripod: stepForwardRectangularGait");
 }
 
 void Tripod::bodyRotate(double angle){
-	makeMovement(&Leg::IKBodyRotate, angle);
+	makeMovement(&Leg::IKBodyRotate, angle, "Tripod: bodyRotate");
 }
 
 void Tripod::stepRotate(double angle){
-	makeMovement(&Leg::stepRotate, angle);
+	makeMovement(&Leg::stepRotate, angle, "Tripod: stepRotate");
 }
 
 void Tripod::liftUp(double height_up){
-	makeMovement(&Leg::liftUp, height_up, "LIFTING TRIPOD\n\r");
+	makeMovement(&Leg::liftUp, height_up, "Tripod: liftUp");
 }
 
 void Tripod::lowerDown(double height_down){
-	makeMovement(&Leg::lowerDown, height_down, "LOWERING TRIPOD\n\r");
+	makeMovement(&Leg::lowerDown, height_down, "Tripod: lowerDown");
 }
 
 void Tripod::finishStep(){
-	setPosition(&Leg::finishStep, "TRIPOD FINISHING STEP\n\r");
+	//setPosition(&Leg::finishStep, "Tripod: finishStep\n\r");
+	setPosition(wkq::RS_DEFAULT);
 }
 
+void Tripod::finishStepRectangularGait(){
+	//setPosition(&Leg::finishStep, "Tripod: finishStep\n\r");
+	setPosition(wkq::RS_RECTANGULAR);
+}
 
 /* ================================================= RAISE AND LOWER ================================================= */
 
@@ -113,19 +117,10 @@ void Tripod::copyState(const Tripod& tripod_in){
 
 
 void Tripod::makeMovement(void (Leg::*leg_action)(double), double arg, const string debug_msg /*=""*/ ){
-	if(debug_msg!="") printf("%s\n\r", debug_msg.c_str());
+	if(debug_msg!="" && debug_) printf("\n\r%s\n\r", debug_msg.c_str());
 	
 	for(int i=0; i<LEG_COUNT; i++){
 		(legs[i].*leg_action)(arg);
-	}
-	writeAngles();
-}
-
-void Tripod::setPosition(void (Leg::*leg_action)(), const string debug_msg /*=""*/){
-	if(debug_msg!="") printf("%s\n\r", debug_msg.c_str());
-
-	for(int i=0; i<LEG_COUNT; i++){
-		(legs[i].*leg_action)();
 	}
 	writeAngles();
 }

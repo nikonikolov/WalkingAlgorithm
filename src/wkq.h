@@ -93,10 +93,10 @@ namespace wkq{
 	};
 
 	
-	/* *** NOTE: Be very careful when introducing new states - if the new state is meaningless in terms of leg configuration
-			on the ground, i.e. backwards consistency with current position does no need to be kept, you need to signify that
-			somehow in Robot::stand()
-	***/
+	/* 	@Note: Be very careful when introducing new states - if the new state is meaningless in terms of leg configuration
+		on the ground, i.e. backwards consistency with current position does no need to be kept, you need to signify that
+		somehow in Robot::stand()
+	*/
 	enum RobotState_t{
 		RS_DEFAULT 				= 0,			// all servos configured to default positions, i.e. centralized for stable stand
 		RS_STANDING				= 1,			// body height equal to knee height, all knees to 90 degrees, the rest centered
@@ -104,6 +104,7 @@ namespace wkq{
 		RS_STANDING_QUAD 		= 4, 			// standing with legs configured in Quad mode and configured to stand on the ground
 		RS_FLAT_QUAD			= 5,			// standing with legs configured in Quad mode and fully flat
 		RS_QUAD_SETUP			= 6, 			// Legs set so that pixhawk configuration can be perfromed 
+		RS_RECTANGULAR 			= 7, 			// Legs set in a manner for Retangular Gait
 
 		RS_FLY_STANDING_QUAD 	= 20, 			// Flying with legs configured in Quad mode but not fully flat
 		RS_FLY_STRAIGHT_QUAD 	= 21, 			// Flying with legs configured in Quad mode and fully flat
@@ -116,6 +117,18 @@ namespace wkq{
 		RS_hex			= 6,			// not completely defined yet
 		RS_quad			= 7,			// not completely defined yet
 		*/
+	}; 
+
+	enum TripodMovement_t{
+		TM_BODY_FORWARD 		= 0,
+		TM_STEP_FORWARD 		= 1,
+		TM_BODY_FORWARD_RECT	= 2,
+		TM_STEP_FORWARD_RECT	= 3,
+		TM_BODY_ROTATE 			= 4,
+		TM_STEP_ROTATE 			= 5,
+
+		TM_LIFT_UP 				= 6,
+		TM_LOWER_DOWN 			= 7,
 	}; 
 
 

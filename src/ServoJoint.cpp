@@ -3,7 +3,84 @@
 #ifndef SIMULATION
 
 ServoJoint::ServoJoint(int ID_in, DnxHAL* dnx_ptr_in) : ID(ID_in), dnx_ptr(dnx_ptr_in) {
+	switch(ID){
+		case wkq::KNEE_LEFT_FRONT	:
+			servo_name = "knee_left_front";
+			break;
+		case wkq::KNEE_LEFT_MIDDLE	:
+			servo_name = "knee_left_middle";
+			break;
+		case wkq::KNEE_LEFT_BACK	:
+			servo_name = "knee_left_back";
+			break;
+		case wkq::KNEE_RIGHT_FRONT	:
+			servo_name = "knee_right_front";
+			break;
+		case wkq::KNEE_RIGHT_MIDDLE	:
+			servo_name = "knee_right_middle";
+			break;
+		case wkq::KNEE_RIGHT_BACK	:
+			servo_name = "knee_right_back";
+			break;
+		case wkq::HIP_LEFT_FRONT	:
+			servo_name = "hip_left_front";
+			break;
+		case wkq::HIP_LEFT_MIDDLE	:
+			servo_name = "hip_left_middle";
+			break;
+		case wkq::HIP_LEFT_BACK	:
+			servo_name = "hip_left_back";
+			break;
+		case wkq::HIP_RIGHT_FRONT	:
+			servo_name = "hip_right_front";
+			break;
+		case wkq::HIP_RIGHT_MIDDLE	:
+			servo_name = "hip_right_middle";
+			break;
+		case wkq::HIP_RIGHT_BACK	:
+			servo_name = "hip_right_back";
+			break;
+		case wkq::WING_LEFT_FRONT	:
+			servo_name = "wing_left_front";
+			break;
+		case wkq::WING_LEFT_MIDDLE	:
+			servo_name = "wing_left_middle";
+			break;
+		case wkq::WING_LEFT_BACK	:
+			servo_name = "wing_left_back";
+			break;
+		case wkq::WING_RIGHT_FRONT	:
+			servo_name = "wing_right_front";
+			break;
+		case wkq::WING_RIGHT_MIDDLE	:
+			servo_name = "wing_right_middle";
+			break;
+		case wkq::WING_RIGHT_BACK	:
+			servo_name = "wing_right_back";
+			break;
+		case wkq::ARM_LEFT_FRONT	:
+			servo_name = "arm_left_front";
+			break;
+		case wkq::ARM_LEFT_MIDDLE	:
+			servo_name = "arm_left_middle";
+			break;
+		case wkq::ARM_LEFT_BACK	:
+			servo_name = "arm_left_back";
+			break;
+		case wkq::ARM_RIGHT_FRONT	:
+			servo_name = "arm_right_front";
+			break;
+		case wkq::ARM_RIGHT_MIDDLE	:
+			servo_name = "arm_right_middle";
+			break;
+		case wkq::ARM_RIGHT_BACK	:
+			servo_name = "arm_right_back";
+			break;
+		defaultPos:
+			servo_name = "error in servo ID";
+	}		
 	setReturnLevel(1);	
+	setGoalVelocity(100);	
 	//setPunch(512);	
 }
 
@@ -38,6 +115,7 @@ int ServoJoint::setGoalPosition(int angle){
 
 // angle is in radians
 int ServoJoint::setGoalPosition(double angle){
+	printf("%s set to %f\n\r", servo_name.c_str(), wkq::degrees(angle));
 	return dnx_ptr->setGoalPosition(ID, angle);
 }
 
@@ -176,7 +254,7 @@ int ServoJoint::setGoalPosition(int angle_in){
 
 int ServoJoint::setGoalPosition(double angle_in){
 	angle=angle_in;
-	printf("%s +  set to %f \n\r", servo_name.c_str(), wkq::degrees(angle));
+	printf("%s set to %f\n\r", servo_name.c_str(), wkq::degrees(angle));
 	return 0;
 }
 

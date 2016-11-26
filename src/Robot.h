@@ -52,19 +52,15 @@ public:
 	//Robot(Master* pixhawk_in, int baud_in, double height_in, const BodyParams& robot_params, wkq::RobotState_t state_in = wkq::RS_DEFAULT); 
 	~Robot();
 
-	/* ------------------------------------ STATIC POSITIONS ----------------------------------- */
+	/* ------------------------------------ SET STATIC POSITIONS ----------------------------------- */
 
-	void defaultPos();				// Reset all Leg parameters to their defaultPos values
-	void center();					// Reset all Legs to their central positions and keep current height
-	void stand();					// Set all Legs to a standing state where height = Tibia
-	void standQuad();				// Same as stand() but arms configured as quad
-	void flatQuad(); 				// flatten legs so you can fly as a quad
+	void setState(wkq::RobotState_t state_in, bool wait_call=false);
 
-	//void flattenLegs(wkq::RobotState_t state_in = wkq::RS_FLAT_QUAD);	// flatten the knee
 
 	/* ------------------------------------ WALK RELATED FUNCTIONALITY ----------------------------------- */
-	
+
 	void walkForward(double coeff);
+	void walkForwardRectangularGait(double coeff);
 	void rotate(double angle);
 
 	void raiseBody(double hraise);
@@ -97,7 +93,8 @@ private:
 	double max_rotation_angle;
 	double max_step_size;
 
-	const double wait_time = 0.5; 	// wait time between writing angles for the two tripods
+	static const double wait_time_; 	// wait time between writing angles for the two tripods
+	static const double ef_raise_;
 
 	wkq::RobotState_t state;
 

@@ -32,8 +32,12 @@ State_t::State_t(double height_in, const BodyParams& robot_params) : /*servo_ang
         default_pos_angles = servo_angles;              
 
         // Initialize servo_angles and vars to meaningless state
-        servo_angles = 0.0;
-        vars = 0.0;
+        //servo_angles = 0.0;
+        //vars = 0.0;
+    }
+    else{
+        servo_angles = default_pos_angles;
+        vars = default_pos_vars;
     }
 }
 
@@ -56,39 +60,57 @@ void State_t::legDefaultPos(){
 }
 
 void State_t::legCenter(){
-    //servo_angles.wing = default_pos_angles.wing;
+#ifdef DOF3
     servo_angles.arm = default_pos_angles.arm;
+#endif
     centerAngles();
 }
 
 void State_t::legStand(){
-    //setAngles((wkq::PI)/2, 0.0, 0.0);       // Automatically calls computevars[] and computes new state
+#ifdef DOF3
+    setAngles((wkq::PI)/2, 0.0, 0.0);       // Automatically calls configureVars() and computes new state
+#else
+    setAngles((wkq::PI)/2, 0.0);            // Automatically calls configureVars() and computes new state
+#endif
 }
 
 void State_t::legFlatten(){ 
-/*    servo_angles.knee=0.0;
-    servo_angles.hip=0.0;
-    // ARM and WING are either set to 0.0 by defaultPos or are not to be changed
+#ifdef DOF3
+    servo_angles.knee = 0.0;
+    servo_angles.hip  = 0.0;
+    // servo_angles.arm is either set to 0.0 by defaultPos or is not to be changed
     clear();
-*/
+#else
+    // servo_angle.hip not to be changed
+    servo_angles.knee = 0.0;
+    clear();
+#endif
 }
 
 
 /* ================================================= MAINTAINING LEG STATE ================================================= */
 
+/*  @ Notes:
+    Update the specified memeber of vars and automatically compute the related vars that change
+*/
 void State_t::updateVar(double* address, double value, bool update_state /*=true*/){
-    
     *address = value;
 
-    if     (address == &(vars.hip_to_end))           vars.hip_to_end_sq = pow(value, 2);
-    else if(address == &(vars.height))               vars.height_sq = pow(value, 2);
-    else if(address == &(vars.arm_ground_to_ef))     vars.arm_ground_to_ef_sq = pow(value, 2);
-    else if(address == &(vars.ef_center))            vars.ef_center_sq = pow(value, 2);
-    else if(address == &(vars.hip_to_end_sq))        vars.hip_to_end = sqrt(value);
+    if     (address == &(vars.height))               vars.height_sq = pow(value, 2);
     else if(address == &(vars.height_sq))            vars.height = sqrt(value);
+#ifdef DOF3    
+    else if(address == &(vars.hip_to_end))           vars.hip_to_end_sq = pow(value, 2);
+    else if(address == &(vars.hip_to_end_sq))        vars.hip_to_end = sqrt(value);
+    else if(address == &(vars.arm_ground_to_ef))     vars.arm_ground_to_ef_sq = pow(value, 2);
     else if(address == &(vars.arm_ground_to_ef_sq))  vars.arm_ground_to_ef = sqrt(value);
+    else if(address == &(vars.ef_center))            vars.ef_center_sq = pow(value, 2);
     else if(address == &(vars.ef_center_sq))         vars.ef_center = sqrt(value);
     else                                             printf("ERROR in State_t::updateVar\n\r");
+#else
+    /*
+        FILL IN
+    */
+#endif
 
     if(update_state) update(address);  
 }
@@ -102,7 +124,8 @@ void State_t::updateVar(double* address, double value, double* address_sq, doubl
 
 
 void State_t::update(double* address){
-/*    if      (address == &(vars.hip_to_end))
+#ifdef DOF3
+    if(address == &(vars.hip_to_end))
         // Assumed that change is in END EFFECTOR and only arm_ground_to_ef is affected
         updateVar(&vars.arm_ground_to_ef, sqrt(vars.hip_to_end_sq - vars.height_sq) + params.COXA, false);
     
@@ -123,24 +146,36 @@ void State_t::update(double* address){
     else printf("ERROR in State_t::update\n\r");
 
     // All parameters that can be changed require the update of HIP and KNEE servo_angles
-    updateAngles();         
-*/
+    configureAngles();         
+#else
+    /*
+        FILL IN
+    */
+#endif
 }
 
 
-// Update KNEE and HIP servo_angles basing on the current hip_to_end and HEIGHT
-void State_t::updateAngles(){
-/*
+/*  @ Notes:
+    DOF3 - Update servo_angles.hip and servo_angles.knee based on the current vars.hip_to_end and vars.height
+*/
+void State_t::configureAngles(){
+#ifdef DOF3
+    double knee_tmp, hip_tmp;
+
     // Cosine Rule to find new Knee Servo Angle
-    double knee_tmp = acos( (params.FEMUR_SQ + params.TIBIA_SQ - vars.hip_to_end_sq ) / ( 2 * params.FEMUR * params.TIBIA) );
+    knee_tmp = acos( (params.FEMUR_SQ + params.TIBIA_SQ - vars.hip_to_end_sq ) / ( 2 * params.FEMUR * params.TIBIA) );
     // Convert to actual angle for the servo
     servo_angles.knee = wkq::PI - knee_tmp;                                                 // Input valid for a LEFT LEG
 
     // Cosine Rule to find new Hip Servo Angle
-    double hip_tmp = acos( (params.FEMUR_SQ + vars.hip_to_end_sq - params.TIBIA_SQ ) / ( 2 * params.FEMUR * vars.hip_to_end) );
+    hip_tmp = acos( (params.FEMUR_SQ + vars.hip_to_end_sq - params.TIBIA_SQ ) / ( 2 * params.FEMUR * vars.hip_to_end) );
     // Convert to actual angle for the servo
     servo_angles.hip = (wkq::PI)/2 - hip_tmp - acos(vars.height/vars.hip_to_end);       // Input valid for a LEFT LEG
-*/
+#else
+    /*
+        FILL IN
+    */
+#endif
 }
 
 
@@ -151,82 +186,134 @@ void State_t::clear(){
 
 /*  @ Notes:
     height should be 0.0 when the current vars.height should be used; if this variable has not been set to a meaningful value, 
-    the height that needs to be used should be passed as parameter - computeEFVars() will set the value in StateVar[HEIGHT]
+    the height that needs to be used should be passed as parameter - configureEFVars() will set the value in StateVar[HEIGHT]
 */
 void State_t::centerAngles(double height /*=0.0*/){
+
+    if(height == 0.0) height = vars.height;
+    if      (height < params.MIN_HEIGHT) height = params.MIN_HEIGHT;
+    else if (height > params.MAX_HEIGHT) height = params.MAX_HEIGHT;
+
+#ifdef DOF3
     servo_angles.arm = 0.0;
-
-#ifndef DOF3
-
-    if(height == 0.0) height = vars.height;
-
-    if      (height < params.MIN_HEIGHT) height = params.MIN_HEIGHT;
-    else if (height > params.MAX_HEIGHT) height = params.MAX_HEIGHT;
-
-    servo_angles.knee = wkq::PI/2 - acos( height / params.TIBIA);
-
-    computeEFVars(height);          // Update vars - needs to be passed the same argument
-
-#else
-
-    if(height == 0.0) height = vars.height;
-
-    if      (height < params.MIN_HEIGHT) height = params.MIN_HEIGHT;
-    else if (height > params.MAX_HEIGHT) height = params.MAX_HEIGHT;
-
     servo_angles.hip = asin( (height - params.TIBIA) / params.FEMUR );
     servo_angles.knee = wkq::PI/2 - servo_angles.hip;
 
-    computeEFVars(height);          // Update vars - needs to be passed the same argument
+    configureEFVars(height);          // Update vars - needs to be passed the same argument
+#else
+    //servo_angles.hip = 0.0;
+    servo_angles.knee = wkq::PI/2 - acos( height / params.TIBIA);
 
+    configureEFVars(height);          // Update vars - needs to be passed the same argument
 #endif
 }
 
 
+#ifdef DOF3
 void State_t::setAngles(double knee, double hip, double arm){
-/*    servo_angles.knee = knee;
+    servo_angles.knee = knee;
     servo_angles.hip = hip;
     servo_angles.arm = arm;
-    computeVars();
-*/
+    configureVars();
 }
+#else
+void State_t::setAngles(double knee, double hip){
+    servo_angles.knee = knee;
+    servo_angles.hip = hip;
+    configureVars();
+}
+#endif
+
+
+
+/*  @ Notes:
+    Computes valid vars basing on servo_angles and assumes all vars can be defined
+void State_t::configureVars(){
+#ifdef DOF3
+    double knee_height;
+    double height, hip_to_end_sq, arm_g_to_end;
+    
+    knee_height = params.TIBIA*cos(wkq::PI/2 - fabs(servo_angles.hip) - (wkq::PI - servo_angles.knee) );
+    
+    height = knee_height - params.FEMUR*sin(fabs(servo_angles.hip));
+    updateVar(&vars.height, height, false);                     // Update only HEIGHT
+    
+    hip_to_end_sq = pow(params.FEMUR,2) + pow(params.TIBIA,2) - 2*params.FEMUR*params.TIBIA*cos(wkq::PI - servo_angles.knee);
+    updateVar(&vars.hip_to_end_sq, hip_to_end_sq, false);       // Updates only hip_to_end
+
+    arm_g_to_end = sqrt(vars.hip_to_end_sq - vars.height_sq) + params.COXA;
+    updateVar(&vars.arm_ground_to_ef, arm_g_to_end, false);     // Update only arm_ground_to_ef
+
+    // Note that servo_angles are already centered so ef_center will be fine
+    updateVar(&vars.ef_center, vars.arm_ground_to_ef+params.DIST_CENTER, false);
+#else
+    /*
+        FILL IN
+#endif
+}
+*/
 
 
 /*  @ Notes:
     Computes valid vars basing on servo_angles and assumes all vars can be defined
 */
-void State_t::computeVars(){
-/*
-    double knee_height = params.TIBIA*cos(wkq::radians(90) - fabs(servo_angles.hip) - (wkq::PI - servo_angles.knee) );
+void State_t::configureVars(double height = /*0.0*/){
+#ifdef DOF3
+    double knee_height;
+    double height, hip_to_end_sq, arm_g_to_end;
     
-    double height = knee_height - params.FEMUR*sin(fabs(servo_angles.hip));
-    updateVar(&vars.height, height, false);                  // Only updates HEIGHT
+    if(height!=0.0){
+        updateVar(&vars.height, height, false);                 // Update only HEIGHT
+    } 
+    else{
+        knee_height = params.TIBIA*cos(wkq::PI/2 - fabs(servo_angles.hip) - (wkq::PI - servo_angles.knee) );
+        
+        height = knee_height - params.FEMUR*sin(fabs(servo_angles.hip));
+        updateVar(&vars.height, height, false);                 // Update only HEIGHT
+    }
     
-    double hip_to_end_sq = pow(params.FEMUR,2) + pow(params.TIBIA,2) - 2*params.FEMUR*params.TIBIA*cos(wkq::PI - servo_angles.knee);
-    updateVar(&vars.hip_to_end_sq, hip_to_end_sq, false);        // Only updates hip_to_end
+    hip_to_end_sq = pow(params.FEMUR,2) + pow(params.TIBIA,2) - 2*params.FEMUR*params.TIBIA*cos(wkq::PI - servo_angles.knee);
+    updateVar(&vars.hip_to_end_sq, hip_to_end_sq, false);       // Updates only hip_to_end
 
-    double arm_g_to_end = sqrt(vars.hip_to_end_sq-vars.height_sq) + params.COXA;
-    updateVar(&vars.arm_ground_to_ef, arm_g_to_end, false);          // Only updates arm_ground_to_ef
+    arm_g_to_end = sqrt(vars.hip_to_end_sq - vars.height_sq) + params.COXA;
+    updateVar(&vars.arm_ground_to_ef, arm_g_to_end, false);     // Update only arm_ground_to_ef
 
     // Note that servo_angles are already centered so ef_center will be fine
-    updateVar(&vars.ef_center, vars.arm_ground_to_ef+params.DIST_CENTER, false);
-*/
+    updateVar(&vars.ef_center, vars.arm_ground_to_ef + params.DIST_CENTER, false);
+#else
+    /*
+        FILL IN
+    */
+#endif
 }
 
 
-void State_t::computeEFVars(double height /*=0.0*/){
-/*    if(height!=0.0) updateVar(&vars.height, height, false);  // Only updates HEIGHT
+/*  @ Notes:
+    Computes valid vars related to the End Effector basing on servo_angles and assumes all vars can be defined
+*/
+void State_t::configureEFVars(double height /*=0.0*/){
+#ifdef DOF3
+    double hip_to_end_sq, arm_g_to_end;
 
-    double hip_to_end_sq = pow(params.FEMUR,2) + pow(params.TIBIA,2) - 2*params.FEMUR*params.TIBIA*cos(wkq::PI - servo_angles.knee);
-    updateVar(&vars.hip_to_end_sq, hip_to_end_sq, false);        // Only updates hip_to_end
+    if(height!=0.0) updateVar(&vars.height, height, false);     // Update only HEIGHT
 
-    double arm_g_to_end = sqrt(vars.hip_to_end_sq-vars.height_sq) + params.COXA;
-    updateVar(&vars.arm_ground_to_ef, arm_g_to_end, false);          // Only updates arm_ground_to_ef
+    hip_to_end_sq = pow(params.FEMUR,2) + pow(params.TIBIA,2) - 2*params.FEMUR*params.TIBIA*cos(wkq::PI - servo_angles.knee);
+    updateVar(&vars.hip_to_end_sq, hip_to_end_sq, false);       // Update only hip_to_end
+
+    arm_g_to_end = sqrt(vars.hip_to_end_sq - vars.height_sq) + params.COXA;
+    updateVar(&vars.arm_ground_to_ef, arm_g_to_end, false);     // Update onyl arm_ground_to_ef
 
     // Note that servo_angles are already centered so ef_center will be fine
-    if(height!=0.0) updateVar(&vars.ef_center, vars.arm_ground_to_ef+params.DIST_CENTER, false);
-*/
+    if(height!=0.0) updateVar(&vars.ef_center, vars.arm_ground_to_ef + params.DIST_CENTER, false);
+#else
+    if(height!=0.0) updateVar(&vars.height, height, false);     // Update only HEIGHT
+    /*
+        FILL IN
+    */
+#endif
 }
+
+
 
 
 /*

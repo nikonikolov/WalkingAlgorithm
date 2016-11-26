@@ -1,11 +1,15 @@
 #ifndef SERVOJOINT_H
 #define SERVOJOINT_H
 
+#include <string>
+
+#include "wkq.h"
+using std::string;
+
+
 #ifndef SIMULATION
 
 #include "../libdnx/mbed/DnxHAL.h"
-
-
 
 class ServoJoint{
 
@@ -31,14 +35,11 @@ public:
 private:
 
 	int ID;
+    string servo_name;
 	DnxHAL* dnx_ptr;		// Pointer to the object (Knees/Hips/Arms/Wings) associated with the right serial port
 };
 
 #else
-
-#include "wkq.h"
-#include <string>
-using std::string;
 
 typedef int DnxHAL;
 void wait(int time);

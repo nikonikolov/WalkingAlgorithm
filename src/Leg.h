@@ -36,11 +36,11 @@ FRAMEWORK:
 	3. updateVar() 		- 	When you use this to update hip_to_end it is assumed the change is in ENDEFFECTOR
 							rather than in the HEIGHT of the robot. If change is in the HEIGHT, the vars.height
 							will not be updates
-	4. updateAngles()	-	Function automatically called when updateVar() is called. Basing on vars[]
+	4. configureAngles()	-	Function automatically called when updateVar() is called. Basing on vars[]
 							function computes new angles for Hip and Knee
 	5. center()			-	Assumes Leg is already lifted up, otherwise robot will probably fall down
-	6. computeVars() 	- 	Computes all vars[] based on the current servo_angles[] does not use Update(), but computes variables
-							manually to ensure no call to updateAngles()
+	6. configureVars() 	- 	Computes all vars[] based on the current servo_angles[] does not use Update(), but computes variables
+							manually to ensure no call to configureAngles()
 
 -------------------------------------------------------------------------------------------
 
@@ -49,11 +49,12 @@ FRAMEWORK:
 #ifndef LEG_H
 #define LEG_H
 
+#include <cmath>
+
 #include "ServoJoint.h"
 #include "State_t.h"
 #include "wkq.h"
-#include <cmath>
-
+using wkq::RobotState_t;
 
 class Leg{
 
@@ -73,24 +74,22 @@ public:
 
 	/* ---------------------------------------- STATIC POSITIONS ---------------------------------------- */
 
-	inline void defaultPos();				// Reset all Leg parameters to their defaultPos values
-	inline void center();					// Reset all Legs to their central positions and keep current height
-	inline void stand();					// Centralize all Legs for a standing state where height = Tibia
-	inline void flatten();					// flatten the knee
-	void standQuad();						// Same as stand() but arms configured as quad
-	void flatQuad(); 						// Configuration for flying as as a quad
+	void setPosition(wkq::RobotState_t robot_state);
 
 	/* ---------------------------------------- RAISE AND LOWER ---------------------------------------- */
 
 	void liftUp(double height);				// Lift End Effector in the air
 	void lowerDown(double height);			// Put End Effector straight down
-	void finishStep();								// Put End Effector down with ARM, HIP and KNEE centered
+	void finishStep();						// Put End Effector down with ARM, HIP and KNEE centered
 
 	/* ---------------------------------------- WALKING ALGORITHMS ---------------------------------------- */
 
 	void IKBodyForward(double step_size);	// Change angles and state of Leg for a step forward
 	void stepForward(double step_size);		// Put End Effector down by making a step forward. Leg must be already lifted
-	
+
+	void IKBodyForwardRectangularGait(double step_size);
+	void stepForwardRectangularGait(double step_size);
+
 	void IKBodyRotate(double angle);			// Change angles and state of Leg for a rotation around central axis
 	void stepRotate(double angle);			// Put End Effector down by making a rotation step. Leg must be already lifted
 	
@@ -103,6 +102,7 @@ public:
 
 
 private:
+	void confRectangular();
 	void confQuadArms();
 
 	/* ============================================== MEMBER DATA ============================================== */
@@ -115,24 +115,10 @@ private:
 	wkq::LegID leg_id; 							// ID of the leg
 
 	bool debug_ = false;
+
+
+	bool first_step_taken = false;
 };
-
-
-inline void Leg::defaultPos(){
-	state.legDefaultPos();
-}
-
-inline void Leg::center(){
-	state.legCenter();
-}
-
-inline void Leg::stand(){
-	state.legStand();
-}
-inline void Leg::flatten(){	
-	state.legFlatten();
-}
-
 
 #endif
 

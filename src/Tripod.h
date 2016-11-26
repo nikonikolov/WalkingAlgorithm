@@ -30,6 +30,7 @@ FRAMEWORK:
 #define TRIPOD_H
 
 #include "Leg.h"
+using wkq::RobotState_t;
 
 #define FRONTLEG 	0
 #define MIDDLELEG 	1
@@ -51,31 +52,32 @@ public:
 
 	/* ------------------------------------ STATIC POSITIONS ----------------------------------- */
 
-	void defaultPos();					// Reset all Leg parameters to their defaultPos values
-	void center();						// Reset all Legs to their central positions and keep current height
-	void stand();						// Set all Legs to a standing state where height = Tibia
-	void standQuad();					// Same as stand() but arms configured as quad
-	void flatQuad();					// Straighten legs to fly as a quad
+	void setPosition(wkq::RobotState_t robot_state); 				// Wrapper for calling a function from Leg that sets a static leg position
 
 	//double standing();					// Determines if standing, and if not returns by how much should be lifted
+	void center();						// Reset all Legs to their central positions and keep current height
 
 	/* ------------------------------------ WALKING MOVEMENTS ----------------------------------- */
 	
 	void bodyForward(double step_size);
 	void stepForward(double step_size);
 
+	void bodyForwardRectangularGait(double step_size);
+	void stepForwardRectangularGait(double step_size);
+	void finishStepRectangularGait();
+
 	void bodyRotate(double angle);
 	void stepRotate(double angle);
+	void finishStep();
 	
 	void liftUp(double height_up);
 	void lowerDown(double height_down);
-	void finishStep();
 
 	void raiseBody(double hraise);
 
 private:
 	void makeMovement(void (Leg::*leg_action)(double), double arg, const string debug_msg=""); 		// Wrapper for calling a function from Leg that makes any moevement
-	void setPosition(void (Leg::*leg_action)(), const string debug_msg=""); 						// Wrapper for calling a function from Leg that sets a static leg position
+	//void setPosition(void (Leg::*leg_action)(), const string debug_msg=""); 						// Wrapper for calling a function from Leg that sets a static leg position
 
 	void writeAngles();
 	void writeHipKneeAngles();
@@ -84,6 +86,8 @@ private:
 	Leg legs[LEG_COUNT];
 
 	static const double leg_lift;
+
+	bool debug_ = true;
 };
 
 #endif 
