@@ -80,7 +80,9 @@ ServoJoint::ServoJoint(int ID_in, DnxHAL* dnx_ptr_in) : ID(ID_in), dnx_ptr(dnx_p
 			servo_name = "error in servo ID";
 	}		
 	setReturnLevel(1);	
+	wait_ms(0.5);
 	setGoalVelocity(100);	
+	wait_ms(0.5);
 	//setPunch(512);	
 }
 

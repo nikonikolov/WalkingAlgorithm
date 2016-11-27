@@ -119,16 +119,23 @@ namespace wkq{
 		*/
 	}; 
 
-	enum TripodMovement_t{
-		TM_BODY_FORWARD 		= 0,
-		TM_STEP_FORWARD 		= 1,
-		TM_BODY_FORWARD_RECT	= 2,
-		TM_STEP_FORWARD_RECT	= 3,
-		TM_BODY_ROTATE 			= 4,
-		TM_STEP_ROTATE 			= 5,
+	enum RobotMovement_t{
+		RM_HEXAPOD_GAIT 		= 0,
+		RM_RECTANGULAR_GAIT 	= 1,
+		RM_ROTATION_HEXAPOD 	= 2,
+		RM_ROTATION_RECTANGULAR = 3,
 
-		TM_LIFT_UP 				= 6,
-		TM_LOWER_DOWN 			= 7,
+
+		/*RM_BODY_FORWARD 		= 0,
+		RM_STEP_FORWARD 		= 1,
+		RM_BODY_FORWARD_RECT	= 2,
+		RM_STEP_FORWARD_RECT	= 3,
+		RM_BODY_ROTATE 			= 4,
+		RM_STEP_ROTATE 			= 5,
+
+		RM_LIFT_UP 				= 6,
+		RM_LOWER_DOWN 			= 7,
+		*/
 	}; 
 
 
@@ -147,9 +154,8 @@ namespace wkq{
 
 /* ------------------------------------------------- POINT ------------------------------------------------- */ 
 
-	class Point{
+	struct Point{
 
-	public:
 		Point();
 		Point(double x_in, double y_in);
 		Point(double x_in, double y_in, double mod_in, double arg_in);
@@ -164,9 +170,9 @@ namespace wkq{
 		inline double origin_dist() const;
 		//void origin_symmetric();
 
-		inline void translate_y(double delta_y);
-		inline void translate_x(double delta_x);
-		inline void translate(const Point& p2);
+		void translate_y(double delta_y);
+		void translate_x(double delta_x);
+		//void translate(const Point& p2);
 		
 		inline double dist(const Point& p_in) const;
 		inline double dist_sq(const Point& p_in) const;
@@ -178,8 +184,8 @@ namespace wkq{
 		friend bool operator==(const Point& p1, const Point& p2);
 	*/
 
-	private:
-		void rect_coord();
+		void update_rect_coord();
+		void update_polar_coord();
 
 		double x = 0;
 		double y = 0;
@@ -207,19 +213,11 @@ namespace wkq{
 	}
 
 	double Point::dist(const Point& p_in) const{
-		return sqrt( pow((x-p_in.x),2) + pow((y-p_in.y),2) );
+		return sqrt( dist_sq(p_in) );
 	}
 
 	double Point::dist_sq(const Point& p_in) const{
 		return pow((x-p_in.x),2) + pow((y-p_in.y),2);
-	}
-
-	void Point::translate_y(double delta_y){
-		y += delta_y;
-	}
-
-	void Point::translate_x(double delta_x){
-		x += delta_x;
 	}
 
 

@@ -1,5 +1,3 @@
-#include <cstdlib>
-
 #include "src/wkq.h"
 
 #include "src/ServoJoint.h"
@@ -65,15 +63,15 @@ int main(int argc, char **argv){
 	//	wk_quad = new Robot(pixhawk, baud, init_height, robot_params, wkq::RS_FLAT_QUAD);					
 	//	wk_quad = new Robot(pixhawk, baud, init_height, robot_params, wkq::RS_DEFAULT);					
 	
-	//wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_DEFAULT);					
+	wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_DEFAULT);					
 	//wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_FLAT_QUAD);					
-	wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_RECTANGULAR);					
+	//wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_RECTANGULAR);					
 
 	printf("MAIN: Robot Initialized\n\r");
 
 	wait(10);
 	//wk_quad->testSingleTripodStand();
-	wk_quad->walkForwardRectangularGait(1.0);
+	wk_quad->makeMovement(wkq::RM_HEXAPOD_GAIT, 1.0);
 
 
 	//wk_quad->testSingleTripodStand();

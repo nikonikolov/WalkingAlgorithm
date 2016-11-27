@@ -50,13 +50,13 @@ struct DynamicVars{
 
     double height;                          // Vertical distance from hip mount point to ground
     double height_sq;
+    double ef_center;                       // Distance from End Effector to robot center for centered leg
+    double ef_center_sq;
 #ifdef DOF3
     double hip_to_end;                      // Direct distance from hip mount point to the point where the end effector touches ground
     double hip_to_end_sq;
     double arm_ground_to_ef;                // Distance from arm ground projection to end effector
     double arm_ground_to_ef_sq;
-    double ef_center;                       // Distance from End Effector to robot center for centered HIP and KNEE
-    double ef_center_sq;
 #else
     double hip_ground_to_ef;                // Distance from the ground projection of the hip mount point to the end effector
     double hip_ground_to_ef_sq;

@@ -84,10 +84,10 @@ public:
 
 	/* ---------------------------------------- WALKING ALGORITHMS ---------------------------------------- */
 
-	void IKBodyForward(double step_size);	// Change angles and state of Leg for a step forward
+	void bodyForward(double step_size);	// Change angles and state of Leg for a step forward
 	void stepForward(double step_size);		// Put End Effector down by making a step forward. Leg must be already lifted
 
-	void IKBodyForwardRectangularGait(double step_size);
+	void bodyForwardRectangularGait(double step_size);
 	void stepForwardRectangularGait(double step_size);
 
 	void IKBodyRotate(double angle);			// Change angles and state of Leg for a rotation around central axis

@@ -9,7 +9,7 @@ using std::string;
 
 #ifndef SIMULATION
 
-#include "../libdnx/mbed/DnxHAL.h"
+#include "../libdnx/DnxHAL.h"
 
 class ServoJoint{
 

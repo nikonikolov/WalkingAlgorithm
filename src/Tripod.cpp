@@ -43,7 +43,7 @@ void Tripod::center(){
 /* ================================================= WALKING MOVEMENTS ================================================= */
 
 void Tripod::bodyForward(double step_size){
-	makeMovement(&Leg::IKBodyForward, step_size, "Tripod: bodyForward");
+	makeMovement(&Leg::bodyForward, step_size, "Tripod: bodyForward");
 }
 
 void Tripod::stepForward(double step_size){
@@ -51,7 +51,7 @@ void Tripod::stepForward(double step_size){
 }
 
 void Tripod::bodyForwardRectangularGait(double step_size){
-	makeMovement(&Leg::IKBodyForwardRectangularGait, step_size, "Tripod: bodyForwardRectangularGait");
+	makeMovement(&Leg::bodyForwardRectangularGait, step_size, "Tripod: bodyForwardRectangularGait");
 }
 
 void Tripod::stepForwardRectangularGait(double step_size){
@@ -80,7 +80,6 @@ void Tripod::finishStep(){
 }
 
 void Tripod::finishStepRectangularGait(){
-	//setPosition(&Leg::finishStep, "Tripod: finishStep\n\r");
 	setPosition(wkq::RS_RECTANGULAR);
 }
 

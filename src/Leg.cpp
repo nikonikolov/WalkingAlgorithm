@@ -149,7 +149,7 @@ void Leg::lowerDown(double height){
     Note that End Effector is still kept on the same line as HIP and KNEE are centered for this position
 */
 void Leg::finishStep(){
-    state.centerAngles();
+    state.centerLeg();
 }
 
 
@@ -158,38 +158,45 @@ void Leg::finishStep(){
 
 
 // Valid calculations for negative input as well in the current form
-void Leg::IKBodyForward(double step_size){
+void Leg::bodyForward(double step_size){
 
 #ifdef DOF3
-    double step_size_sq = pow(step_size,2);
+    double step_size_sq;
+    double arm_ground_to_ef_new, arm_ground_to_ef_sq_new; 
+    double arm_rotation;
 
-    // Cosine Rule to find new hip_to_endSQ
-    double arm_ground_to_ef_sq_new = state.vars.arm_ground_to_ef_sq + step_size_sq - 
-                                2 * step_size * state.vars.arm_ground_to_ef * cos( angle_offset + state.servo_angles.arm ) ;
+    step_size_sq = pow(step_size,2);
 
-    double arm_ground_to_ef_new = sqrt(arm_ground_to_ef_sq_new);
+    // Cosine Rule to find the new arm_ground_to_ef
+    arm_ground_to_ef_sq_new = state.vars.arm_ground_to_ef_sq + step_size_sq - 2 * step_size * state.vars.arm_ground_to_ef * cos(angle_offset + state.servo_angles.arm) ;
+    arm_ground_to_ef_new = sqrt(arm_ground_to_ef_sq_new);
 
-    // Cosine Rule to find new Arm Servo Angle
-    double ArmTmp = acos( (step_size_sq + arm_ground_to_ef_sq_new - state.vars.arm_ground_to_ef_sq) / ( 2 * step_size * arm_ground_to_ef_new ) );
+    // Cosine Rule to find new servo_angles.arm
+    arm_rotation = acos( (step_size_sq + arm_ground_to_ef_sq_new - state.vars.arm_ground_to_ef_sq) / ( 2 * step_size * arm_ground_to_ef_new ) );
     // Convert to actual angle for the servo
-    state.servo_angles.arm = wkq::PI - angle_offset - ArmTmp;           // NB: Valid for a LEFT servo facing down
+    state.servo_angles.arm = wkq::PI - angle_offset - arm_rotation;           // NB: Valid for a LEFT servo facing down
 
-    state.updateVar(&(state.vars.arm_ground_to_ef), arm_ground_to_ef_new, &(state.vars.arm_ground_to_ef_sq), arm_ground_to_ef_sq_new);      // Automatically changes robot state in software
+    // Update the whole leg state
+    state.updateVar(&(state.vars.arm_ground_to_ef), arm_ground_to_ef_new, &(state.vars.arm_ground_to_ef_sq), arm_ground_to_ef_sq_new);
+
 #else   
-    double step_size_sq = pow(step_size,2);
+    double step_size_sq;
+    double hip_ground_to_ef_new, hip_ground_to_ef_sq_new; 
+    double hip_rotation;
 
-    // Cosine Rule to find new hip_to_endSQ
-    double hip_ground_to_ef = state.vars.hip_ground_to_ef_sq + step_size_sq - 
-                                2 * step_size * state.vars.hip_ground_to_ef * cos( angle_offset + state.servo_angles.arm ) ;
+    step_size_sq = pow(step_size,2);
 
-    double arm_ground_to_ef_new = sqrt(hip_ground_to_ef);
+    // Cosine Rule to find the new hip_ground_to_ef
+    hip_ground_to_ef_sq_new = state.vars.hip_ground_to_ef_sq + step_size_sq - 2 * step_size * state.vars.hip_ground_to_ef * cos(angle_offset - state.servo_angles.hip) ;
+    hip_ground_to_ef_new = sqrt(hip_ground_to_ef_sq_new);
 
-    // Cosine Rule to find new Arm Servo Angle
-    double ArmTmp = acos( (step_size_sq + hip_ground_to_ef - state.vars.hip_ground_to_ef_sq) / ( 2 * step_size * arm_ground_to_ef_new ) );
+    // Cosine Rule to find new servo_angles.arm
+    hip_rotation = acos( (step_size_sq + hip_ground_to_ef_sq_new - state.vars.hip_ground_to_ef_sq) / ( 2 * step_size * hip_ground_to_ef_new ) );
     // Convert to actual angle for the servo
-    state.servo_angles.arm = wkq::PI - angle_offset - ArmTmp;           // NB: Valid for a LEFT servo facing down
+    state.servo_angles.hip = angle_offset + hip_rotation - wkq::PI;           // NB: Valid for a LEFT servo facing up
 
-    state.updateVar(&(state.vars.hip_ground_to_ef), arm_ground_to_ef_new, &(state.vars.hip_ground_to_ef_sq), hip_ground_to_ef);      // Automatically changes robot state in software
+    // Update the whole leg state
+    state.updateVar(&(state.vars.hip_ground_to_ef), hip_ground_to_ef_new, &(state.vars.hip_ground_to_ef_sq), hip_ground_to_ef_sq_new);
 
 /*  double step_size_sq = pow(step_size,2);
     double dir_offset = 0.0;
@@ -218,8 +225,84 @@ void Leg::IKBodyForward(double step_size){
 }
 
 
+/*  
+    @param: step_size - must be always twice the active step_size so that bigger steps can be done
+*/
+void Leg::stepForward(double step_size){
+#ifdef DOF3
+    // Distance from Robot center to end effector for a fully centered robot at this height
+    double ef_center = state.vars.ef_center;
+
+    // Create Point representing the new END EFFECTOR position
+    double x_ef_new, y_ef_new;
+    if(leg_id == wkq::LEG_RIGHT_MIDDLE || leg_id == wkq::LEG_LEFT_MIDDLE){          // Middle Joint
+        //x_ef_new = ef_center - step_size/sqrt(3); - change when you have prev and current step size as inputs
+        x_ef_new = ef_center - step_size/sqrt(3);
+        y_ef_new = 0.0;
+    }   
+    else{
+        x_ef_new = ef_center/2.0 + step_size/sqrt(3);
+        y_ef_new = sqrt(3)*x_ef_new;                      // Front Joint
+
+        if(leg_id == wkq::LEG_RIGHT_BACK || leg_id == wkq::LEG_LEFT_BACK)   y_ef_new -= sqrt(3)*ef_center;           // Back Joint
+    }       
+    wkq::Point ef_new(x_ef_new, y_ef_new);
+
+    // Create Point representing current HIP position
+    double hip_arg = wkq::PI/2 -angle_offset;
+    wkq::Point p_hip(state.params.DIST_CENTER*cos(hip_arg), state.params.DIST_CENTER*sin(hip_arg));
+
+    // Create Point representing the new HIP position
+    wkq::Point p_hip_new(p_hip);
+    p_hip_new.translate_y(step_size*2);
+
+    // Calculate new arm_ground_to_ef
+    double arm_ground_to_ef_sq_new = p_hip.dist_sq(ef_new);
+
+    // Cosine Rule to find new ARM angle
+    double arg_triangle = 
+            acos( (p_hip.dist_sq(p_hip_new) +  p_hip.dist_sq(ef_new) - p_hip_new.dist_sq(ef_new)) / (2*p_hip.dist(p_hip_new)*p_hip.dist_sq(ef_new)) );
+    //state.servo_angles.arm = wkq::PI - angle_offset - arg_triangle;
+    state.servo_angles.arm = arg_triangle - angle_offset ;      // Unconfirmed that valid for all joints
+
+    state.updateVar(&(state.vars.arm_ground_to_ef_sq), arm_ground_to_ef_sq_new);                // Automatically changes hip_to_end, HIP and KNEE   
+#else
+   
+    // Distance from Robot center to end effector for a fully centered robot at this height
+    double ef_center = state.vars.ef_center;
+    double x_ef_new, y_ef_new;
+    double x_hip, y_hip;
+    double hip_ground_to_ef_sq;
+    double hip_rotation;
+
+    // Create Point representing the new END EFFECTOR position
+    x_ef_new = ef_center * cos(wkq::PI/2 - angle_offset);
+    y_ef_new = ef_center * sin(wkq::PI/2 - angle_offset);
+    wkq::Point p_ef_new(x_ef_new, y_ef_new);
+
+    // Create Point representing current HIP position
+    x_hip = state.params.DIST_CENTER * cos(wkq::PI/2 - angle_offset);
+    y_hip = state.params.DIST_CENTER * sin(wkq::PI/2 - angle_offset);
+    wkq::Point p_hip(x_hip, y_hip);
+    // Translate the point backwards from the imaginary center
+    p_hip.translate_y(-step_size/2);
+
+    // Calculate new hip_ground_to_ef
+    hip_ground_to_ef_sq = p_hip.dist_sq(p_ef_new);
+
+    // Find the gradient between the points
+    hip_rotation = atan( (p_ef_new.y - p_hip.y) / (p_ef_new.x - p_hip.x) );
+    state.servo_angles.hip = hip_rotation + angle_offset - wkq::PI/2;
+
+    // Update the whole leg state
+    state.updateVar(&(state.vars.hip_ground_to_ef_sq), hip_ground_to_ef_sq);                
+
+#endif
+}
+
+
 // Assumes the leg starts from default position
-void Leg::IKBodyForwardRectangularGait(double step_size){
+void Leg::bodyForwardRectangularGait(double step_size){
 #ifdef DOF3
     /*
         FILL IN
@@ -275,54 +358,6 @@ void Leg::stepForwardRectangularGait(double step_size){
 }
 
 
-// Input is the currently used step size
-void Leg::stepForward(double step_size){
-#ifdef DOF3
-    // Distance from Robot center to end effector for a fully centered robot at this height
-    double ef_center = state.vars.ef_center;
-
-    // Create Point representing the new END EFFECTOR position
-    double x_EFNew, y_EFNew;
-    if(leg_id == wkq::LEG_RIGHT_MIDDLE || leg_id == wkq::LEG_LEFT_MIDDLE){          // Middle Joint
-        //x_EFNew = ef_center - step_size/sqrt(3); - change when you have prev and current step size as inputs
-        x_EFNew = ef_center - step_size/sqrt(3);
-        y_EFNew = 0.0;
-    }   
-    else{
-        x_EFNew = ef_center/2.0 + step_size/sqrt(3);
-        y_EFNew = sqrt(3)*x_EFNew;                      // Front Joint
-
-        if(leg_id == wkq::LEG_RIGHT_BACK || leg_id == wkq::LEG_LEFT_BACK)   y_EFNew -= sqrt(3)*ef_center;           // Back Joint
-    }       
-    wkq::Point EFNew(x_EFNew, y_EFNew);
-
-    // Create Point representing current HIP position
-    double hip_arg = wkq::PI/2 -angle_offset;
-    wkq::Point p_hip(state.params.DIST_CENTER*cos(hip_arg), state.params.DIST_CENTER*sin(hip_arg));
-
-    // Create Point representing the new HIP position
-    wkq::Point p_hip_new(p_hip);
-    p_hip_new.translate_y(step_size*2);
-
-    // Calculate new arm_ground_to_ef
-    double arm_ground_to_ef_sq_new = p_hip.dist_sq(EFNew);
-
-    // Cosine Rule to find new ARM angle
-    double arg_triangle = 
-            acos( (p_hip.dist_sq(p_hip_new) +  p_hip.dist_sq(EFNew) - p_hip_new.dist_sq(EFNew)) / (2*p_hip.dist(p_hip_new)*p_hip.dist_sq(EFNew)) );
-    //state.servo_angles.arm = wkq::PI - angle_offset - arg_triangle;
-    state.servo_angles.arm = arg_triangle - angle_offset ;      // Unconfirmed that valid for all joints
-
-    state.updateVar(&(state.vars.arm_ground_to_ef_sq), arm_ground_to_ef_sq_new);                // Automatically changes hip_to_end, HIP and KNEE   
-#else
-    /*
-        FILL IN
-    */
-#endif
-}
-
-
-
 void Leg::IKBodyRotate(double angle){
 #ifdef DOF3
     // Sine Rule to find rotation distance
@@ -340,10 +375,10 @@ void Leg::IKBodyRotate(double angle){
     double arm_ground_to_ef_new = sqrt(arm_ground_to_ef_sq_new);
 
     // Cosine Rule to find new Arm Servo Angle
-    double ArmTmp = acos( (rot_dist_sq + arm_ground_to_ef_sq_new - state.vars.arm_ground_to_ef_sq) / ( 2 * rot_dist * arm_ground_to_ef_new ) );
+    double arm_rotation = acos( (rot_dist_sq + arm_ground_to_ef_sq_new - state.vars.arm_ground_to_ef_sq) / ( 2 * rot_dist * arm_ground_to_ef_new ) );
     // Convert to actual angle for the servo - valid for a LEFT LEG servo facing down
-    if (angle>=0.0) state.servo_angles.arm = wkq::PI/2 - ArmTmp + angle/2;  // - (- wkq::PI/2 + state.servo_angles.arm - angle/2)
-    else            state.servo_angles.arm = -wkq::PI/2 + ArmTmp + angle/2; // - (  wkq::PI/2 - state.servo_angles.arm - angle/2)
+    if (angle>=0.0) state.servo_angles.arm = wkq::PI/2 - arm_rotation + angle/2;  // - (- wkq::PI/2 + state.servo_angles.arm - angle/2)
+    else            state.servo_angles.arm = -wkq::PI/2 + arm_rotation + angle/2; // - (  wkq::PI/2 - state.servo_angles.arm - angle/2)
 
     state.updateVar(&(state.vars.arm_ground_to_ef), arm_ground_to_ef_new, &(state.vars.arm_ground_to_ef_sq), arm_ground_to_ef_sq_new);                  // Automatically changes robot state in software
 #else
@@ -386,7 +421,6 @@ void Leg::writeAngles(){
     if(debug_) printf("Leg: enter writeAngles\n\r");
 
     if(!leg_right){
-        if(debug_) printf("Leg: writeAngles - left leg\n\r");
 #ifdef DOF3
         joints.arm.setGoalPosition(state.servo_angles.arm);
 #endif
@@ -394,19 +428,15 @@ void Leg::writeAngles(){
         joints.knee.setGoalPosition(state.servo_angles.knee);
     }
     else{
-        if(debug_) printf("Leg: writeAngles - right leg\n\r");
     
 #ifdef DOF3
-        if(state.servo_angles.arm != 0)     joints.arm.setGoalPosition(-state.servo_angles.arm);
-        else                                joints.arm.setGoalPosition(state.servo_angles.arm);
+        joints.arm.setGoalPosition(-state.servo_angles.arm);
 #endif
-        if(state.servo_angles.hip != 0)     joints.hip.setGoalPosition(-state.servo_angles.hip);
-        else                                joints.hip.setGoalPosition(state.servo_angles.hip);
-        if(state.servo_angles.knee != 0)    joints.knee.setGoalPosition(-state.servo_angles.knee);
-        else                                joints.knee.setGoalPosition(state.servo_angles.knee);
+        joints.hip.setGoalPosition(-state.servo_angles.hip);
+        joints.knee.setGoalPosition(-state.servo_angles.knee);
     }
 
-    if(debug_) printf("Leg: done with writeAngles\n\r");
+    if(debug_) printf("Leg: done writeAngles\n\r");
 }
 
 /*

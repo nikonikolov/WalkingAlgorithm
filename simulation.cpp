@@ -61,33 +61,14 @@ int main(){
 #endif	
 
 	printf("MAIN: All comms ready\n\r");
-
-	//	wk_quad = new Robot(pixhawk, baud, init_height, robot_params, wkq::RS_FLAT_QUAD);					
-	//	wk_quad = new Robot(pixhawk, baud, init_height, robot_params, wkq::RS_DEFAULT);					
 	
-	//wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_DEFAULT);					
+	wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_DEFAULT);					
 	//wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_FLAT_QUAD);					
-	wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_RECTANGULAR);					
+	//wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_RECTANGULAR);					
 
 	printf("MAIN: Robot Initialized\n\r");
 
-	wk_quad->walkForwardRectangularGait(0.4);
-
-	/*wk_quad->stand();
-	printf("Robot Standing\n");
-	wk_quad->standQuad();
-	printf("Robot Standing as Quad\n");
-	wk_quad->defaultPos();
-	printf("Legs in Default position\n");
-	wk_quad->center();
-	printf("Legs Centered\n");
-	*/
-	
-	//wk_quad->walkForward(0.7);
-	//printf("ROBOT WALKED\n");
-
-	// Further tests - lifting body after center to stand
-	// Centering for arbitrary height
+	wk_quad->makeMovement(wkq::RM_HEXAPOD_GAIT, 1.0);
 
 
 	return 0;

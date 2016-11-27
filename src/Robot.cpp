@@ -58,115 +58,86 @@ void Robot::setState(wkq::RobotState_t state_in, void (Tripod::*tripod_action)()
 */
 /* ================================================= WALK RELATED FUNCTIONALITY ================================================= */
 
+void Robot::makeMovement(RobotMovement_t movement, double coeff){
+	double step_size;
+	bool continue_movement;
+	int tripod_up, tripod_down;
 
-void Robot::walkForward(double coeff){
+	void (Tripod::*body_forward)(double);
+	void (Tripod::*step_forward)(double);
+	void (Tripod::*finish_step)();
+
 	if(coeff<0.0) coeff=0.1;
 	if(coeff>1.0) coeff=1.0;
 
-	double step_size = coeff*max_step_size;
+	step_size 			= coeff*max_step_size;
+	continue_movement 	= true;
+	tripod_up 			= TRIPOD_RIGHT;
+	tripod_down 		= TRIPOD_LEFT;
 
-	bool continue_movement = true;
-	int tripod_up = TRIPOD_LEFT, tripod_down = TRIPOD_RIGHT;
-
-	//printf("Movement forward starts\n\r");
-	
-	// repeat until walkForward signal stops
-	while(continue_movement){
-		Tripods[tripod_up].liftUp(ef_raise_);
-		wait(2);
-		//printf("First tripod lifted\n\r");
-		Tripods[tripod_down].bodyForward(step_size);
-		//printf("Second tripod moved body forward\n\r");
-
-		// Read Input and find out whether movement should go on
-		continue_movement = pixhawk->inputWalkForward();
-
-		wait(2);
-		// Movement goes on
-		if(continue_movement){
-			Tripods[tripod_up].stepForward(step_size);
-			//printf("First tripod put down legs for another step forward\n\r");
-			std::swap(tripod_up, tripod_down);			// swap the roles of the Tripods
-			wait(2);
-		}
-		
-		// Movement stops
-		else{
-			Tripods[tripod_up].finishStep();
-			//printf("First tripod finished step\n\r");
-		wait(2);
-			Tripods[tripod_down].liftUp(ef_raise_);
-			//printf("Second tripod lifted\n\r");
-		wait(2);
-			Tripods[tripod_down].finishStep();
-			//printf("Second tripod finished step\n\r");
-		}
+	switch(movement){
+		case wkq::RM_HEXAPOD_GAIT:
+			body_forward 	= &Tripod::bodyForward;
+			step_forward 	= &Tripod::stepForward;
+			finish_step 	= &Tripod::finishStep;
+			break;
+		case wkq::RM_RECTANGULAR_GAIT:
+			body_forward 	= &Tripod::bodyForwardRectangularGait;
+			step_forward 	= &Tripod::stepForwardRectangularGait;
+			finish_step 	= &Tripod::finishStepRectangularGait;
+			break;
+		case wkq::RM_ROTATION_HEXAPOD:
+			break;
+		case wkq::RM_ROTATION_RECTANGULAR:
+			break;
+		default:
+			printf("ERROR - Robot: makeMovement - movement not implemented\n\r");
+			return;
 	}
-}
-	
 
-void Robot::walkForwardRectangularGait(double coeff){
-	if(coeff<0.0) coeff=0.1;
-	if(coeff>1.0) coeff=1.0;
-
-	double step_size = coeff*max_step_size;
-
-	bool continue_movement = true;
-	int tripod_up = TRIPOD_RIGHT, tripod_down = TRIPOD_LEFT;
-
-	//printf("Movement forward starts\n\r");
-	
 	bool first = true;
 	// repeat until walkForward signal stops
 	while(continue_movement){
-		// Read Input and find out whether movement should go on
+		// Read input and find out whether movement should go on
 		if(!first) continue_movement = pixhawk->inputWalkForward();
 
 		Tripods[tripod_up].liftUp(ef_raise_);
 		wait(wait_time_);
-		//printf("First tripod lifted\n\r");
-		if(first || !continue_movement) 	Tripods[tripod_down].bodyForwardRectangularGait(step_size);
-		else 		Tripods[tripod_down].bodyForwardRectangularGait(2*step_size);
-		//printf("Second tripod moved body forward\n\r");
 
-		break;
-		
+		if(first || !continue_movement){
+			first = false;
+			(Tripods[tripod_down].*body_forward)(step_size);
+		} 	
+		else 								(Tripods[tripod_down].*body_forward)(2*step_size);
 		wait(wait_time_);
+
 		// Movement goes on
 		if(continue_movement){
+			/*
 			if(first){
-				Tripods[tripod_up].stepForwardRectangularGait(step_size);
+				(Tripods[tripod_up].*step_forward)(step_size);
 				first = false;		
 			}
-			else	Tripods[tripod_up].stepForwardRectangularGait(2*step_size);
-			//printf("First tripod put down legs for another step forward\n\r");
+			else{
+				(Tripods[tripod_up].*step_forward)(2*step_size);
+			}	
+			*/
+			(Tripods[tripod_up].*step_forward)(2*step_size);
 			std::swap(tripod_up, tripod_down);			// swap the roles of the Tripods
 			wait(wait_time_);
 		}
 		
 		// Movement stops
 		else{
-			Tripods[tripod_up].finishStepRectangularGait();
-			//printf("First tripod finished step\n\r");
+			(Tripods[tripod_up].*finish_step)();
 			wait(wait_time_);
 			Tripods[tripod_down].liftUp(ef_raise_);
-			//printf("Second tripod lifted\n\r");
 			wait(wait_time_);
-			Tripods[tripod_down].finishStepRectangularGait();
-			//printf("Second tripod finished step\n\r");
+			(Tripods[tripod_down].*finish_step)();
 		}
 	}
 }
 
-
-void Robot::rotate(double angle){
-	/*for(int i=0; i<TRIPOD_COUNT; i++){
-		Tripods[i].bodyRotate(angle);
-	}
-
-	writeAngles();
-	*/
-}
 
 void Robot::raiseBody(double hraise){
 	if(wkq::compare_doubles(0.0, hraise)) return;

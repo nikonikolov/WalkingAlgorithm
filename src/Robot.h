@@ -33,6 +33,7 @@ FRAMEWORK:
 #include "Master.h"
 
 using wkq::RobotState_t;
+using wkq::RobotMovement_t;
 
 #ifndef SIMULATION
 #include "../libdnx/SerialAX12.h"
@@ -59,9 +60,7 @@ public:
 
 	/* ------------------------------------ WALK RELATED FUNCTIONALITY ----------------------------------- */
 
-	void walkForward(double coeff);
-	void walkForwardRectangularGait(double coeff);
-	void rotate(double angle);
+	void makeMovement(RobotMovement_t movement, double coeff);
 
 	void raiseBody(double hraise);
 

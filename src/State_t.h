@@ -43,9 +43,9 @@ FRAMEWORK:
 	5. center()			-	Assumes Leg is already lifted up, otherwise robot will probably fall down
 	6. configureVars() 	- 	Used when state changes and new vars[] need to be computed. Computes all vars[] based on the current 
 							servo_angles[] does not use Update(), but computes variables manually to ensure no call to configureAngles()
-	7. configureEFVars() 	- 	Called only by centerAngles(). Computes hip_to_end, arm_ground_to_ef and ef_center (if needed) basing on 
+	7. configureEFVars() 	- 	Called only by centerLeg(). Computes hip_to_end, arm_ground_to_ef and ef_center (if needed) basing on 
 							params[] and KNEE
-	8. centerAngles() 	- 	Computed median HIP and KNEE basing on params[] and current HEIGHT or the input HEIGHT if provided.
+	8. centerLeg() 	- 	Computed median HIP and KNEE basing on params[] and current HEIGHT or the input HEIGHT if provided.
 							Calls configureEFVars automatically in order to keep state consistent
 	9. setAngles() 		- 	Should be called only on complete state change because automatically calls configureVars() and this
 							updates all vars, including ef_center
@@ -88,7 +88,7 @@ public:
 	void clear();											// Clears vars[] - needed for flight-related actions
 	//void StateVerify();									// Verifies the current leg state is physically possible and accurate
 
-	void centerAngles(double height =0.0); 					// Compute median HIP, KNEE based on params[] and HEIGHT/height. Calls configureEFVars()
+	void centerLeg(double height =0.0); 					// Compute median HIP, KNEE based on params[] and HEIGHT/height. Calls configureEFVars()
 
 #ifdef DOF3
 	void setAngles(double knee, double hip, double arm);	// Calls configureVars()
@@ -111,8 +111,9 @@ private:
 
 	void update(double* address);							// Auto-invoked when any vars[] changes in order to keep leg state consistent
 	void configureAngles();									// Update KNEE and HIP servo_angles basing on the current hip_to_end and HEIGHT
-	void configureEFVars(double height=0.0); 					// Compute hip_to_end, arm_ground_to_ef based on KNEE, HEIGHT/height; called by centerAngles()
-	void configureVars();										// Computes valid vars[] basing on servo_angles[]
+	//void configureEFVars(double height=0.0); 				// Compute hip_to_end, arm_ground_to_ef based on KNEE, HEIGHT/height; called by centerLeg()
+	//void configureVars();									// Computes valid vars basing on servo_angles
+	void configureVars(double height=0.0);					// Compute valid vars basing on servo_angles
 
 
 	/* ------------------------------------ PRIVATE MEMBER DATA ------------------------------------ */

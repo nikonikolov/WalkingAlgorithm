@@ -11,19 +11,35 @@ wkq::Point::~Point(){}
 
 wkq::Point::Point(double x_in, double y_in, double mag_in, double arg_in) : mag(mag_in), arg(arg_in) {}
 
-void wkq::Point::rect_coord(){
+
+void wkq::Point::translate_y(double delta_y){
+	y += delta_y;
+	update_polar_coord();
+}
+void wkq::Point::translate_x(double delta_x){
+	x += delta_x;
+	update_polar_coord();
+}
+
+void wkq::Point::update_rect_coord(){
 	x=mag*cos(arg);
 	y=mag*sin(arg);
 }
 
+void wkq::Point::update_polar_coord(){
+	arg = atan(y/x);
+	mag = sqrt(y*y + x*x);
+}
+
+
 void wkq::Point::set_arg(double arg_in){
 	arg=arg_in;
-	rect_coord();
+	update_rect_coord();
 }
 
 void wkq::Point::set_mag(double mag_in){
 	mag=mag_in;
-	rect_coord();
+	update_rect_coord();
 }
 
 

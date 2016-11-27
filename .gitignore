@@ -1,4 +1,6 @@
 Notes.txt
 bin/*
-src/*.d
-src/*.o
+*.d
+*.o
+!mbed/*.o
+!mbed/*.d

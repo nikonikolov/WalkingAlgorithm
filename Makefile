@@ -4,11 +4,11 @@
 GCC_BIN = 
 PROJECT = bin/wkquad
 OBJECTS = ./main.o $(HARDWARE_OBJS) $(SOFTWARE_OBJS)
-HARDWARE_OBJS = ./libdnx/mbed/DnxHAL.o ./libdnx/SerialAX12.o ./libdnx/SerialXL320.o 
-SOFTWARE_OBJS = ./src/ServoJoint.o ./src/robot_types.o ./src/State_t.o ./src/Leg.o ./src/Tripod.o ./src/Robot.o ./src/wkq.o ./src/Master.o
+HARDWARE_OBJS = ./libdnx/DnxHAL.o ./libdnx/SerialAX12.o ./libdnx/SerialXL320.o 
+SOFTWARE_OBJS = ./src/robot_types.o ./src/wkq.o ./src/ServoJoint.o ./src/State_t.o ./src/Leg.o ./src/Tripod.o ./src/Robot.o ./src/Master.o
 
-SOFTWARE_SRCS = ./src/ServoJoint.cpp ./src/robot_types.cpp ./src/State_t.cpp ./src/Leg.cpp ./src/Tripod.cpp ./src/Robot.cpp ./src/wkq.cpp ./src/Master.cpp
-SOFTWARE_HDRS = ./src/ServoJoint.h ./src/robot_types.cpp ./src/State_t.h ./src/Leg.h ./src/Tripod.h ./src/Robot.h ./src/wkq.h ./src/Master.h
+SIM_HDRS = $(SOFTWARE_OBJS:.o=.h)
+SIM_SRCS = $(SOFTWARE_OBJS:.o=.cpp)
 
 SYS_OBJECTS = ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/board.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/cmsis_nvic.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/retarget.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/startup_LPC17xx.o ./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/system_LPC17xx.o 
 INCLUDE_PATHS = -I. -I./mbed -I./mbed/TARGET_LPC1768 -I./mbed/TARGET_LPC1768/TARGET_NXP -I./mbed/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X -I./mbed/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X/TARGET_MBED_LPC1768 -I./mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM 
@@ -35,6 +35,7 @@ CC_SYMBOLS = -DTOOLCHAIN_GCC_ARM -DTOOLCHAIN_GCC -DMBED_BUILD_TIMESTAMP=14591057
 LD_FLAGS = $(CPU) -Wl,--gc-sections --specs=nano.specs -u _printf_float -u _scanf_float -Wl,--wrap,main -Wl,-Map=$(PROJECT).map,--cref
 LD_SYS_LIBS = -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys
 
+CUSTOM_FLAGS = -DDNX_PLATFORM_MBED
 
 ifeq ($(DEBUG), 1)
   CC_FLAGS += -DDEBUG -O0
@@ -47,8 +48,8 @@ endif
 all: $(PROJECT).bin $(PROJECT).hex size
 
 # to compile with debug information use command make bin/sim GDB=-g
-bin/sim: $(SOFTWARE_SRCS) $(SOFTWARE_HDRS) simulation.cpp 
-	g++ -DSIMULATION -std=gnu++11 $(GDB) simulation.cpp $(SOFTWARE_SRCS) -o bin/sim
+bin/sim: $(SIM_SRCS) $(SIM_HDRS) simulation.cpp 
+	g++ -DSIMULATION -std=gnu++11 $(GDB) simulation.cpp $(SIM_SRCS) -o bin/sim
 
 clean:
 	-rm -f $(PROJECT).bin $(PROJECT).elf $(PROJECT).hex $(PROJECT).map $(PROJECT).lst $(OBJECTS) $(DEPS)
@@ -67,7 +68,7 @@ cleansim:
 	$(CC)  $(CC_FLAGS) $(CC_SYMBOLS) -std=gnu99   $(INCLUDE_PATHS) -o $@ $<
 
 .cpp.o:
-	$(CPP) $(CC_FLAGS) $(CC_SYMBOLS) -std=gnu++11 -fno-rtti $(INCLUDE_PATHS) -o $@ $<
+	$(CPP) $(CC_FLAGS) $(CC_SYMBOLS) $(CUSTOM_FLAGS) -std=gnu++11 -fno-rtti $(INCLUDE_PATHS) -o $@ $<
 # Original version of the above line:
 #	$(CPP) $(CC_FLAGS) $(CC_SYMBOLS) -std=gnu++98 -fno-rtti $(INCLUDE_PATHS) -o $@ $<
 
