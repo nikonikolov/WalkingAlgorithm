@@ -59,7 +59,7 @@ void Tripod::stepForwardRectangularGait(double step_size){
 }
 
 void Tripod::bodyRotate(double angle){
-	makeMovement(&Leg::IKBodyRotate, angle, "Tripod: bodyRotate");
+	makeMovement(&Leg::bodyRotate, angle, "Tripod: bodyRotate");
 }
 
 void Tripod::stepRotate(double angle){

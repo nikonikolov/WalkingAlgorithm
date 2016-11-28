@@ -56,10 +56,6 @@ FRAMEWORK:
 #include "wkq.h"
 using wkq::RobotState_t;
 
-#include <iostream>
-using namespace std;
-
-
 class Leg{
 
 public:
@@ -94,7 +90,7 @@ public:
 	void bodyForwardRectangularGait(double step_size);
 	void stepForwardRectangularGait(double step_size);
 
-	void IKBodyRotate(double angle);			// Change angles and state of Leg for a rotation around central axis
+	void bodyRotate(double angle);			// Change angles and state of Leg for a rotation around central axis
 	void stepRotate(double angle);			// Put End Effector down by making a rotation step. Leg must be already lifted
 	
 	void raiseBody(double hraise);

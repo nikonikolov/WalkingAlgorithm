@@ -11,19 +11,19 @@ Robot::Robot(Master* pixhawk_in, DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, doubl
 	}, 
 	pixhawk(pixhawk_in), state(state_in){
 	
-	printf("ROBOT start\n\r");
+	if(debug_) printf("ROBOT start\n\r");
 	
 	// Calculate max size for movements
 	max_step_size = 		State_t::max_step_size;
 	max_rotation_angle = 	State_t::max_rotation_angle;
-	
-	printf("ROBOT calculating state\n\r");
+
+	if(debug_) printf("ROBOT calculating state\n\r");
 
 	// init to meaningless state
 	state = wkq::RS_FLAT_QUAD;
 	setState(state_in);
 
-	printf("ROBOT done\n\r");
+	if(debug_) printf("ROBOT done\n\r");
 }
 
 /*
@@ -59,7 +59,7 @@ void Robot::setState(wkq::RobotState_t state_in, void (Tripod::*tripod_action)()
 /* ================================================= WALK RELATED FUNCTIONALITY ================================================= */
 
 void Robot::makeMovement(RobotMovement_t movement, double coeff){
-	double step_size;
+	double move_arg;
 	bool continue_movement;
 	int tripod_up, tripod_down;
 
@@ -67,10 +67,9 @@ void Robot::makeMovement(RobotMovement_t movement, double coeff){
 	void (Tripod::*step_forward)(double);
 	void (Tripod::*finish_step)();
 
-	if(coeff<0.0) coeff=0.1;
-	if(coeff>1.0) coeff=1.0;
+	if(coeff < -1.0) coeff = -1.0;
+	if(coeff > 1.0)  coeff = 1.0;
 
-	step_size 			= coeff*max_step_size;
 	continue_movement 	= true;
 	//tripod_up 			= TRIPOD_RIGHT;
 	//tripod_down 		= TRIPOD_LEFT;
@@ -82,18 +81,24 @@ void Robot::makeMovement(RobotMovement_t movement, double coeff){
 			body_forward 	= &Tripod::bodyForward;
 			step_forward 	= &Tripod::stepForward;
 			finish_step 	= &Tripod::finishStep;
+			move_arg = coeff*max_step_size;
 			break;
 		case wkq::RM_RECTANGULAR_GAIT:
 			body_forward 	= &Tripod::bodyForwardRectangularGait;
 			step_forward 	= &Tripod::stepForwardRectangularGait;
 			finish_step 	= &Tripod::finishStepRectangularGait;
+			move_arg = coeff*max_step_size;
 			break;
 		case wkq::RM_ROTATION_HEXAPOD:
+			body_forward 	= &Tripod::bodyRotate;
+			step_forward 	= &Tripod::stepRotate;
+			finish_step 	= &Tripod::finishStep;
+			move_arg = coeff*max_rotation_angle;
 			break;
 		case wkq::RM_ROTATION_RECTANGULAR:
 			break;
 		default:
-			printf("ERROR - Robot: makeMovement - movement not implemented\n\r");
+			printf("ERROR - Robot::makeMovement - movement not implemented\n\r");
 			return;
 	}
 
@@ -108,10 +113,10 @@ void Robot::makeMovement(RobotMovement_t movement, double coeff){
 
 		if(first || !continue_movement){
 			first = false;
-			(Tripods[tripod_down].*body_forward)(step_size);
+			(Tripods[tripod_down].*body_forward)(move_arg);
 		} 	
 		else{
-			(Tripods[tripod_down].*body_forward)(2*step_size);
+			(Tripods[tripod_down].*body_forward)(2*move_arg);
 		} 
 		wait(wait_time_);
 
@@ -119,14 +124,14 @@ void Robot::makeMovement(RobotMovement_t movement, double coeff){
 		if(continue_movement){
 			/*
 			if(first){
-				(Tripods[tripod_up].*step_forward)(step_size);
+				(Tripods[tripod_up].*step_forward)(move_arg);
 				first = false;		
 			}
 			else{
-				(Tripods[tripod_up].*step_forward)(2*step_size);
+				(Tripods[tripod_up].*step_forward)(2*move_arg);
 			}	
 			*/
-			(Tripods[tripod_up].*step_forward)(2*step_size);
+			(Tripods[tripod_up].*step_forward)(2*move_arg);
 			std::swap(tripod_up, tripod_down);			// swap the roles of the Tripods
 			wait(wait_time_);
 		}
@@ -182,13 +187,13 @@ void Robot::singleStepForwardTest(double coeff){
 	wait(wait_time_);
 	Tripods[tripod_up].liftUp(ef_raise_);
 	wait(wait_time_);
-	printf("First tripod lifted\n\r");
+	if(debug_) printf("First tripod lifted\n\r");
 	Tripods[tripod_down].bodyForward(step_size);
 	wait(wait_time_);
-	printf("Second tripod moved body forward\n\r");
+	if(debug_) printf("Second tripod moved body forward\n\r");
 
 	Tripods[tripod_up].stepForward(step_size);
-	printf("First tripod put down legs for another step forward\n\r");
+	if(debug_) printf("First tripod put down legs for another step forward\n\r");
 }
 
 

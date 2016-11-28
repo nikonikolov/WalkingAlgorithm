@@ -36,7 +36,8 @@ State_t::State_t(double height_in, const BodyParams& robot_params) : /*servo_ang
         // Initialize servo_angles and vars to meaningless state
         //servo_angles = 0.0;
         //vars = 0.0;
-        max_step_size = computeMaxStepSize();
+        max_step_size       = computeMaxStepSize();
+        max_rotation_angle  = wkq::radians(10);
     }
     else{
         servo_angles = default_pos_angles;
@@ -102,13 +103,13 @@ void State_t::updateVar(double* address, double value, bool update_state /*=true
 
     if     (address == &(vars.height))               vars.height_sq = pow(value, 2);
     else if(address == &(vars.height_sq))            vars.height = sqrt(value);
+    else if(address == &(vars.ef_center))            vars.ef_center_sq = pow(value, 2);
+    else if(address == &(vars.ef_center_sq))         vars.ef_center = sqrt(value);
 #ifdef DOF3    
     else if(address == &(vars.hip_to_end))           vars.hip_to_end_sq = pow(value, 2);
     else if(address == &(vars.hip_to_end_sq))        vars.hip_to_end = sqrt(value);
     else if(address == &(vars.arm_ground_to_ef))     vars.arm_ground_to_ef_sq = pow(value, 2);
     else if(address == &(vars.arm_ground_to_ef_sq))  vars.arm_ground_to_ef = sqrt(value);
-    else if(address == &(vars.ef_center))            vars.ef_center_sq = pow(value, 2);
-    else if(address == &(vars.ef_center_sq))         vars.ef_center = sqrt(value);
 #else
     else if(address == &(vars.hip_ground_to_ef))     vars.hip_ground_to_ef_sq = pow(value, 2);
     else if(address == &(vars.hip_ground_to_ef_sq))  vars.hip_ground_to_ef = sqrt(value);

@@ -104,6 +104,8 @@ private:
 		RPC_STAND_QUAD 		= 4,
 		RPC_STRAIGHT_QUAD	= 5
 	};
+
+	bool debug_ = false;
 };
 
 #endif //ROBOT_H

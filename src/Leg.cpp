@@ -291,7 +291,7 @@ void Leg::stepForward(double step_size){
     hip_ground_to_ef_sq = p_hip.dist_sq(p_ef_new);
 
     // Find the gradient between the points
-    hip_rotation = atan( (p_ef_new.y - p_hip.y) / (p_ef_new.x - p_hip.x) );
+    hip_rotation = p_hip.line_arg(p_ef_new);
     state.servo_angles.hip = hip_rotation + angle_offset - wkq::PI/2;
 
     // Update the whole leg state
@@ -358,7 +358,12 @@ void Leg::stepForwardRectangularGait(double step_size){
 }
 
 
-void Leg::IKBodyRotate(double angle){
+/*
+    @param angle:
+        - positive value - CW rotation
+        - negative value - CCW rotation
+*/
+void Leg::bodyRotate(double angle){
 #ifdef DOF3
     // Sine Rule to find rotation distance
     double rot_dist = 2 * state.params.DIST_CENTER * sin (fabs(angle)/2);
@@ -382,15 +387,74 @@ void Leg::IKBodyRotate(double angle){
 
     state.updateVar(&(state.vars.arm_ground_to_ef), arm_ground_to_ef_new, &(state.vars.arm_ground_to_ef_sq), arm_ground_to_ef_sq_new);                  // Automatically changes robot state in software
 #else
-    /*
-        FILL IN
-    */
+
+    //state.vars.print();
+    //cout<<endl;
+
+    double rot_dist, rot_dist_sq;
+    double hip_ground_to_ef, hip_ground_to_ef_sq;
+    double hip_rotation;
+    double cos_rule_arg;
+
+    // Sine Rule to find rotation distance
+    rot_dist = 2 * state.params.DIST_CENTER * sin (fabs(angle)/2);
+    rot_dist_sq = pow(rot_dist, 2);
+
+    // Cosine Rule to find new hip_ground_to_ef
+    if (angle >= 0.0)   cos_rule_arg = wkq::PI/2 + angle/2 - state.servo_angles.hip;
+    else                cos_rule_arg = wkq::PI/2 - angle/2 + state.servo_angles.hip;  
+    hip_ground_to_ef_sq = state.vars.hip_ground_to_ef_sq + rot_dist_sq - 2 * rot_dist * state.vars.hip_ground_to_ef * cos(cos_rule_arg);
+    hip_ground_to_ef = sqrt(hip_ground_to_ef_sq);
+
+    // Cosine rule to find the new servo_angles.hip - valid for left leg facing up
+    hip_rotation = acos( (rot_dist_sq + hip_ground_to_ef_sq - state.vars.hip_ground_to_ef_sq) / ( 2 * rot_dist * hip_ground_to_ef ) );
+    if(angle >= 0.0) state.servo_angles.hip = (wkq::PI - angle)/2 + hip_rotation - wkq::PI;
+    else             state.servo_angles.hip = wkq::PI - hip_rotation - (wkq::PI + angle)/2; 
+
+    // Update the whole leg state
+    state.updateVar(&(state.vars.hip_ground_to_ef), hip_ground_to_ef, &(state.vars.hip_ground_to_ef_sq), hip_ground_to_ef_sq);
 #endif
 }
 
 
 // Input is the currently used step size
-void Leg::stepRotate(double step_size){
+void Leg::stepRotate(double angle){
+#ifdef DOF3
+    /*
+        FILL IN
+    */
+#else
+   
+    // Distance from Robot center to end effector for a fully centered robot at this height
+    double ef_center = state.vars.ef_center;
+    double x_ef_new, y_ef_new;
+    double x_hip, y_hip;
+    double hip_ground_to_ef_sq;
+    double hip_rotation;
+
+    // Create Point representing the new END EFFECTOR position
+    x_ef_new = ef_center * cos(wkq::PI/2 - angle_offset);
+    y_ef_new = ef_center * sin(wkq::PI/2 - angle_offset);
+    wkq::Point p_ef_new(x_ef_new, y_ef_new);
+
+    // Create Point representing current HIP position
+    x_hip = state.params.DIST_CENTER * cos(wkq::PI/2 - angle_offset);
+    y_hip = state.params.DIST_CENTER * sin(wkq::PI/2 - angle_offset);
+    wkq::Point p_hip(x_hip, y_hip);
+    // Translate the point backwards from the imaginary center
+    p_hip.rotate(-angle/2);
+
+    // Calculate new hip_ground_to_ef
+    hip_ground_to_ef_sq = p_hip.dist_sq(p_ef_new);
+
+    // Find the gradient between the points
+    hip_rotation = p_hip.line_arg(p_ef_new);
+    state.servo_angles.hip = hip_rotation + angle_offset - wkq::PI/2;
+
+    // Update the whole leg state
+    state.updateVar(&(state.vars.hip_ground_to_ef_sq), hip_ground_to_ef_sq);                
+
+#endif
 }
 
 

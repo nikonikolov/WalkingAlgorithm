@@ -156,9 +156,9 @@ namespace wkq{
 
 	struct Point{
 
-		Point();
+		//Point();
+		//Point(double x_in, double y_in, double mod_in, double arg_in);
 		Point(double x_in, double y_in);
-		Point(double x_in, double y_in, double mod_in, double arg_in);
 		Point(const Point& p_in);
 		~Point();
 		
@@ -167,22 +167,25 @@ namespace wkq{
 		inline double get_mag() const;
 		inline double get_arg() const;
 		
-		inline double origin_dist() const;
-		//void origin_symmetric();
+		double origin_dist() const;
+		double dist(const Point& p_in) const;
+		double dist_sq(const Point& p_in) const;
+		double line_arg(const Point& p_in);
 
 		void translate_y(double delta_y);
 		void translate_x(double delta_x);
+		void rotate(double delta_arg);
 		//void translate(const Point& p2);
 		
-		inline double dist(const Point& p_in) const;
-		inline double dist_sq(const Point& p_in) const;
 	
-		void set_arg(double arg_in);
-		void set_mag(double mag_in);
+		//void set_arg(double arg_in);
+		//void set_mag(double mag_in);
 	/*
 		friend bool operator<(const Point& p1, const Point& p2);
 		friend bool operator==(const Point& p1, const Point& p2);
 	*/
+
+	private:
 
 		void update_rect_coord();
 		void update_polar_coord();
@@ -208,17 +211,6 @@ namespace wkq{
 		return mag;
 	}
 
-	double Point::origin_dist() const{
-		return sqrt(pow(x,2) + pow(y,2));
-	}
-
-	double Point::dist(const Point& p_in) const{
-		return sqrt( dist_sq(p_in) );
-	}
-
-	double Point::dist_sq(const Point& p_in) const{
-		return pow((x-p_in.x),2) + pow((y-p_in.y),2);
-	}
 
 
 /* ------------------------------------------------- END POINT ------------------------------------------------- */ 
