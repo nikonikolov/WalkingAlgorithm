@@ -103,6 +103,8 @@ struct LegJoints{
 };
 
 
+//struct LegLocation
+
 
 /*
 struct TripodLegs{

@@ -14,8 +14,8 @@ Robot::Robot(Master* pixhawk_in, DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, doubl
 	printf("ROBOT start\n\r");
 	
 	// Calculate max size for movements
-	max_step_size = 		calcMaxStepSize();
-	max_rotation_angle = 	calcMaxRotationAngle();
+	max_step_size = 		State_t::max_step_size;
+	max_rotation_angle = 	State_t::max_rotation_angle;
 	
 	printf("ROBOT calculating state\n\r");
 
@@ -72,8 +72,10 @@ void Robot::makeMovement(RobotMovement_t movement, double coeff){
 
 	step_size 			= coeff*max_step_size;
 	continue_movement 	= true;
-	tripod_up 			= TRIPOD_RIGHT;
-	tripod_down 		= TRIPOD_LEFT;
+	//tripod_up 			= TRIPOD_RIGHT;
+	//tripod_down 		= TRIPOD_LEFT;
+	tripod_up 			= TRIPOD_LEFT;
+	tripod_down 		= TRIPOD_RIGHT;
 
 	switch(movement){
 		case wkq::RM_HEXAPOD_GAIT:
@@ -108,7 +110,9 @@ void Robot::makeMovement(RobotMovement_t movement, double coeff){
 			first = false;
 			(Tripods[tripod_down].*body_forward)(step_size);
 		} 	
-		else 								(Tripods[tripod_down].*body_forward)(2*step_size);
+		else{
+			(Tripods[tripod_down].*body_forward)(2*step_size);
+		} 
 		wait(wait_time_);
 
 		// Movement goes on
@@ -216,15 +220,5 @@ bool Robot::noState(){
 	if(state==wkq::RS_FLAT_QUAD) return true;
 	if(state==wkq::RS_QUAD_SETUP) return true;
 	return false;
-}
-
-// Needs to be dynamically adjusted after tests
-double Robot::calcMaxStepSize(){
-	return 3.0;
-}
-
-// Needs to be dynamically adjusted after tests
-double Robot::calcMaxRotationAngle(){
-	return (wkq::PI)/3;
 }
 

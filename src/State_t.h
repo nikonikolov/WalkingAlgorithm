@@ -85,16 +85,17 @@ public:
 	void updateVar(double* address, double value, bool update_state=true);
 	void updateVar(double* address, double value, double* address_sq, double value_sq);
 
+	void centerLeg(double height =0.0); 					// Compute median HIP, KNEE based on params[] and HEIGHT/height. Calls configureEFVars()
 	void clear();											// Clears vars[] - needed for flight-related actions
 	//void StateVerify();									// Verifies the current leg state is physically possible and accurate
 
-	void centerLeg(double height =0.0); 					// Compute median HIP, KNEE based on params[] and HEIGHT/height. Calls configureEFVars()
 
 #ifdef DOF3
 	void setAngles(double knee, double hip, double arm);	// Calls configureVars()
 #else
 	void setAngles(double knee, double hip);				// Calls configureVars()
 #endif
+
 
 	/* ------------------------------------ PUBLIC MEMBER DATA ------------------------------------ */
 
@@ -104,6 +105,9 @@ public:
 
 	//static Leg_Joints 	angle_limits_max;				// Store max angle limits of the robot
 	//static Leg_Joints 	angle_limits_min;				// Store min angle limits of the robot
+
+	static double 			max_step_size;					// max_step_size that will be used by Robot - must be half of the actual input that is fed to Leg
+	static double 			max_rotation_angle;  			// max_rotation_angle that will be used by Robot - must be half of the actual input that is fed to Leg
 
 private:
 
@@ -115,6 +119,7 @@ private:
 	//void configureVars();									// Computes valid vars basing on servo_angles
 	void configureVars(double height=0.0);					// Compute valid vars basing on servo_angles
 
+	double computeMaxStepSize();
 
 	/* ------------------------------------ PRIVATE MEMBER DATA ------------------------------------ */
 	

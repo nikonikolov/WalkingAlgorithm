@@ -31,13 +31,16 @@ void DynamicVars::operator=(const DynamicVars& obj_in){
     if( this != &obj_in){
         this->height                = obj_in.height;
         this->height_sq             = obj_in.height_sq;
+        this->ef_center             = obj_in.ef_center;
+        this->ef_center_sq          = obj_in.ef_center_sq;
 #ifdef DOF3
         this->hip_to_end            = obj_in.hip_to_end;
         this->hip_to_end_sq         = obj_in.hip_to_end_sq;
         this->arm_ground_to_ef      = obj_in.arm_ground_to_ef;
         this->arm_ground_to_ef_sq   = obj_in.arm_ground_to_ef_sq;
-        this->ef_center             = obj_in.ef_center;
-        this->ef_center_sq          = obj_in.ef_center_sq;
+#else
+        this->hip_ground_to_ef      = obj_in.hip_ground_to_ef;
+        this->hip_ground_to_ef_sq   = obj_in.hip_ground_to_ef_sq;
 #endif
     }
 }
@@ -59,12 +62,15 @@ void DynamicVars::operator=(double value){
 void DynamicVars::print(){
     printf("DynamicVars: height %f\n\r", height);                          
     printf("DynamicVars: height_sq %f\n\r", height_sq);
+    printf("DynamicVars: ef_center %f\n\r", ef_center);                       
+    printf("DynamicVars: ef_center_sq %f\n\r", ef_center_sq);
 #ifdef DOF3
     printf("DynamicVars: hip_to_end %f\n\r", hip_to_end);                      
     printf("DynamicVars: hip_to_end_sq %f\n\r", hip_to_end_sq);
     printf("DynamicVars: arm_ground_to_ef %f\n\r", arm_ground_to_ef);                
     printf("DynamicVars: arm_ground_to_ef_sq %f\n\r", arm_ground_to_ef_sq);
-    printf("DynamicVars: ef_center %f\n\r", ef_center);                       
-    printf("DynamicVars: ef_center_sq %f\n\r", ef_center_sq);
+#else
+    printf("DynamicVars: hip_ground_to_ef %f\n\r", hip_ground_to_ef);                
+    printf("DynamicVars: hip_ground_to_ef_sq %f\n\r", hip_ground_to_ef_sq);
 #endif
 }

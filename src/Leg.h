@@ -56,6 +56,10 @@ FRAMEWORK:
 #include "wkq.h"
 using wkq::RobotState_t;
 
+#include <iostream>
+using namespace std;
+
+
 class Leg{
 
 public:

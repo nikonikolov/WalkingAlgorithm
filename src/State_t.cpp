@@ -12,6 +12,8 @@ LegAngles State_t::angle_limits_min(wkq::radians(150), wkq::radians(-(90-20)), w
 LegAngles State_t::default_pos_angles;
 DynamicVars State_t::default_pos_vars;
 bool State_t::default_pos_calculated = false;
+double State_t::max_step_size = 0;
+double State_t::max_rotation_angle = 0;
 
 
 /*  @ Notes:
@@ -34,6 +36,7 @@ State_t::State_t(double height_in, const BodyParams& robot_params) : /*servo_ang
         // Initialize servo_angles and vars to meaningless state
         //servo_angles = 0.0;
         //vars = 0.0;
+        max_step_size = computeMaxStepSize();
     }
     else{
         servo_angles = default_pos_angles;
@@ -331,6 +334,9 @@ void State_t::clear(){
     vars =  -1.0;
 }
 
+double State_t::computeMaxStepSize(){
+    return 0.4 * (vars.ef_center / sqrt(3)); 
+}
 
 /*
 void State_t::Verify(){
