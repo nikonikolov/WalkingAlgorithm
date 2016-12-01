@@ -1,6 +1,6 @@
 #include "Robot.h"
 
-const double Robot::wait_time_ = 3;
+const double Robot::wait_time_ = 0.5;
 const double Robot::ef_raise_ = 5;
 
 Robot::Robot(Master* pixhawk_in, DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, 
@@ -103,6 +103,7 @@ void Robot::makeMovement(RobotMovement_t movement, double coeff){
 	}
 
 	bool first = true;
+	int i=1;
 	// repeat until walkForward signal stops
 	while(continue_movement){
 		// Read input and find out whether movement should go on
@@ -111,14 +112,16 @@ void Robot::makeMovement(RobotMovement_t movement, double coeff){
 		Tripods[tripod_up].liftUp(ef_raise_);
 		wait(wait_time_);
 
+		//if(i == 3) break;
 		if(first || !continue_movement){
+		//if(first){
 			first = false;
 			(Tripods[tripod_down].*body_forward)(move_arg);
 		} 	
 		else{
 			(Tripods[tripod_down].*body_forward)(2*move_arg);
 		} 
-		wait(wait_time_);
+		//wait(wait_time_);
 
 		// Movement goes on
 		if(continue_movement){
@@ -144,6 +147,7 @@ void Robot::makeMovement(RobotMovement_t movement, double coeff){
 			wait(wait_time_);
 			(Tripods[tripod_down].*finish_step)();
 		}
+		i++;
 	}
 }
 

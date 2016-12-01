@@ -70,8 +70,8 @@ int main(int argc, char **argv){
 	printf("MAIN: Robot Initialized\n\r");
 
 	wait(10);
-	//wk_quad->testSingleTripodStand();
-	wk_quad->makeMovement(wkq::RM_HEXAPOD_GAIT, 1.0);
+	wk_quad->makeMovement(wkq::RM_HEXAPOD_GAIT, .6);
+	//wk_quad->makeMovement(wkq::RM_ROTATION_HEXAPOD, 0.4);
 
 
 	//wk_quad->testSingleTripodStand();

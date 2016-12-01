@@ -297,6 +297,8 @@ void Leg::stepForward(double step_size){
     // Update the whole leg state
     state.updateVar(&(state.vars.hip_ground_to_ef_sq), hip_ground_to_ef_sq);                
 
+    //state.servo_angles.knee = wkq::PI/2;
+
 #endif
 }
 

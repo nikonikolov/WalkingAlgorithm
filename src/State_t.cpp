@@ -227,6 +227,8 @@ void State_t::configureAngles(){
     servo_angles.hip = (wkq::PI)/2 - hip_tmp - acos(vars.height/vars.hip_to_end);       // Input valid for a LEFT LEG
 #else
     servo_angles.knee = wkq::PI/2 - asin((vars.hip_ground_to_ef - params.FEMUR) / params.TIBIA );
+    //servo_angles.knee = wkq::PI/2;
+    
     //servo_angles.knee = wkq::PI/2 - acos( vars.height / params.TIBIA);        -- WRONG--
 #endif
 }

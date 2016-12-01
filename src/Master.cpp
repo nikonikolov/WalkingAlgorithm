@@ -7,7 +7,7 @@ Master::Master(PinName tx, PinName rx, int baud_in) :
 
 bool Master::inputWalkForward(){
 	static int out=0;
-	if(out<2){
+	if(out<7){
 		out++;
 		return true;
 	} 
