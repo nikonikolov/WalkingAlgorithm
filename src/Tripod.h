@@ -41,12 +41,8 @@ using wkq::RobotState_t;
 class Tripod{
 
 public:
-	Tripod(int ID_front_knee, int ID_middle_knee, int ID_back_knee,
-			DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, const BodyParams& robot_params);
-
+	Tripod(int ID_front_knee, int ID_middle_knee, int ID_back_knee, unordered_map<int, DnxHAL*>& servo_map, double height_in, const BodyParams& robot_params);
 	~Tripod ();
-
-	/* ------------------------------------ COPYING STATE ----------------------------------- */
 
 	void copyState(const Tripod& tripod_in);
 
@@ -54,7 +50,6 @@ public:
 
 	void setPosition(wkq::RobotState_t robot_state); 				// Wrapper for calling a function from Leg that sets a static leg position
 
-	//double standing();					// Determines if standing, and if not returns by how much should be lifted
 	void center();						// Reset all Legs to their central positions and keep current height
 
 	/* ------------------------------------ WALKING MOVEMENTS ----------------------------------- */
@@ -77,10 +72,12 @@ public:
 
 private:
 	void makeMovement(void (Leg::*leg_action)(double), double arg, const string debug_msg=""); 		// Wrapper for calling a function from Leg that makes any moevement
-	//void setPosition(void (Leg::*leg_action)(), const string debug_msg=""); 						// Wrapper for calling a function from Leg that sets a static leg position
 
 	void writeAngles();
 	void writeHipKneeAngles();
+
+	template<typename MemberFnPtr, typename FnArg>
+	void setServosParam(MemberFnPtr fn, FnArg arg, bool extra=false);
 
 	//TripodLegs legs;
 	Leg legs[LEG_COUNT];
@@ -89,6 +86,15 @@ private:
 
 	bool debug_ = true;
 };
+
+
+template<typename MemberFnPtr, typename FnArg>
+void Tripod::setServosParam(MemberFnPtr fn, FnArg arg, bool extra/*=false*/){
+	for(int i=0; i<LEG_COUNT; i++){
+		legs[i].setServosParam(fn, arg, extra);
+	}
+}
+
 
 #endif 
 

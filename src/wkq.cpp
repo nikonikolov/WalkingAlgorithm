@@ -17,17 +17,20 @@ wkq::Point::~Point(){}
 
 
 double wkq::Point::origin_dist() const{
-	return sqrt(pow(x,2) + pow(y,2));
+	return sqrt(x*x + y*y);
 }
+
 double wkq::Point::dist(const Point& p_in) const{
 	return sqrt(dist_sq(p_in));
 }
+
 double wkq::Point::dist_sq(const Point& p_in) const{
 	return pow((x-p_in.x),2) + pow((y-p_in.y),2);
 }
 
 double wkq::Point::line_arg(const Point& p_in){
-	return atan( (p_in.y - y) / (p_in.x - x) );
+	//return atan( (p_in.y - y) / (p_in.x - x) );
+	return atan2( p_in.y - y, p_in.x - x );
 }
 
 
@@ -41,6 +44,13 @@ void wkq::Point::translate_x(double delta_x){
 	update_polar_coord();
 }
 
+void wkq::Point::translate(const Point& p2){
+	x += p2.x;
+	y += p2.y;
+	update_polar_coord();
+}
+
+
 void wkq::Point::rotate(double delta_arg){
 	arg += delta_arg;
 	update_rect_coord();
@@ -53,7 +63,8 @@ void wkq::Point::update_rect_coord(){
 }
 
 void wkq::Point::update_polar_coord(){
-	arg = atan(y/x);
+	//arg = atan(y/x);
+	arg = atan2(y, x);
 	mag = sqrt(y*y + x*x);
 }
 
@@ -76,10 +87,6 @@ void Point::origin_symmetric(){
 	y=-y;
 }
 
-	void Point :: translate(const Point& p2){
-		x=x+p2.x;
-		y=y+p2.y;
-	}
 
 bool operator<(const Point& p1, const Point& p2){
 	return (p1.origin_dist() < p2.origin_dist());

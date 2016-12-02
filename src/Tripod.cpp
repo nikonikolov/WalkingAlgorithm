@@ -3,18 +3,16 @@
 const double Tripod::leg_lift = 10.0; 
 
 #ifdef DOF3
-Tripod::Tripod (int ID_front_knee, int ID_middle_knee, int ID_back_knee,
-				DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, const BodyParams& robot_params) :
-	legs{	Leg(ID_front_knee, 	ID_front_knee+6, 	ID_front_knee+18, 	dnx_hips_knees, dnx_arms, height_in, robot_params),
-			Leg(ID_middle_knee, ID_middle_knee+6, 	ID_middle_knee+18, 	dnx_hips_knees, dnx_arms, height_in, robot_params),
-			Leg(ID_back_knee, 	ID_back_knee+6, 	ID_back_knee+18, 	dnx_hips_knees, dnx_arms, height_in, robot_params)
+Tripod::Tripod (int ID_front_knee, int ID_middle_knee, int ID_back_knee, unordered_map<int, DnxHAL*>& servo_map, double height_in, const BodyParams& robot_params) :
+	legs{	Leg(ID_front_knee, 	ID_front_knee+6, 	ID_front_knee+18, 	servo_map, height_in, robot_params),
+			Leg(ID_middle_knee, ID_middle_knee+6, 	ID_middle_knee+18, 	servo_map, height_in, robot_params),
+			Leg(ID_back_knee, 	ID_back_knee+6, 	ID_back_knee+18, 	servo_map, height_in, robot_params)
 		} {}
 #else
-Tripod::Tripod (int ID_front_knee, int ID_middle_knee, int ID_back_knee,
-				DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, const BodyParams& robot_params) :
-	legs{	Leg(ID_front_knee, 	ID_front_knee+6, 	dnx_hips_knees, dnx_arms, height_in, robot_params),
-			Leg(ID_middle_knee, ID_middle_knee+6, 	dnx_hips_knees, dnx_arms, height_in, robot_params),
-			Leg(ID_back_knee, 	ID_back_knee+6, 	dnx_hips_knees, dnx_arms, height_in, robot_params)
+Tripod::Tripod (int ID_front_knee, int ID_middle_knee, int ID_back_knee, unordered_map<int, DnxHAL*>& servo_map, double height_in, const BodyParams& robot_params) :
+	legs{	Leg(ID_front_knee, 	ID_front_knee+6, 	servo_map, height_in, robot_params),
+			Leg(ID_middle_knee, ID_middle_knee+6, 	servo_map, height_in, robot_params),
+			Leg(ID_back_knee, 	ID_back_knee+6, 	servo_map, height_in, robot_params)
 		} {}
 #endif		
 Tripod::~Tripod(){}
@@ -94,14 +92,6 @@ void Tripod::raiseBody(double hraise){
 	writeAngles();
 }
 
-/*
-double Tripod::standing(){
-	double height = legs[0].get(STATE_VAR, HEIGHT);
-	double height_stand = legs[0].get(PARAM, TIBIA);
-	if(!wkq::compare_doubles(height, height_stand)) return 0.0;
-	else return height_stand - height;
-}
-*/
 
 void Tripod::copyState(const Tripod& tripod_in){
 	for(int i=0; i<LEG_COUNT; i++){

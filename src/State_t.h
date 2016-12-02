@@ -103,6 +103,8 @@ public:
 	LegAngles 				servo_angles;					// In radians: 0.0 - center, positive - CW, negative - CCW
 	DynamicVars 			vars;							// Store current values of variables that determine state of the robot
 
+	//JointCoordinates 		joint_coord; 					// Store the coordinates of hip, knee and end effector
+
 	//static Leg_Joints 	angle_limits_max;				// Store max angle limits of the robot
 	//static Leg_Joints 	angle_limits_min;				// Store min angle limits of the robot
 

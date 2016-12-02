@@ -4,15 +4,15 @@
 
 // Tripod constructor does not write to angles, so Leg constrcutor is only responsible for calculating the proper defaultPos
 #ifdef DOF3
-Leg::Leg(int ID_knee, int ID_hip, int ID_arm, DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, const BodyParams& robot_params) :
+Leg::Leg(int ID_knee, int ID_hip, int ID_arm, unordered_map<int, DnxHAL*>& servo_map, double height_in, const BodyParams& robot_params) :
     state(height_in, robot_params), 
     // Instantiate joints
-    joints(ID_knee, dnx_hips_knees, ID_hip, dnx_hips_knees, ID_arm, dnx_arms) {
+    joints(ID_knee, ID_hip, ID_arm, servo_map) {
 #else   
-Leg::Leg(int ID_knee, int ID_hip, DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, const BodyParams& robot_params) :
+Leg::Leg(int ID_knee, int ID_hip, unordered_map<int, DnxHAL*>& servo_map, double height_in, const BodyParams& robot_params) :
     state(height_in, robot_params), 
     // Instantiate joints
-    joints(ID_knee, dnx_hips_knees, ID_hip, dnx_arms) {
+    joints(ID_knee, ID_hip, servo_map) {
 #endif
 
     switch(ID_knee){

@@ -3,11 +3,10 @@
 const double Robot::wait_time_ = 0.5;
 const double Robot::ef_raise_ = 5;
 
-Robot::Robot(Master* pixhawk_in, DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, 
-		const BodyParams& robot_params, wkq::RobotState_t state_in /*= wkq::RS_DEFAULT*/) :
+Robot::Robot(Master* pixhawk_in, unordered_map<int, DnxHAL*>& servo_map, double height_in, const BodyParams& robot_params, wkq::RobotState_t state_in /*= wkq::RS_DEFAULT*/) :
 	Tripods{
-		Tripod(wkq::KNEE_LEFT_FRONT, wkq::KNEE_RIGHT_MIDDLE, wkq::KNEE_LEFT_BACK, dnx_hips_knees, dnx_arms, height_in, robot_params),
-		Tripod(wkq::KNEE_RIGHT_FRONT, wkq::KNEE_LEFT_MIDDLE, wkq::KNEE_RIGHT_BACK, dnx_hips_knees, dnx_arms, height_in, robot_params)
+		Tripod(wkq::KNEE_LEFT_FRONT, wkq::KNEE_RIGHT_MIDDLE, wkq::KNEE_LEFT_BACK, servo_map, height_in, robot_params),
+		Tripod(wkq::KNEE_RIGHT_FRONT, wkq::KNEE_LEFT_MIDDLE, wkq::KNEE_RIGHT_BACK, servo_map, height_in, robot_params)
 	}, 
 	pixhawk(pixhawk_in), state(state_in){
 	
@@ -26,14 +25,6 @@ Robot::Robot(Master* pixhawk_in, DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, doubl
 	if(debug_) printf("ROBOT done\n\r");
 }
 
-/*
-Robot::Robot(Master* pixhawk_in, int baud_in, double height_in, const BodyParams& robot_params, wkq::RobotState_t state_in/* = wkq::RS_DEFAULT*) : 
-#ifndef SIMULATION
-	Robot(pixhawk_in, new SerialAX12(DnxHAL::Port_t(p9, p10), baud_in), new SerialXL320(DnxHAL::Port_t(p13, p14), baud_in), height_in, robot_params, state_in) {}
-#else
-	Robot(pixhawk_in, NULL, NULL, height_in, robot_params, state_in) {}
-#endif
-*/
 Robot::~Robot(){}
 
 
@@ -47,15 +38,6 @@ void Robot::setState(wkq::RobotState_t state_in, bool wait_call/*=false*/){
 	state = state_in;
 }
 
-/*
-void Robot::setState(wkq::RobotState_t state_in, void (Tripod::*tripod_action)(), bool wait_call/*=false*){
-	for(int i=0; i<TRIPOD_COUNT; i++){
-		(Tripods[i].*tripod_action)();
-		if(wait_call) wait(wait_time_);
-	}
-	state = state_in;
-}
-*/
 /* ================================================= WALK RELATED FUNCTIONALITY ================================================= */
 
 void Robot::makeMovement(RobotMovement_t movement, double coeff){

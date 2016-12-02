@@ -61,9 +61,9 @@ class Leg{
 public:
 
 #ifndef DOF3	
-	Leg(int ID_knee, int ID_arm, DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, const BodyParams& robot_params);
+	Leg(int ID_knee, int ID_arm, unordered_map<int, DnxHAL*>& servo_map, double height_in, const BodyParams& robot_params);
 #else
-	Leg(int ID_knee, int ID_hip, int ID_arm, DnxHAL* dnx_hips_knees, DnxHAL* dnx_arms, double height_in, const BodyParams& robot_params);
+	Leg(int ID_knee, int ID_hip, int ID_arm, unordered_map<int, DnxHAL*>& servo_map, double height_in, const BodyParams& robot_params);
 #endif
 	~Leg();
 
@@ -100,6 +100,9 @@ public:
 	void writeAngles();							// Write servo_angles[] to physcial servos in order ARM, HIP, KNEE
 	void writeJoint(int idx);			// Write only a single angle contained in servo_angles[] to physcial servo
 
+	template<typename MemberFnPtr, typename FnArg>
+	void setServosParam(MemberFnPtr fn, FnArg arg, bool extra=false);
+
 
 private:
 	void confRectangular();
@@ -119,6 +122,26 @@ private:
 
 	bool first_step_taken = false;
 };
+
+
+template<typename MemberFnPtr, typename FnArg>
+void Leg::setServosParam(MemberFnPtr fn, FnArg arg, bool extra/*=false*/){
+    if(extra){
+#ifdef DOF3
+	    (joints.arm.*fn)(arg, extra);
+#endif
+	    (joints.hip.*fn)(arg, extra);
+	    (joints.knee.*fn)(arg, extra);
+    } 	
+    else{
+#ifdef DOF3
+	    (joints.arm.*fn)(arg);
+#endif
+    	(joints.hip.*fn)(arg);
+	    (joints.knee.*fn)(arg);
+    } 		
+}
+
 
 #endif
 

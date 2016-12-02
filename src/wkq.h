@@ -9,13 +9,14 @@ Walking Quadcopter Namespace
 
 */
 
-#ifndef wkq_NAMESPACE_H
-#define wkq_NAMESPACE_H
+#ifndef WKQ_NAMESPACE_H
+#define WKQ_NAMESPACE_H
 
 #include <cmath>
 
 namespace wkq{
 
+	/* ------------------------------------------------- UTILITIES ------------------------------------------------- */ 
 
 	const double PI = 3.14159265358979323846264338327950288419716939937510;
 
@@ -30,6 +31,9 @@ namespace wkq{
 	inline bool compare_doubles(double a, double b, double error = 0.01){
 		return fabs(a - b) <= error;
 	}
+
+
+	/* ------------------------------------------------- SERVOS ------------------------------------------------- */ 
 
 	/* 	SERVO NAMES: Number corresponds to ID of the servo
 	 	NOTE: Try to keep IDs the same. Changing them will cause bugs in Tripod constructor parameters 
@@ -82,6 +86,7 @@ namespace wkq{
 	const int ARM_MIN =					0;
 	const int ARM_MAX =					1024;
 
+	/* ------------------------------------------------- ENUM DEFINITIONS ------------------------------------------------- */ 
 
 	enum LegID{
 		LEG_LEFT_FRONT 			= 1,
@@ -156,12 +161,13 @@ namespace wkq{
 
 	struct Point{
 
-		//Point();
+		Point();
 		//Point(double x_in, double y_in, double mod_in, double arg_in);
 		Point(double x_in, double y_in);
 		Point(const Point& p_in);
 		~Point();
-		
+
+		// Getters		
 		inline double get_x() const;
 		inline double get_y() const;
 		inline double get_mag() const;
@@ -174,8 +180,9 @@ namespace wkq{
 
 		void translate_y(double delta_y);
 		void translate_x(double delta_x);
+		void translate(const Point& p2);
+
 		void rotate(double delta_arg);
-		//void translate(const Point& p2);
 		
 	
 		//void set_arg(double arg_in);

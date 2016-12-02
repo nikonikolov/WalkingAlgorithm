@@ -88,11 +88,11 @@ struct LegAngles{
 struct LegJoints{
 
 #ifdef DOF3
-    LegJoints(int ID_knee, DnxHAL* dnx_port_knee, int ID_hip, DnxHAL* dnx_port_hip, int ID_arm, DnxHAL* dnx_port_arm) :
-        knee(ID_knee, dnx_port_knee), hip(ID_hip, dnx_port_hip), arm(ID_arm, dnx_port_arm) {}
+    LegJoints(int ID_knee, int ID_hip, int ID_arm, unordered_map<int, DnxHAL*>& servo_map) :
+        knee(ID_knee, servo_map), hip(ID_hip, servo_map), arm(ID_arm, servo_map) {}
 #else    
-    LegJoints(int ID_knee, DnxHAL* dnx_port_knee, int ID_hip, DnxHAL* dnx_port_hip) :
-        knee(ID_knee, dnx_port_knee), hip(ID_hip, dnx_port_hip) {}
+    LegJoints(int ID_knee, int ID_hip, unordered_map<int, DnxHAL*>& servo_map) :
+        knee(ID_knee, servo_map), hip(ID_hip, servo_map) {}
 #endif
 
     ServoJoint knee;
@@ -103,7 +103,11 @@ struct LegJoints{
 };
 
 
-//struct LegLocation
+struct JointCoordinates{
+    wkq::Point hip;
+    wkq::Point knee;
+    wkq::Point ef;
+};
 
 
 /*

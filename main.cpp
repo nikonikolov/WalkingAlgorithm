@@ -1,5 +1,5 @@
-#include "src/wkq.h"
 
+#include "src/wkq.h"
 #include "src/ServoJoint.h"
 #include "src/Leg.h"
 #include "src/Tripod.h"
@@ -22,6 +22,7 @@ int main(int argc, char **argv){
 	Master* pixhawk;
 	BodyParams robot_params;
 	Robot* wk_quad;
+	unordered_map<int, DnxHAL*> servo_map;
 
 #ifdef DOF3
 	robot_params.DIST_CENTER 		= 10.95;
@@ -56,14 +57,26 @@ int main(int argc, char **argv){
 
 	dnx_hips_knees 	= new SerialAX12(DnxHAL::Port_t(p9, p10), baud);
 	dnx_arms 		= dnx_hips_knees;
+
+	servo_map[wkq::KNEE_LEFT_FRONT] 	= dnx_hips_knees;
+	servo_map[wkq::KNEE_LEFT_MIDDLE] 	= dnx_hips_knees;
+	servo_map[wkq::KNEE_LEFT_BACK] 		= dnx_hips_knees;
+	servo_map[wkq::KNEE_RIGHT_FRONT] 	= dnx_hips_knees;
+	servo_map[wkq::KNEE_RIGHT_MIDDLE] 	= dnx_hips_knees;
+	servo_map[wkq::KNEE_RIGHT_BACK] 	= dnx_hips_knees;
+
+	servo_map[wkq::HIP_LEFT_FRONT] 		= dnx_hips_knees;
+	servo_map[wkq::HIP_LEFT_MIDDLE] 	= dnx_hips_knees;
+	servo_map[wkq::HIP_LEFT_BACK] 		= dnx_hips_knees;
+	servo_map[wkq::HIP_RIGHT_FRONT]		= dnx_hips_knees;
+	servo_map[wkq::HIP_RIGHT_MIDDLE] 	= dnx_hips_knees;
+	servo_map[wkq::HIP_RIGHT_BACK] 		= dnx_hips_knees;
+
 #endif	
 
 	printf("MAIN: All comms ready\n\r");
 
-	//	wk_quad = new Robot(pixhawk, baud, init_height, robot_params, wkq::RS_FLAT_QUAD);					
-	//	wk_quad = new Robot(pixhawk, baud, init_height, robot_params, wkq::RS_DEFAULT);					
-	
-	wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_DEFAULT);					
+	wk_quad = new Robot(pixhawk, servo_map, init_height, robot_params, wkq::RS_DEFAULT);					
 	//wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_FLAT_QUAD);					
 	//wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_RECTANGULAR);					
 
@@ -74,35 +87,6 @@ int main(int argc, char **argv){
 	//wk_quad->makeMovement(wkq::RM_ROTATION_HEXAPOD, 0.4);
 
 
-	//wk_quad->testSingleTripodStand();
-	//wk_quad->walkForward(0.5);
-
-/*
-	while(true){
-		int torque = 0;
-		torque += dnx_hips_knees.getValue(11, AX_PRESENT_LOAD);
-		printf("SINGLE KNEE troque = %d\n\r", torque);
-		torque += dnx_hips_knees.getValue(12, AX_PRESENT_LOAD);
-		torque += dnx_hips_knees.getValue(13, AX_PRESENT_LOAD);
-		torque += dnx_hips_knees.getValue(14, AX_PRESENT_LOAD);
-		torque += dnx_hips_knees.getValue(15, AX_PRESENT_LOAD);
-		torque += dnx_hips_knees.getValue(16, AX_PRESENT_LOAD);
-		//int torque = dnx_hips_knees.getValue(wkq::KNEE_RIGHT_FRONT, AX_PRESENT_LOAD);
-		printf("AVERAGE KNEE troque = %d\n\r", torque/6);
-		
-		torque = 0;
-		torque = dnx_hips_knees.getValue(17, AX_PRESENT_LOAD);
-		printf("SINLE HIP troque = %d\n\r", torque);
-		torque = dnx_hips_knees.getValue(18, AX_PRESENT_LOAD);
-		torque = dnx_hips_knees.getValue(19, AX_PRESENT_LOAD);
-		torque = dnx_hips_knees.getValue(20, AX_PRESENT_LOAD);
-		torque = dnx_hips_knees.getValue(21, AX_PRESENT_LOAD);
-		torque = dnx_hips_knees.getValue(22, AX_PRESENT_LOAD);
-		printf("AVERAGE HIP troque = %d\n\r", torque/6);
-		wait(2);
-	}
-
-*/
 
 /*
 	// INIT ROS
