@@ -1,6 +1,6 @@
 #include "Robot.h"
 
-const double Robot::wait_time_ = 0.5;
+const double Robot::wait_time_ = 0.3;
 const double Robot::ef_raise_ = 5;
 
 Robot::Robot(Master* pixhawk_in, unordered_map<int, DnxHAL*>& servo_map, double height_in, const BodyParams& robot_params, wkq::RobotState_t state_in /*= wkq::RS_DEFAULT*/) :

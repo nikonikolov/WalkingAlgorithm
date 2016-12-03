@@ -490,16 +490,16 @@ void Leg::writeAngles(){
 #ifdef DOF3
         joints.arm.setGoalPosition(state.servo_angles.arm);
 #endif
-        joints.hip.setGoalPosition(state.servo_angles.hip);
         joints.knee.setGoalPosition(state.servo_angles.knee);
+        joints.hip.setGoalPosition(state.servo_angles.hip);
     }
     else{
     
 #ifdef DOF3
         joints.arm.setGoalPosition(-state.servo_angles.arm);
 #endif
-        joints.hip.setGoalPosition(-state.servo_angles.hip);
         joints.knee.setGoalPosition(-state.servo_angles.knee);
+        joints.hip.setGoalPosition(-state.servo_angles.hip);
     }
 
     if(debug_) printf("Leg: done writeAngles\n\r");

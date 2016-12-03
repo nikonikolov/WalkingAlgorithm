@@ -85,7 +85,7 @@ ServoJoint::ServoJoint(int ID_in, unordered_map<int, DnxHAL*>& servo_map) : ID(I
 	
 	setReturnLevel(1);	
 	wait_ms(0.1);
-	setGoalVelocity(100);	
+	setGoalVelocity(250);	
 	wait_ms(0.1);
 }
 
@@ -95,7 +95,7 @@ int ServoJoint::getID() const {
 }
 
 int ServoJoint::setID(int newID){
-#ifndef SIMUALTION
+#ifndef SIMULATION
 	return dnx_ptr->setID(ID, newID);
 #else
 	ID = newID;
@@ -104,7 +104,7 @@ int ServoJoint::setID(int newID){
 }
 	
 int ServoJoint::getValue(int address){
-#ifndef SIMUALTION
+#ifndef SIMULATION
 	return dnx_ptr->getValue(ID, address);
 #else
 	return 0;
@@ -112,7 +112,7 @@ int ServoJoint::getValue(int address){
 }
     
 int ServoJoint::setBaud(int rate){
-#ifndef SIMUALTION
+#ifndef SIMULATION
 	return dnx_ptr->setBaud(ID, rate);
 #else
 	return 0;
@@ -120,7 +120,7 @@ int ServoJoint::setBaud(int rate){
 }
     
 int ServoJoint::setReturnLevel(int lvl){
-#ifndef SIMUALTION
+#ifndef SIMULATION
 	return dnx_ptr->setReturnLevel(ID, lvl);
 #else
 	return 0;
@@ -128,7 +128,7 @@ int ServoJoint::setReturnLevel(int lvl){
 }
 
 int ServoJoint::setLED(int colour){
-#ifndef SIMUALTION
+#ifndef SIMULATION
 	return dnx_ptr->setLED(ID, colour);
 #else
 	return 0;
@@ -136,7 +136,7 @@ int ServoJoint::setLED(int colour){
 }
 
 int ServoJoint::setGoalPosition(int angle, bool cash/*=false*/){
-#ifndef SIMUALTION
+#ifndef SIMULATION
 	return dnx_ptr->setGoalPosition(ID, angle, cash);
 #else
 	return 0;
@@ -146,7 +146,7 @@ int ServoJoint::setGoalPosition(int angle, bool cash/*=false*/){
 // angle is in radians
 int ServoJoint::setGoalPosition(double angle, bool cash/*=false*/){
 	if(debug_) printf("%s set to %f\n\r", servo_name.c_str(), wkq::degrees(angle));
-#ifndef SIMUALTION
+#ifndef SIMULATION
 	return dnx_ptr->setGoalPosition(ID, angle, cash);
 #else
 	return 0;
@@ -154,7 +154,7 @@ int ServoJoint::setGoalPosition(double angle, bool cash/*=false*/){
 }
 
 int ServoJoint::setGoalVelocity(int velocity){
-#ifndef SIMUALTION
+#ifndef SIMULATION
 	return dnx_ptr->setGoalVelocity(ID, velocity);
 #else
 	return 0;
@@ -162,7 +162,7 @@ int ServoJoint::setGoalVelocity(int velocity){
 }
 
 int ServoJoint::setGoalTorque(int torque){
-#ifndef SIMUALTION
+#ifndef SIMULATION
 	return dnx_ptr->setGoalTorque(ID, torque);
 #else
 	return 0;
@@ -170,7 +170,7 @@ int ServoJoint::setGoalTorque(int torque){
 }
 
 int ServoJoint::setPunch(int punch){
-#ifndef SIMUALTION
+#ifndef SIMULATION
 	return dnx_ptr->setPunch(ID, punch);
 #else
 	return 0;
@@ -178,7 +178,7 @@ int ServoJoint::setPunch(int punch){
 }
 
 int ServoJoint::action(int arg){
-#ifndef SIMUALTION
+#ifndef SIMULATION
 	return dnx_ptr->action(ID);
 #else
 	return 0;
@@ -189,14 +189,14 @@ void ServoJoint::operator=(const ServoJoint& obj_in){
 	if(this != &obj_in){
 		this->ID 			= obj_in.ID;
 		this->servo_name 	= obj_in.servo_name;
-
+#ifndef SIMULATION
 		this->dnx_ptr 		= obj_in.dnx_ptr;
-
+#endif
 	}
 }
 
 
-#ifdef SIMUALTION
+#ifdef SIMULATION
 void wait(int time){}
 void wait_ms(int time){}
 #endif

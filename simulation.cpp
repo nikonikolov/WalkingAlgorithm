@@ -27,6 +27,7 @@ int main(){
 	Master* pixhawk;
 	BodyParams robot_params;
 	Robot* wk_quad;
+	unordered_map<int, DnxHAL*> servo_map;
 
 #ifdef DOF3
 	robot_params.DIST_CENTER 		= 10.95;
@@ -62,9 +63,9 @@ int main(){
 
 	printf("MAIN: All comms ready\n\r");
 	
-	wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_DEFAULT);					
-	//wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_FLAT_QUAD);					
-	//wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_RECTANGULAR);					
+	wk_quad = new Robot(pixhawk, servo_map, init_height, robot_params, wkq::RS_DEFAULT);					
+	//wk_quad = new Robot(pixhawk, servo_map, init_height, robot_params, wkq::RS_FLAT_QUAD);					
+	//wk_quad = new Robot(pixhawk, servo_map, init_height, robot_params, wkq::RS_RECTANGULAR);					
 
 	printf("MAIN: Robot Initialized\n\r");
 

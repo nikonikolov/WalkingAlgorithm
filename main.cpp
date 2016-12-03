@@ -17,8 +17,8 @@ int main(int argc, char **argv){
 	printf("MAIN started\n\r");
 	int baud, baud_xl320;
 	double init_height;
-	DnxHAL* dnx_hips_knees;
-	DnxHAL* dnx_arms;
+	DnxHAL* front_legs;
+	DnxHAL* back_legs;
 	Master* pixhawk;
 	BodyParams robot_params;
 	Robot* wk_quad;
@@ -34,13 +34,12 @@ int main(int argc, char **argv){
 	robot_params.MAX_HEIGHT = robot_params.FEMUR*sin(wkq::radians(70)) + robot_params.TIBIA;
 	robot_params.compute_squares();
 
-	baud 			= 115200;
-	baud_xl320 		= 1000000; 		
+	baud 			= 10000000;
 	init_height 	= 15.0;	
 	pixhawk 		= new Master();
 
-	dnx_hips_knees 	= new SerialAX12(DnxHAL::Port_t(p9, p10), baud);
-	dnx_arms 		= new SerialXL320(DnxHAL::Port_t(p13, p14), baud_xl320);
+	front_legs 	= new SerialAX12(DnxHAL::Port_t(p9, p10), baud);
+	back_legs 	= new SerialXL320(DnxHAL::Port_t(p13, p14), baud);
 
 #else 
 	robot_params.DIST_CENTER = 10.95 + 2.15;
@@ -51,40 +50,41 @@ int main(int argc, char **argv){
 	robot_params.MAX_HEIGHT = robot_params.TIBIA;
 	robot_params.compute_squares();
 
-	baud 			= 115200;
+	//baud 			= 115200;
+	baud 			= 1000000;
 	init_height 	= robot_params.TIBIA;	
 	pixhawk 		= new Master();
 
-	dnx_hips_knees 	= new SerialAX12(DnxHAL::Port_t(p9, p10), baud);
-	dnx_arms 		= dnx_hips_knees;
+	front_legs 	= new SerialAX12(DnxHAL::Port_t(p9, p10), baud);
+	back_legs 	= new SerialAX12(DnxHAL::Port_t(p13, p14), baud);
+	
+	servo_map[wkq::KNEE_LEFT_FRONT] 	= front_legs;
+	servo_map[wkq::KNEE_LEFT_MIDDLE] 	= back_legs;
+	servo_map[wkq::KNEE_LEFT_BACK] 		= back_legs;
+	servo_map[wkq::KNEE_RIGHT_FRONT] 	= front_legs;
+	servo_map[wkq::KNEE_RIGHT_MIDDLE] 	= front_legs;
+	servo_map[wkq::KNEE_RIGHT_BACK] 	= back_legs;
 
-	servo_map[wkq::KNEE_LEFT_FRONT] 	= dnx_hips_knees;
-	servo_map[wkq::KNEE_LEFT_MIDDLE] 	= dnx_hips_knees;
-	servo_map[wkq::KNEE_LEFT_BACK] 		= dnx_hips_knees;
-	servo_map[wkq::KNEE_RIGHT_FRONT] 	= dnx_hips_knees;
-	servo_map[wkq::KNEE_RIGHT_MIDDLE] 	= dnx_hips_knees;
-	servo_map[wkq::KNEE_RIGHT_BACK] 	= dnx_hips_knees;
-
-	servo_map[wkq::HIP_LEFT_FRONT] 		= dnx_hips_knees;
-	servo_map[wkq::HIP_LEFT_MIDDLE] 	= dnx_hips_knees;
-	servo_map[wkq::HIP_LEFT_BACK] 		= dnx_hips_knees;
-	servo_map[wkq::HIP_RIGHT_FRONT]		= dnx_hips_knees;
-	servo_map[wkq::HIP_RIGHT_MIDDLE] 	= dnx_hips_knees;
-	servo_map[wkq::HIP_RIGHT_BACK] 		= dnx_hips_knees;
+	servo_map[wkq::HIP_LEFT_FRONT] 		= front_legs;
+	servo_map[wkq::HIP_LEFT_MIDDLE] 	= back_legs;
+	servo_map[wkq::HIP_LEFT_BACK] 		= back_legs;
+	servo_map[wkq::HIP_RIGHT_FRONT]		= front_legs;
+	servo_map[wkq::HIP_RIGHT_MIDDLE] 	= front_legs;
+	servo_map[wkq::HIP_RIGHT_BACK] 		= back_legs;
 
 #endif	
 
 	printf("MAIN: All comms ready\n\r");
 
 	wk_quad = new Robot(pixhawk, servo_map, init_height, robot_params, wkq::RS_DEFAULT);					
-	//wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_FLAT_QUAD);					
-	//wk_quad = new Robot(pixhawk, dnx_hips_knees, dnx_arms, init_height, robot_params, wkq::RS_RECTANGULAR);					
+	//wk_quad = new Robot(pixhawk, front_legs, back_legs, init_height, robot_params, wkq::RS_FLAT_QUAD);					
+	//wk_quad = new Robot(pixhawk, front_legs, back_legs, init_height, robot_params, wkq::RS_RECTANGULAR);					
 
 	printf("MAIN: Robot Initialized\n\r");
 
 	wait(10);
-	wk_quad->makeMovement(wkq::RM_HEXAPOD_GAIT, .6);
-	//wk_quad->makeMovement(wkq::RM_ROTATION_HEXAPOD, 0.4);
+	//wk_quad->makeMovement(wkq::RM_HEXAPOD_GAIT, .4);
+	wk_quad->makeMovement(wkq::RM_ROTATION_HEXAPOD, 1);
 
 
 
