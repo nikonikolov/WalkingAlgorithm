@@ -110,6 +110,7 @@ public:
 
 	static double 			max_step_size;					// max_step_size that will be used by Robot - must be half of the actual input that is fed to Leg
 	static double 			max_rotation_angle;  			// max_rotation_angle that will be used by Robot - must be half of the actual input that is fed to Leg
+	static double 			ef_raise; 						// amount to raise the end effector by when lifting a leg
 
 private:
 

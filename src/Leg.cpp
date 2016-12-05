@@ -67,8 +67,15 @@ void Leg::setPosition(wkq::RobotState_t robot_state){
             state.legCenter();
             break;             
         case wkq::RS_STANDING_QUAD:
-            state.legStand();
+            // Implementation for robot already standing
+            liftUp(State_t::ef_raise);
             confQuadArms();
+            writeAngles();
+            wait(0.1);
+            lowerDown(State_t::ef_raise);
+
+            //state.legStand();
+            //confQuadArms();
             break;        
         case wkq::RS_FLAT_QUAD:
             confQuadArms();
@@ -443,7 +450,7 @@ void Leg::stepRotate(double angle){
     x_hip = state.params.DIST_CENTER * cos(wkq::PI/2 - angle_offset);
     y_hip = state.params.DIST_CENTER * sin(wkq::PI/2 - angle_offset);
     wkq::Point p_hip(x_hip, y_hip);
-    // Translate the point backwards from the imaginary center
+    // Rotate the point in the opposite direction relative to the center
     p_hip.rotate(-angle/2);
 
     // Calculate new hip_ground_to_ef

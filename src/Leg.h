@@ -103,7 +103,6 @@ public:
 	template<typename MemberFnPtr, typename FnArg>
 	void setServosParam(MemberFnPtr fn, FnArg arg, bool extra=false);
 
-
 private:
 	void confRectangular();
 	void confQuadArms();

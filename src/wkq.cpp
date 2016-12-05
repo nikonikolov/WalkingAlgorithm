@@ -52,7 +52,8 @@ void wkq::Point::translate(const Point& p2){
 
 
 void wkq::Point::rotate(double delta_arg){
-	arg += delta_arg;
+	arg -= delta_arg;
+	//arg += delta_arg;
 	update_rect_coord();
 }
 
