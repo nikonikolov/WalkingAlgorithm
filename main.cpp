@@ -76,15 +76,24 @@ int main(int argc, char **argv){
 
 	printf("MAIN: All comms ready\n\r");
 
-	wk_quad = new Robot(pixhawk, servo_map, init_height, robot_params, wkq::RS_DEFAULT);					
-	//wk_quad = new Robot(pixhawk, front_legs, back_legs, init_height, robot_params, wkq::RS_FLAT_QUAD);					
-	//wk_quad = new Robot(pixhawk, front_legs, back_legs, init_height, robot_params, wkq::RS_RECTANGULAR);					
+	wk_quad = new Robot(pixhawk, servo_map, init_height, robot_params, wkq::RS_FLAT_QUAD);					
+	//wk_quad = new Robot(pixhawk, servo_map, init_height, robot_params, wkq::RS_DEFAULT);
+	
+	//wk_quad = new Robot(pixhawk, servo_map, init_height, robot_params, wkq::RS_DEFAULT);
+	//wk_quad = new Robot(pixhawk, servo_map, init_height, robot_params, wkq::RS_FLAT_QUAD);					
+	//wk_quad = new Robot(pixhawk, servo_map, init_height, robot_params, wkq::RS_STANDING_QUAD);					
+	
+	//wait(2);
+	//wk_quad->setState(wkq::RS_DEFAULT);
+
 
 	printf("MAIN: Robot Initialized\n\r");
 
-	wait(10);
-	//wk_quad->makeMovement(wkq::RM_HEXAPOD_GAIT, .4);
-	wk_quad->makeMovement(wkq::RM_ROTATION_HEXAPOD, 1);
+	//wait(10);
+	//wk_quad->makeMovement(wkq::RM_HEXAPOD_GAIT, .7);
+	//wk_quad->setState(wkq::RS_STANDING_QUAD);
+	//wait(1);
+	//wk_quad->setState(wkq::RS_FLAT_QUAD);
 
 
 

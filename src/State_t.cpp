@@ -14,7 +14,7 @@ DynamicVars State_t::default_pos_vars;
 bool State_t::default_pos_calculated = false;
 double State_t::max_step_size = 0;
 double State_t::max_rotation_angle = 0;
-double State_t::ef_raise = 5.0;
+double State_t::ef_raise = 3.0;
 
 
 /*  @ Notes:

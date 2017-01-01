@@ -69,8 +69,12 @@ int main(){
 
 	printf("MAIN: Robot Initialized\n\r");
 
-	wk_quad->makeMovement(wkq::RM_HEXAPOD_GAIT, 1.0);
-	//wk_quad->makeMovement(wkq::RM_ROTATION_HEXAPOD, 1.0);
+	wk_quad->makeMovement(wkq::RM_HEXAPOD_GAIT, .7);
+	wk_quad->setState(wkq::RS_STANDING_QUAD);
+	//wk_quad->makeMovement(wkq::RM_ROTATION_HEXAPOD, 1);
+	//wk_quad->makeMovement(wkq::RM_ROTATION_HEXAPOD, 1);
+	wait(1);
+	wk_quad->setState(wkq::RS_FLAT_QUAD);
 
 
 	return 0;

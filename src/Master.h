@@ -36,6 +36,11 @@ private:
 #endif
     int baud;
     double bit_period_;
+
+    int call=0;
+    int steps1=20;
+    int steps2=20;
+    int steps3=20;
 };
 
 

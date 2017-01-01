@@ -138,7 +138,8 @@ void Leg::liftUp(double height){
 #ifdef DOF3
     state.servo_angles.knee = wkq::PI - state.servo_angles.knee + acos(1 - pow(height,2) / state.params.TIBIA_SQ); 
 #else
-    state.servo_angles.knee -= 2*asin( sqrt(2)/2 * height/ state.params.TIBIA); 
+    state.servo_angles.knee = wkq::radians(50);
+    //state.servo_angles.knee = 2*asin( sqrt(2)/2 * height/ state.params.TIBIA); 
 #endif
 }
 

@@ -1,6 +1,7 @@
 #include "Robot.h"
 
-const double Robot::wait_time_ = 0.3;
+const double Robot::wait_time_ = 0.1;
+//const double Robot::wait_time_ = 1;
 const double Robot::ef_raise_ = State_t::ef_raise;
 
 Robot::Robot(Master* pixhawk_in, unordered_map<int, DnxHAL*>& servo_map, double height_in, const BodyParams& robot_params, wkq::RobotState_t state_in /*= wkq::RS_DEFAULT*/) :
@@ -45,8 +46,8 @@ void Robot::makeMovement(RobotMovement_t movement, double coeff){
 	bool continue_movement;
 	int tripod_up, tripod_down;
 
-	void (Tripod::*body_forward)(double);
-	void (Tripod::*step_forward)(double);
+	void (Tripod::*move_body)(double);
+	void (Tripod::*make_step)(double);
 	void (Tripod::*finish_step)();
 
 	if(coeff < -1.0) coeff = -1.0;
@@ -60,22 +61,22 @@ void Robot::makeMovement(RobotMovement_t movement, double coeff){
 
 	switch(movement){
 		case wkq::RM_HEXAPOD_GAIT:
-			body_forward 	= &Tripod::bodyForward;
-			step_forward 	= &Tripod::stepForward;
+			move_body 		= &Tripod::bodyForward;
+			make_step 		= &Tripod::stepForward;
 			finish_step 	= &Tripod::finishStep;
-			move_arg = coeff*max_step_size;
+			move_arg  		= coeff*max_step_size;
 			break;
 		case wkq::RM_RECTANGULAR_GAIT:
-			body_forward 	= &Tripod::bodyForwardRectangularGait;
-			step_forward 	= &Tripod::stepForwardRectangularGait;
+			move_body 		= &Tripod::bodyForwardRectangularGait;
+			make_step 		= &Tripod::stepForwardRectangularGait;
 			finish_step 	= &Tripod::finishStepRectangularGait;
-			move_arg = coeff*max_step_size;
+			move_arg 		= coeff*max_step_size;
 			break;
 		case wkq::RM_ROTATION_HEXAPOD:
-			body_forward 	= &Tripod::bodyRotate;
-			step_forward 	= &Tripod::stepRotate;
+			move_body	 	= &Tripod::bodyRotate;
+			make_step 		= &Tripod::stepRotate;
 			finish_step 	= &Tripod::finishStep;
-			move_arg = coeff*max_rotation_angle;
+			move_arg 		= coeff*max_rotation_angle;
 			break;
 		case wkq::RM_ROTATION_RECTANGULAR:
 			break;
@@ -94,14 +95,13 @@ void Robot::makeMovement(RobotMovement_t movement, double coeff){
 		Tripods[tripod_up].liftUp(ef_raise_);
 		wait(wait_time_);
 
-		//if(i == 3) break;
 		if(first || !continue_movement){
 		//if(first){
 			first = false;
-			(Tripods[tripod_down].*body_forward)(move_arg);
+			(Tripods[tripod_down].*move_body)(move_arg);
 		} 	
 		else{
-			(Tripods[tripod_down].*body_forward)(2*move_arg);
+			(Tripods[tripod_down].*move_body)(2*move_arg);
 		} 
 		//wait(wait_time_);
 
@@ -109,14 +109,14 @@ void Robot::makeMovement(RobotMovement_t movement, double coeff){
 		if(continue_movement){
 			/*
 			if(first){
-				(Tripods[tripod_up].*step_forward)(move_arg);
+				(Tripods[tripod_up].*make_step)(move_arg);
 				first = false;		
 			}
 			else{
-				(Tripods[tripod_up].*step_forward)(2*move_arg);
+				(Tripods[tripod_up].*make_step)(2*move_arg);
 			}	
 			*/
-			(Tripods[tripod_up].*step_forward)(2*move_arg);
+			(Tripods[tripod_up].*make_step)(2*move_arg);
 			std::swap(tripod_up, tripod_down);			// swap the roles of the Tripods
 			wait(wait_time_);
 		}

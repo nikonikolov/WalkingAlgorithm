@@ -78,6 +78,10 @@ public:
 
 	/* ---------------------------------------- RAISE AND LOWER ---------------------------------------- */
 
+	void prepareLiftUp(){
+		state.servo_angles.knee = wkq::PI;
+	}
+
 	void liftUp(double height);				// Lift End Effector in the air
 	void lowerDown(double height);			// Put End Effector straight down
 	void finishStep();						// Put End Effector down with ARM, HIP and KNEE centered
